@@ -45,7 +45,7 @@ RETRY_DELAY    = 2              # seconds between retries
 # Recommendation: 1 hour for academic project.
 # 5 min would hit rate limits and generate 288 snapshots/day.
 # 1 hour = 24 snapshots/day = clean and manageable.
-SNAPSHOT_INTERVAL_MINUTES = 5   # change to 30 for denser data
+SNAPSHOT_INTERVAL_MINUTES = 1   # change to 30 for denser data
 
 # ── Historical data ────────────────────────────────────────────
 # Deribit trades endpoint can go back ~90 days depending on instrument.
@@ -56,7 +56,8 @@ TRADES_CHUNK_DAYS   = 2         # fetch 3 days at a time to avoid timeout
 
 # ── Data cleaning thresholds ───────────────────────────────────
 MIN_BID             = 0.0       # bid must be > this
-MAX_SPREAD_PCT      = 0.40      # spread/mid must be < this (40%)
+MAX_SPREAD_PCT      = 0.25      # spread/mid must be < this (25%) — was 0.40, tightened to cut phantoms
+MIN_MID_PRICE       = 0.0005    # mid must be >= this (≈$42 at $85K spot) — Filter 10
 MIN_OPEN_INTEREST   = 1         # OI must be >= this
 MIN_MONEYNESS       = 0.50      # strike/spot must be >= this
 MAX_MONEYNESS       = 3.00      # strike/spot must be <= this

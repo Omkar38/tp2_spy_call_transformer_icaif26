@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(touch docs/.gitkeep)",
+      "Bash(touch ml/__init__.py)",
+      "Bash(mv files/__init__.py files/backtest.py files/dataset.py files/features.py files/train.py files/transformer.py ml/)",
+      "Bash(rmdir files:*)",
+      "Bash(python -c \"from ml import features, dataset, transformer, train, backtest; print\\(''All ml/ imports OK''\\)\")",
+      "Bash(pip install:*)",
+      "Bash(python -c \":*)"
+    ]
+  }
+}

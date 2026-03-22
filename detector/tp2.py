@@ -120,6 +120,26 @@ def detect_violations(conn: sqlite3.Connection, snapshot_hour: str) -> dict:
             total_cost_pct  = avg_spread_pct * 4 if avg_spread_pct else None
             net_edge        = viol_pct - total_cost_pct if total_cost_pct else None
 
+            # ── Phantom violation gates ──────────────────────────
+            # Gate 1: any single leg spread > 20% → untradeable phantom
+            if valid_spreads and max(valid_spreads) > 0.20:
+                continue
+
+            # Gate 2: any leg mid < MIN_MID_PRICE → near-zero, illiquid
+            mids = [c11, c21, c12, c22]
+            if min(mids) < cfg.MIN_MID_PRICE:
+                continue
+
+            # Gate 3: executable profit must be positive
+            # Long: buy K1T1 at ask, buy K2T2 at ask; sell K1T2 at bid, sell K2T1 at bid
+            ask_k1t1 = c11 * (1 + (r11["spread_pct"] or 0) / 2)
+            ask_k2t2 = c22 * (1 + (r22["spread_pct"] or 0) / 2)
+            bid_k1t2 = c12 * (1 - (r12["spread_pct"] or 0) / 2)
+            bid_k2t1 = c21 * (1 - (r21["spread_pct"] or 0) / 2)
+            executable = (bid_k1t2 * bid_k2t1) - (ask_k1t1 * ask_k2t2)
+            if executable <= 0:
+                continue
+
             # ── Profitability label ──────────────────────────────
             if net_edge is not None:
                 if net_edge > 0:

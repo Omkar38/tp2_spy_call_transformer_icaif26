@@ -107,7 +107,11 @@ def run_cleaning_pass(conn: sqlite3.Connection, snapshot_hour: str = None) -> di
         # ── Filter 6: spread ratio ───────────────────────────────
         spread     = ask - bid
         spread_pct = spread / mid
-        if spread_pct > cfg.MAX_SPREAD_PCT:
+        if spread_pct >= cfg.MAX_SPREAD_PCT:   # >= closes the fence-post: 0.25 is excluded
+            continue
+
+        # ── Filter 10: minimum mid price ─────────────────────────
+        if mid < cfg.MIN_MID_PRICE:
             continue
 
         # ── Filter 7: moneyness range ────────────────────────────
