@@ -81,6 +81,13 @@ MIN_VIOLATION_PCT   = 0.10      # ignore sub-0.1% violations (numerical noise)
 # ── Reversion analysis ─────────────────────────────────────────
 REVERSION_WINDOWS_H = [1, 2, 4, 8, 24, 48]   # hours to check reversion at
 
+# Reversion speed thresholds (hours) — calibrated for 1-minute snapshot frequency
+# On 24/7 crypto (Deribit), genuine arb executes in minutes not hours
+REVERSION_SUPERFAST_H = 0.5       # < 30 minutes → genuine liquid arb
+REVERSION_FAST_H      = 2.0       # 30 min – 2h  → real but execution-constrained
+REVERSION_MEDIUM_H    = 8.0       # 2h – 8h      → regime-locked / structural
+# > 8h = slow,  > 48h without reversion = never
+
 # ── Logging ───────────────────────────────────────────────────
 LOG_LEVEL  = "INFO"
 LOG_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"

@@ -287,11 +287,13 @@ def check_reversions(conn: sqlite3.Connection, current_hour: str):
         hours_elapsed = (current_dt - detected_dt).total_seconds() / 3600
 
         if reverted:
-            if hours_elapsed <= 4:
+            if hours_elapsed <= cfg.REVERSION_SUPERFAST_H:       # 30 minutes
+                speed = "superfast"
+            elif hours_elapsed <= cfg.REVERSION_FAST_H:          # 30 min – 2 hours
                 speed = "fast"
-            elif hours_elapsed <= 24:
+            elif hours_elapsed <= cfg.REVERSION_MEDIUM_H:        # 2 – 8 hours
                 speed = "medium"
-            else:
+            else:                                                # > 8 hours
                 speed = "slow"
         else:
             speed = "not_yet" if hours_elapsed < 48 else "never"

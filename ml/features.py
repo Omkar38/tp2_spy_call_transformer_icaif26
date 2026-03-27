@@ -16,7 +16,7 @@ Two feature streams per violation:
     - Binary flag: is this instrument a leg of the detected violation?
 
 Labels:
-    Binary — fast reversion (<4h) = 1, else 0.
+    Binary — fast reversion (<2h, superfast + fast) = 1, else 0.
     Source: reversions table, revert_speed field.
 """
 
@@ -113,14 +113,15 @@ def get_labeled_violations(conn: sqlite3.Connection) -> list[dict]:
             r.revert_speed
         FROM violations v
         JOIN reversions r ON r.violation_id = v.id
-        WHERE r.revert_speed IN ('fast', 'medium', 'slow', 'never')
+        WHERE r.revert_speed IN ('superfast', 'fast', 'medium', 'slow', 'never')
         GROUP BY v.id
         HAVING MIN(
             CASE r.revert_speed
-                WHEN 'fast'   THEN 1
-                WHEN 'medium' THEN 2
-                WHEN 'slow'   THEN 3
-                WHEN 'never'  THEN 4
+                WHEN 'superfast' THEN 0
+                WHEN 'fast'      THEN 1
+                WHEN 'medium'    THEN 2
+                WHEN 'slow'      THEN 3
+                WHEN 'never'     THEN 4
             END
         )
         ORDER BY v.snapshot_hour ASC
@@ -129,8 +130,8 @@ def get_labeled_violations(conn: sqlite3.Connection) -> list[dict]:
     violations = []
     for r in rows:
         speed = r["revert_speed"]
-        # Binary label: fast reversion (<4h) is the profitable class
-        label = 1 if speed == "fast" else 0
+        # Binary label: fast reversion (<2h) is the profitable class
+        label = 1 if speed in ("superfast", "fast") else 0
 
         violations.append({
             "id":              r["id"],

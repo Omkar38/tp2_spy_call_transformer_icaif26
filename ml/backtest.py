@@ -4,7 +4,7 @@ ml/backtest.py — Backtest DS-CAT predictions against actual reversion outcomes
 Simulates trading TP2 violations flagged by the model:
   - For each violation the model predicts as "fast reversion" (label=1),
     enter the 4-leg arbitrage trade at ask/bid prices.
-  - Track whether the violation actually reverted within 4 hours.
+  - Track whether the violation actually reverted within 2 hours.
   - Compute net PnL after Deribit fees.
 
 Deribit fee structure (as of 2024-2025):
@@ -181,7 +181,7 @@ def backtest(
         revert_speed = "unknown"
         if revert_row:
             revert_speed = revert_row["revert_speed"]
-            actually_reverted = revert_speed == "fast"
+            actually_reverted = revert_speed in ("superfast", "fast")
 
         trade = BacktestTrade(
             violation_id=meta["id"],
