@@ -25,22 +25,37 @@ from processor.features import compute_regime_features
 log = logging.getLogger("tp2")
 
 
-def detect_violations(conn: sqlite3.Connection, snapshot_hour: str) -> dict:
+def detect_violations(conn: sqlite3.Connection, snapshot_hour: str, currency: str = None) -> dict:
     """
     Run TP2 detection for one snapshot hour.
+    Optional currency filter for V2 multi-currency support.
     Returns summary dict with counts.
     """
     # Load clean calls for this hour, grouped by expiry
-    rows = conn.execute("""
-        SELECT expiry, strike, mid_price, spread_pct,
-               moneyness, mark_iv, underlying_price
-        FROM snapshots
-        WHERE snapshot_hour = ?
-          AND is_clean = 1
-          AND option_type = 'C'
-          AND mid_price > 0
-        ORDER BY expiry, strike
-    """, (snapshot_hour,)).fetchall()
+    # V2: optionally filter by currency
+    if currency:
+        rows = conn.execute("""
+            SELECT expiry, strike, mid_price, spread_pct,
+                   moneyness, mark_iv, underlying_price
+            FROM snapshots
+            WHERE snapshot_hour = ?
+              AND currency = ?
+              AND is_clean = 1
+              AND option_type = 'C'
+              AND mid_price > 0
+            ORDER BY expiry, strike
+        """, (snapshot_hour, currency)).fetchall()
+    else:
+        rows = conn.execute("""
+            SELECT expiry, strike, mid_price, spread_pct,
+                   moneyness, mark_iv, underlying_price
+            FROM snapshots
+            WHERE snapshot_hour = ?
+              AND is_clean = 1
+              AND option_type = 'C'
+              AND mid_price > 0
+            ORDER BY expiry, strike
+        """, (snapshot_hour,)).fetchall()
 
     if not rows:
         log.warning(f"No clean data for {snapshot_hour}")
@@ -60,10 +75,10 @@ def detect_violations(conn: sqlite3.Connection, snapshot_hour: str) -> dict:
     # Compute regime features once for this snapshot
     regime = compute_regime_features(conn, snapshot_hour)
 
-    # Sort expiries by calendar order
+    # Sort expiries by calendar order — dynamic parsing, works for any date range
     expiries = sorted(
-        [e for e in surface.keys() if e in cfg.EXPIRY_ORDER],
-        key=lambda e: cfg.EXPIRY_ORDER[e]
+        [e for e in surface.keys() if cfg.parse_expiry_to_date(e) is not None],
+        key=cfg.expiry_sort_key
     )
 
     snap_dt      = datetime.fromisoformat(snapshot_hour)
@@ -72,7 +87,10 @@ def detect_violations(conn: sqlite3.Connection, snapshot_hour: str) -> dict:
 
     for t1, t2 in combinations(expiries, 2):
         # ── CRITICAL: enforce T1 is nearer than T2 ─────────────
-        if cfg.EXPIRY_ORDER[t1] >= cfg.EXPIRY_ORDER[t2]:
+        # Uses dynamic date parsing — works for any historical period
+        t1_date = cfg.parse_expiry_to_date(t1)
+        t2_date = cfg.parse_expiry_to_date(t2)
+        if t1_date is None or t2_date is None or t1_date >= t2_date:
             continue
 
         e1 = surface[t1]
@@ -82,7 +100,7 @@ def detect_violations(conn: sqlite3.Connection, snapshot_hour: str) -> dict:
         if len(common_strikes) < 2:
             continue
 
-        mat_gap = cfg.EXPIRY_ORDER[t2] - cfg.EXPIRY_ORDER[t1]
+        mat_gap = (t2_date - t1_date).days
 
         for i in range(len(common_strikes) - 1):
             k1, k2 = common_strikes[i], common_strikes[i + 1]
@@ -153,6 +171,7 @@ def detect_violations(conn: sqlite3.Connection, snapshot_hour: str) -> dict:
 
             violations.append((
                 snapshot_hour,
+                currency or "BTC",
                 t1, t2, k1, k2,
                 round(c11, 8), round(c21, 8),
                 round(c12, 8), round(c22, 8),
@@ -179,22 +198,49 @@ def detect_violations(conn: sqlite3.Connection, snapshot_hour: str) -> dict:
             ))
 
     # Save violations
+    # Detect V2 schema (has currency column) vs V1
+    has_currency_col = False
+    try:
+        col_info = conn.execute("PRAGMA table_info(violations)").fetchall()
+        has_currency_col = any(c["name"] == "currency" for c in col_info)
+    except Exception:
+        pass
+
     if violations:
-        conn.executemany("""
-            INSERT OR REPLACE INTO violations (
-                snapshot_hour, T1, T2, K1, K2,
-                C_K1_T1, C_K2_T1, C_K1_T2, C_K2_T2,
-                LHS, RHS, violation_pct,
-                maturity_gap, strike_gap, strike_gap_pct,
-                moneyness_K1, moneyness_K2,
-                avg_spread_pct, est_total_cost_pct, net_edge,
-                btc_spot,
-                btc_return_1h, btc_return_24h, realized_vol_24h,
-                iv_level_surface, iv_skew, term_structure_slope,
-                hour_of_day, day_of_week,
-                profitability
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-        """, violations)
+        if has_currency_col:
+            conn.executemany("""
+                INSERT OR REPLACE INTO violations (
+                    snapshot_hour, currency, T1, T2, K1, K2,
+                    C_K1_T1, C_K2_T1, C_K1_T2, C_K2_T2,
+                    LHS, RHS, violation_pct,
+                    maturity_gap, strike_gap, strike_gap_pct,
+                    moneyness_K1, moneyness_K2,
+                    avg_spread_pct, est_total_cost_pct, net_edge,
+                    btc_spot,
+                    btc_return_1h, btc_return_24h, realized_vol_24h,
+                    iv_level_surface, iv_skew, term_structure_slope,
+                    hour_of_day, day_of_week,
+                    profitability
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            """, violations)
+        else:
+            # V1 DB — strip the currency field (index 1) from each row
+            v1_rows = [row[:1] + row[2:] for row in violations]
+            conn.executemany("""
+                INSERT OR REPLACE INTO violations (
+                    snapshot_hour, T1, T2, K1, K2,
+                    C_K1_T1, C_K2_T1, C_K1_T2, C_K2_T2,
+                    LHS, RHS, violation_pct,
+                    maturity_gap, strike_gap, strike_gap_pct,
+                    moneyness_K1, moneyness_K2,
+                    avg_spread_pct, est_total_cost_pct, net_edge,
+                    btc_spot,
+                    btc_return_1h, btc_return_24h, realized_vol_24h,
+                    iv_level_surface, iv_skew, term_structure_slope,
+                    hour_of_day, day_of_week,
+                    profitability
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            """, v1_rows)
         conn.commit()
 
     viol_rate = len(violations) / total_pairs * 100 if total_pairs > 0 else 0
@@ -287,16 +333,16 @@ def check_reversions(conn: sqlite3.Connection, current_hour: str):
         hours_elapsed = (current_dt - detected_dt).total_seconds() / 3600
 
         if reverted:
-            if hours_elapsed <= cfg.REVERSION_SUPERFAST_H:       # 30 minutes
+            if hours_elapsed <= cfg.REVERSION_SUPERFAST_H:
                 speed = "superfast"
-            elif hours_elapsed <= cfg.REVERSION_FAST_H:          # 30 min – 2 hours
+            elif hours_elapsed <= cfg.REVERSION_FAST_H:
                 speed = "fast"
-            elif hours_elapsed <= cfg.REVERSION_MEDIUM_H:        # 2 – 8 hours
+            elif hours_elapsed <= cfg.REVERSION_MEDIUM_H:
                 speed = "medium"
-            else:                                                # > 8 hours
+            else:
                 speed = "slow"
         else:
-            speed = "not_yet" if hours_elapsed < 48 else "never"
+            speed = "not_yet" if hours_elapsed < cfg.REVERSION_NEVER_H else "never"
 
         reversion_rows.append((
             v["id"], current_hour,

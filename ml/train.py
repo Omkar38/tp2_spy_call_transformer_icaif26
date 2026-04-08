@@ -40,7 +40,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim import AdamW
-from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
+from torch.optim.lr_scheduler import CosineAnnealingLR
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -101,27 +101,34 @@ class FocalLoss(nn.Module):
 def compute_focal_alpha(labels: np.ndarray) -> float:
     """
     Compute α (positive class weight) from training labels.
-    α = n_negative / n_total — gives more weight to rare positives.
+
+    We do NOT use raw class frequency (n_neg/n_total) — with 1.33% positives
+    that gives alpha=0.987, making every FN 75x worse than a FP. The model
+    then collapses to predicting everything positive (high recall, near-zero precision).
+
+    Instead we use sqrt of the frequency ratio, capped at [0.6, 0.9].
+    This gives a 3–6x FN/FP cost ratio — meaningful but not catastrophic.
     """
     n_pos = (labels == 1).sum()
     n_neg = (labels == 0).sum()
-    n_total = n_pos + n_neg
-    if n_total == 0 or n_pos == 0:
+    if n_pos == 0:
         return 0.5
-    alpha = n_neg / n_total  # high alpha → upweight positive class
-    return float(np.clip(alpha, 0.1, 0.99))
+    # sqrt of ratio softens the extreme imbalance
+    raw = np.sqrt(n_neg / n_pos) / (1 + np.sqrt(n_neg / n_pos))
+    return float(np.clip(raw, 0.6, 0.9))
 
 
 # ── Evaluation Metrics ────────────────────────────────────────
 
-def compute_metrics(logits: torch.Tensor, targets: torch.Tensor) -> dict:
+def compute_metrics(logits: torch.Tensor, targets: torch.Tensor, threshold: float = 0.5) -> dict:
     """
     Compute classification metrics relevant for rare-event detection.
 
-    Returns dict with: accuracy, precision, recall, f1, auc_proxy
+    threshold: probability cutoff for predicting positive (default 0.5).
+               Use find_best_threshold() on val set to calibrate.
     """
-    preds = logits.argmax(dim=1)
     probs = F.softmax(logits, dim=1)[:, 1]  # P(fast reversion)
+    preds = (probs >= threshold).long()
 
     tp = ((preds == 1) & (targets == 1)).sum().item()
     fp = ((preds == 1) & (targets == 0)).sum().item()
@@ -144,7 +151,28 @@ def compute_metrics(logits: torch.Tensor, targets: torch.Tensor) -> dict:
         "n_total":  total,
         "n_pos":    tp + fn,
         "avg_prob":  round(probs.mean().item(), 4),
+        "threshold": threshold,
     }
+
+
+def find_best_threshold(logits: torch.Tensor, targets: torch.Tensor) -> float:
+    """
+    Sweep thresholds [0.05, 0.95] and return the one maximising F1.
+    Call this on val set logits, then apply the threshold to test set.
+    """
+    probs = F.softmax(logits, dim=1)[:, 1]
+    best_f1, best_t = 0.0, 0.5
+    for t in np.arange(0.05, 0.95, 0.01):
+        preds = (probs >= t).long()
+        tp = ((preds == 1) & (targets == 1)).sum().item()
+        fp = ((preds == 1) & (targets == 0)).sum().item()
+        fn = ((preds == 0) & (targets == 1)).sum().item()
+        p = tp / max(tp + fp, 1)
+        r = tp / max(tp + fn, 1)
+        f1 = 2 * p * r / max(p + r, 1e-8)
+        if f1 > best_f1:
+            best_f1, best_t = f1, float(t)
+    return best_t
 
 
 # ── Training Loop ─────────────────────────────────────────────
@@ -205,10 +233,10 @@ def train(
     criterion = FocalLoss(gamma=gamma, alpha=alpha)
     optimizer = AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-    # Cosine annealing with warm restarts
-    scheduler = CosineAnnealingWarmRestarts(
-        optimizer, T_0=max(epochs // 3, 5), T_mult=2, eta_min=lr * 0.01
-    )
+    # Simple cosine decay: start at max_lr, decay to lr/100 over all epochs.
+    # No warmup — model is small (150K params), doesn't need it.
+    # Steps per epoch not needed — scheduler steps per epoch.
+    scheduler = CosineAnnealingLR(optimizer, T_max=epochs, eta_min=lr * 0.01)
 
     # ── Tracking ──
     history = {"train_loss": [], "val_loss": [], "val_f1": [], "lr": []}
@@ -247,11 +275,11 @@ def train(
             train_loss_accum += loss.item()
             train_batches += 1
 
+        scheduler.step()  # CosineAnnealingLR steps per epoch
+
         train_loss = train_loss_accum / max(train_batches, 1)
         history["train_loss"].append(train_loss)
         history["lr"].append(optimizer.param_groups[0]["lr"])
-
-        scheduler.step()
 
         # ── Validate ──
         val_metrics = None
@@ -260,14 +288,18 @@ def train(
             history["val_loss"].append(val_loss)
             history["val_f1"].append(val_metrics["f1"])
 
-            # Early stopping on F1
+            # Early stopping on F1 (only if patience is set)
             if val_metrics["f1"] > best_val_f1:
                 best_val_f1 = val_metrics["f1"]
                 epochs_no_improve = 0
-                best_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
-                torch.save(best_state, save_path / "best_model.pt")
             else:
                 epochs_no_improve += 1
+
+        # Always save latest checkpoint — val may be a hard regime
+        current_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
+        torch.save(current_state, save_path / "best_model.pt")
+        if not best_state or (val_metrics and val_metrics["f1"] >= best_val_f1):
+            best_state = current_state
 
         # ── Log ──
         val_str = ""
@@ -285,8 +317,8 @@ def train(
             f"lr={optimizer.param_groups[0]['lr']:.6f}"
         )
 
-        # Early stopping
-        if epochs_no_improve >= patience:
+        # Early stopping (disabled when patience=None)
+        if patience is not None and epochs_no_improve >= patience:
             log.info(f"Early stopping at epoch {epoch} (patience={patience})")
             break
 
@@ -299,11 +331,18 @@ def train(
         log.info("Restored best model checkpoint")
 
     # ── Final test evaluation ──
+    # First calibrate threshold on val set, then apply to test
+    best_threshold = 0.5
+    if "val" in loaders:
+        val_logits, val_targets = collect_logits(model, loaders["val"], device)
+        best_threshold = find_best_threshold(val_logits, val_targets)
+        log.info(f"Best threshold (val F1): {best_threshold:.2f}")
+
     test_metrics = None
     if "test" in loaders:
-        _, test_metrics = evaluate(model, loaders["test"], criterion, device)
+        _, test_metrics = evaluate(model, loaders["test"], criterion, device, threshold=best_threshold)
         log.info(
-            f"TEST: F1={test_metrics['f1']:.4f} "
+            f"TEST (threshold={best_threshold:.2f}): F1={test_metrics['f1']:.4f} "
             f"P={test_metrics['precision']:.4f} "
             f"R={test_metrics['recall']:.4f} "
             f"Acc={test_metrics['accuracy']:.4f}"
@@ -337,11 +376,24 @@ def train(
 # ── Evaluation ────────────────────────────────────────────────
 
 @torch.no_grad()
+def collect_logits(model: nn.Module, loader, device: str) -> tuple:
+    """Collect all logits and targets from a loader (no loss computation)."""
+    model.eval()
+    all_logits, all_targets = [], []
+    for temporal, surface, surface_mask, labels in loader:
+        logits = model(temporal.to(device), surface.to(device), surface_mask.to(device))
+        all_logits.append(logits.cpu())
+        all_targets.append(labels)
+    return torch.cat(all_logits), torch.cat(all_targets)
+
+
+@torch.no_grad()
 def evaluate(
     model: nn.Module,
     loader,
     criterion: nn.Module,
     device: str,
+    threshold: float = 0.5,
 ) -> tuple:
     """
     Evaluate model on a data loader.
@@ -370,7 +422,7 @@ def evaluate(
     all_logits  = torch.cat(all_logits)
     all_targets = torch.cat(all_targets)
     avg_loss    = total_loss / max(n_batches, 1)
-    metrics     = compute_metrics(all_logits, all_targets)
+    metrics     = compute_metrics(all_logits, all_targets, threshold=threshold)
 
     return avg_loss, metrics
 

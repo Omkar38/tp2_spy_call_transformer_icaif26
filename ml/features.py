@@ -112,25 +112,28 @@ def get_labeled_violations(conn: sqlite3.Connection) -> list[dict]:
             v.profitability,
             r.revert_speed
         FROM violations v
-        JOIN reversions r ON r.violation_id = v.id
-        WHERE r.revert_speed IN ('superfast', 'fast', 'medium', 'slow', 'never')
-        GROUP BY v.id
-        HAVING MIN(
-            CASE r.revert_speed
-                WHEN 'superfast' THEN 0
-                WHEN 'fast'      THEN 1
-                WHEN 'medium'    THEN 2
-                WHEN 'slow'      THEN 3
-                WHEN 'never'     THEN 4
-            END
-        )
+        JOIN (
+            SELECT violation_id,
+                   revert_speed,
+                   MIN(CASE revert_speed
+                       WHEN 'superfast' THEN 0
+                       WHEN 'fast'      THEN 1
+                       WHEN 'medium'    THEN 2
+                       WHEN 'slow'      THEN 3
+                       WHEN 'never'     THEN 4
+                       ELSE 99 END) AS speed_rank
+            FROM reversions
+            WHERE revert_speed IN ('superfast', 'fast', 'medium', 'slow', 'never')
+            GROUP BY violation_id
+        ) r ON r.violation_id = v.id
+        WHERE r.speed_rank IS NOT NULL
         ORDER BY v.snapshot_hour ASC
     """).fetchall()
 
     violations = []
     for r in rows:
         speed = r["revert_speed"]
-        # Binary label: fast reversion (<2h) is the profitable class
+        # Binary label: fast reversion (≤2 trading days) is the target class
         label = 1 if speed in ("superfast", "fast") else 0
 
         violations.append({

@@ -5,6 +5,9 @@ Takes raw snapshots from DB and applies all filters.
 Fills the derived columns (spread, moneyness, etc.)
 Marks rows is_clean=1 when they pass all checks.
 
+Works for both crypto (Deribit) and equity (Databento SPX) data.
+The same filters apply — price units and thresholds differ by asset class.
+
 Every filter has an explicit reason tied back to the project.
 """
 
@@ -84,24 +87,35 @@ def run_cleaning_pass(conn: sqlite3.Connection, snapshot_hour: str = None) -> di
         oi    = row["open_interest"]
         iv    = row["mark_iv"]
 
-        # ── Filter 1: calls only (for now) ──────────────────────
-        if cfg.CALLS_ONLY and opt != "C":
+        # ── Filter 1: calls only (V1) or both (V2) ───────────────
+        # V2 DB collects both — only filter if using V1
+        calls_only = cfg.CALLS_ONLY
+        # Auto-detect V2: if the snapshots table has a 'currency' column, it's V2
+        if not hasattr(cfg, '_is_v2_detected'):
+            try:
+                col_info = conn.execute("PRAGMA table_info(snapshots)").fetchall()
+                cfg._is_v2_detected = any(c["name"] == "currency" for c in col_info)
+            except Exception:
+                cfg._is_v2_detected = False
+        if cfg._is_v2_detected:
+            calls_only = cfg.CALLS_ONLY_V2
+        if calls_only and opt != "C":
             continue
 
         # ── Filter 2: valid bid ──────────────────────────────────
         if bid is None or bid <= cfg.MIN_BID:
             continue
 
-        # ── Filter 3: valid ask > bid ────────────────────────────
-        if ask is None or ask <= bid:
+        # ── Filter 3: valid ask >= bid (allow zero spread for EOD/ohlcv equity data) ──
+        if ask is None or ask < bid:
             continue
 
         # ── Filter 4: mid is computable ──────────────────────────
         if mid is None or mid <= 0:
             continue
 
-        # ── Filter 5: open interest ──────────────────────────────
-        if oi is None or oi < cfg.MIN_OPEN_INTEREST:
+        # ── Filter 5: open interest (skip if NULL — equity ohlcv often lacks OI) ──
+        if oi is not None and oi < cfg.MIN_OPEN_INTEREST:
             continue
 
         # ── Filter 6: spread ratio ───────────────────────────────

@@ -119,9 +119,24 @@ def compute_regime_features(conn: sqlite3.Connection, snapshot_hour: str) -> dic
         features["iv_skew"] = None
 
     # ── Term structure slope (far IV - near IV) ───────────────
-    # Near = expiries 1-6, Far = expiries 9+
-    near_expiries = [k for k, v in cfg.EXPIRY_ORDER.items() if 1 <= v <= 6]
-    far_expiries  = [k for k, v in cfg.EXPIRY_ORDER.items() if v >= 9]
+    # Near = first 30 days, Far = 90+ days out
+    # Dynamic: works for any date range, not just hardcoded expiry dict
+    all_expiries = [r["expiry"] for r in conn.execute("""
+        SELECT DISTINCT expiry FROM snapshots
+        WHERE snapshot_hour = ? AND is_clean = 1
+    """, (snapshot_hour,)).fetchall()]
+    snap_dt = datetime.fromisoformat(snapshot_hour)
+    near_expiries = []
+    far_expiries = []
+    for exp in all_expiries:
+        exp_dt = cfg.parse_expiry_to_date(exp)
+        if exp_dt is None:
+            continue
+        days_out = (exp_dt - snap_dt).days
+        if 1 <= days_out <= 30:
+            near_expiries.append(exp)
+        elif days_out >= 90:
+            far_expiries.append(exp)
 
     near_ph = ",".join("?" * len(near_expiries))
     far_ph  = ",".join("?" * len(far_expiries))

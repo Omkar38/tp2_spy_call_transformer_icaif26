@@ -233,27 +233,68 @@ def make_dataloaders(
     test_ds: TP2Dataset = None,
     batch_size: int = 32,
     num_workers: int = 0,
+    balanced: bool = True,
+    pos_neg_ratio: float = 0.3,
 ) -> dict:
     """
     Wrap datasets in DataLoaders.
 
+    balanced=True uses WeightedRandomSampler so each training batch contains
+    ~pos_neg_ratio fraction of positives (default 30%). Without this, with
+    1.33% positives the model sees 1 fast violation per 75 slow ones per batch
+    and focal loss cannot compensate — it still converges to predict everything
+    negative (or everything positive when alpha is high).
+
+    pos_neg_ratio=0.3 means ~30% of each batch is positive. This is aggressive
+    but necessary given so few positives (~3K in training). Val/test are never
+    resampled — they stay in chronological order with true class proportions.
+
     num_workers=0 is safest for Colab + SQLite.
-    Shuffle training only — val/test stay in chronological order.
     """
-    loaders = {
-        "train": DataLoader(
+    import torch
+    from torch.utils.data import WeightedRandomSampler
+
+    pin_memory = torch.cuda.is_available()  # only for CUDA, not MPS
+
+    if balanced:
+        labels = train_ds.labels  # numpy array
+        n_pos = (labels == 1).sum()
+        n_neg = (labels == 0).sum()
+        # Weight each sample so positives are sampled at pos_neg_ratio
+        # w_pos / w_neg = pos_neg_ratio / (1 - pos_neg_ratio) * (n_neg / n_pos)
+        w_pos = (pos_neg_ratio / max(n_pos, 1))
+        w_neg = ((1 - pos_neg_ratio) / max(n_neg, 1))
+        weights = np.where(labels == 1, w_pos, w_neg).astype(np.float64)
+        weights = weights / weights.sum()  # normalise to sum=1
+        sampler = WeightedRandomSampler(
+            weights=torch.from_numpy(weights).double(),
+            num_samples=len(train_ds),
+            replacement=True,
+        )
+        log.info(
+            f"Balanced sampler: n_pos={n_pos}, n_neg={n_neg}, "
+            f"target_pos_rate={pos_neg_ratio:.0%} per batch"
+        )
+        train_loader = DataLoader(
+            train_ds, batch_size=batch_size, sampler=sampler,
+            num_workers=num_workers, pin_memory=pin_memory, drop_last=True,
+        )
+    else:
+        train_loader = DataLoader(
             train_ds, batch_size=batch_size, shuffle=True,
-            num_workers=num_workers, pin_memory=True, drop_last=True,
-        ),
-    }
+            num_workers=num_workers, pin_memory=pin_memory, drop_last=True,
+        )
+
+    loaders = {"train": train_loader}
+
     if val_ds and len(val_ds) > 0:
         loaders["val"] = DataLoader(
             val_ds, batch_size=batch_size, shuffle=False,
-            num_workers=num_workers, pin_memory=True,
+            num_workers=num_workers, pin_memory=pin_memory,
         )
     if test_ds and len(test_ds) > 0:
         loaders["test"] = DataLoader(
             test_ds, batch_size=batch_size, shuffle=False,
-            num_workers=num_workers, pin_memory=True,
+            num_workers=num_workers, pin_memory=pin_memory,
         )
     return loaders

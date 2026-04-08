@@ -8,10 +8,13 @@ SQLite is perfect here:
 - One file you can share with your team
 
 Schema:
-  snapshots   → hourly surface snapshots (one row per instrument per hour)
-  trades      → executed trades from Deribit history
+  snapshots   → surface snapshots (one row per instrument per snapshot)
+  trades      → executed trades (Deribit or Databento)
   violations  → detected TP2 violations with features
   reversions  → reversion labels (filled in as time passes)
+
+Multi-asset: config.DB_PATH points to asset-specific DB (tp2_crypto.db / tp2_equity.db).
+The schema is identical — the asset class context comes from which DB file you open.
 """
 
 import sqlite3
@@ -25,9 +28,14 @@ import config as cfg
 log = logging.getLogger("db")
 
 
-def get_connection() -> sqlite3.Connection:
-    """Get a DB connection with WAL mode for concurrent reads."""
-    conn = sqlite3.connect(cfg.DB_PATH, check_same_thread=False)
+def get_connection(db_path=None) -> sqlite3.Connection:
+    """Get a DB connection with WAL mode for concurrent reads.
+
+    Args:
+        db_path: Override DB path. Defaults to config.DB_PATH (asset-class-specific).
+    """
+    path = db_path or cfg.DB_PATH
+    conn = sqlite3.connect(path, check_same_thread=False)
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
     conn.row_factory = sqlite3.Row   # lets you access columns by name
