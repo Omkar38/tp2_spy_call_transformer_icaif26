@@ -1,0 +1,121 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.85in]{geometry}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\title{T1 All 2024 Violations: Monthly Fixed-Gross Backtest}
+\author{FinalQuant}
+\date{May 2026}
+
+\begin{document}
+\maketitle
+
+\section{Setup}
+
+This report is for the separate no-ML comparison strategy:
+
+\begin{itemize}
+  \item Test year: 2024 only
+  \item Strategy: \texttt{T1}
+  \item Trade rule: trade every valid/labeled 2024 \texttt{T1} violation row
+  \item Gross exposure: \$1,000 per accepted trade
+  \item Input file: \texttt{reports/t1\_all\_violations/t1\_all\_2024\_valid\_trades.csv}
+\end{itemize}
+
+\section{Overall Result}
+
+\begin{center}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+2024 T1 violation candidates & 1,905,494 \\
+Valid/traded 2024 T1 rows & 499,801 \\
+Invalid/skipped 2024 T1 rows & 1,405,693 \\
+Net PnL & \$3,591,186.72 \\
+Average return & 0.72\% \\
+Median return & -3.63\% \\
+Win rate & 28.95\% \\
+Profit factor & 1.0899 \\
+Max drawdown & -\$7,242,614.43 \\
+Daily Sharpe-like ratio & 0.3043 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Month-Wise Result}
+
+\begin{center}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Month & Trades & Monthly PnL & Cumulative PnL & Avg Return \\
+\midrule
+Jan & 42,226 & -\$1,148,139 & -\$1,148,139 & -2.72\% \\
+Feb & 56,942 & -\$3,904,992 & -\$5,053,130 & -6.86\% \\
+Mar & 41,408 & -\$1,565,798 & -\$6,618,929 & -3.78\% \\
+Apr & 45,986 & \$3,258,229 & -\$3,360,699 & 7.09\% \\
+May & 22,055 & -\$828,241 & -\$4,188,940 & -3.76\% \\
+Jun & 18,083 & -\$1,494,139 & -\$5,683,080 & -8.26\% \\
+Jul & 73,072 & \$11,288,440 & \$5,605,360 & 15.45\% \\
+Aug & 28,490 & \$2,466,830 & \$8,072,190 & 8.66\% \\
+Sep & 33,555 & -\$742,427 & \$7,329,763 & -2.21\% \\
+Oct & 35,256 & -\$991,015 & \$6,338,748 & -2.81\% \\
+Nov & 30,605 & \$350,296 & \$6,689,044 & 1.14\% \\
+Dec & 72,123 & -\$3,097,858 & \$3,591,187 & -4.30\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Month & Monthly PnL & Relative scale \\
+\midrule
+Jan & -\$1.15M & \textcolor{red}{\rule{1.0cm}{7pt}}\\
+Feb & -\$3.90M & \textcolor{red}{\rule{3.5cm}{7pt}}\\
+Mar & -\$1.57M & \textcolor{red}{\rule{1.4cm}{7pt}}\\
+Apr & \$3.26M & \textcolor{green!50!black}{\rule{2.9cm}{7pt}}\\
+May & -\$0.83M & \textcolor{red}{\rule{0.7cm}{7pt}}\\
+Jun & -\$1.49M & \textcolor{red}{\rule{1.3cm}{7pt}}\\
+Jul & \$11.29M & \textcolor{green!50!black}{\rule{10.0cm}{7pt}}\\
+Aug & \$2.47M & \textcolor{green!50!black}{\rule{2.2cm}{7pt}}\\
+Sep & -\$0.74M & \textcolor{red}{\rule{0.7cm}{7pt}}\\
+Oct & -\$0.99M & \textcolor{red}{\rule{0.9cm}{7pt}}\\
+Nov & \$0.35M & \textcolor{green!50!black}{\rule{0.3cm}{7pt}}\\
+Dec & -\$3.10M & \textcolor{red}{\rule{2.7cm}{7pt}}\\
+\bottomrule
+\end{tabular}
+\caption{Month-wise fixed-gross PnL for trading all valid 2024 T1 violation rows. July dominates the full-year positive result.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Month & Cumulative PnL & Relative scale \\
+\midrule
+Jan & -\$1.15M & \textcolor{red}{\rule{1.4cm}{7pt}}\\
+Feb & -\$5.05M & \textcolor{red}{\rule{6.3cm}{7pt}}\\
+Mar & -\$6.62M & \textcolor{red}{\rule{8.2cm}{7pt}}\\
+Apr & -\$3.36M & \textcolor{red}{\rule{4.2cm}{7pt}}\\
+May & -\$4.19M & \textcolor{red}{\rule{5.2cm}{7pt}}\\
+Jun & -\$5.68M & \textcolor{red}{\rule{7.0cm}{7pt}}\\
+Jul & \$5.61M & \textcolor{green!50!black}{\rule{6.9cm}{7pt}}\\
+Aug & \$8.07M & \textcolor{green!50!black}{\rule{10.0cm}{7pt}}\\
+Sep & \$7.33M & \textcolor{green!50!black}{\rule{9.1cm}{7pt}}\\
+Oct & \$6.34M & \textcolor{green!50!black}{\rule{7.9cm}{7pt}}\\
+Nov & \$6.69M & \textcolor{green!50!black}{\rule{8.3cm}{7pt}}\\
+Dec & \$3.59M & \textcolor{green!50!black}{\rule{4.5cm}{7pt}}\\
+\bottomrule
+\end{tabular}
+\caption{Month-end cumulative PnL path for the T1 all-violations comparison strategy.}
+\end{figure}
+
+\section{Comparison Note}
+
+The ML-selected fixed-gross benchmark traded 6,132 rows and produced \$524,095.82 net PnL with a 45.58\% win rate and 1.6530 profit factor. The T1 all-violations comparison traded 499,801 rows and produced larger total dollars, but with much weaker average return, win rate, profit factor, and drawdown.
+
+\end{document}

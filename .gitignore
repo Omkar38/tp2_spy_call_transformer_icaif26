@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+
+data/processed/*.parquet
+data/features/*.parquet
+data/labels/*.parquet
+data/models/*.joblib
+reports/tables/*.csv
+reports/tables/*.json
+
+# Large raw/generated artifacts exceed GitHub's normal file size limits.
+archive/*.json
+reports/*/*valid*_trades.csv
