@@ -1,0 +1,9 @@
+{
+  "trades": 0,
+  "net_pnl": 0.0,
+  "avg_return": NaN,
+  "median_return": NaN,
+  "win_rate": NaN,
+  "profit_factor": NaN,
+  "max_drawdown": NaN
+}

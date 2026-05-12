@@ -1,0 +1,119 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.85in]{geometry}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\title{K1 All 2024 Violations: Monthly Fixed-Gross Backtest}
+\author{FinalQuant}
+\date{May 2026}
+
+\begin{document}
+\maketitle
+
+\section{Setup}
+
+\begin{itemize}
+  \item Test year: 2024 only
+  \item Strategy: \texttt{K1}
+  \item Trade rule: trade every valid/labeled 2024 row for this strategy
+  \item ML selection: none
+  \item Gross exposure: \$1,000 per accepted trade
+\end{itemize}
+
+\section{Overall Result}
+
+\begin{center}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Metric & Value \\
+\midrule
+2024 candidates & 1,905,494 \\
+Valid/traded rows & 521,974 \\
+Invalid/skipped rows & 1,383,520 \\
+Net PnL & -\$12,812,181 \\
+Average return & -2.45\% \\
+Median return & -2.00\% \\
+Win rate & 30.59\% \\
+Profit factor & 0.7460 \\
+Max drawdown & -\$24,889,120 \\
+Daily Sharpe-like ratio & -1.0198 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Month-Wise Result}
+
+\begin{center}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Month & Trades & Monthly PnL & Cumulative PnL & Avg Return \\
+\midrule
+Jan & 45,834 & -\$1,718,643 & -\$1,718,643 & -3.75\% \\
+Feb & 59,391 & \$242,824 & -\$1,475,819 & 0.41\% \\
+Mar & 40,110 & \$1,734,636 & \$258,816 & 4.32\% \\
+Apr & 49,771 & \$5,933,280 & \$6,192,096 & 11.92\% \\
+May & 23,838 & -\$1,705,359 & \$4,486,738 & -7.15\% \\
+Jun & 19,985 & -\$1,672,883 & \$2,813,855 & -8.37\% \\
+Jul & 75,680 & \$7,172,783 & \$9,986,638 & 9.48\% \\
+Aug & 29,892 & \$1,739,156 & \$11,725,794 & 5.82\% \\
+Sep & 36,286 & -\$1,318,242 & \$10,407,551 & -3.63\% \\
+Oct & 36,405 & -\$360,903 & \$10,046,649 & -0.99\% \\
+Nov & 31,502 & -\$94,030 & \$9,952,619 & -0.30\% \\
+Dec & 73,280 & -\$22,764,799 & -\$12,812,181 & -31.07\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{figure}[h]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Month & Monthly PnL & Relative scale \\
+\midrule
+Jan & -\$1,718,643 & \textcolor{red}{\rule{0.8cm}{7pt}}\\
+Feb & \$242,824 & \textcolor{green!50!black}{\rule{0.2cm}{7pt}}\\
+Mar & \$1,734,636 & \textcolor{green!50!black}{\rule{0.8cm}{7pt}}\\
+Apr & \$5,933,280 & \textcolor{green!50!black}{\rule{2.6cm}{7pt}}\\
+May & -\$1,705,359 & \textcolor{red}{\rule{0.7cm}{7pt}}\\
+Jun & -\$1,672,883 & \textcolor{red}{\rule{0.7cm}{7pt}}\\
+Jul & \$7,172,783 & \textcolor{green!50!black}{\rule{3.2cm}{7pt}}\\
+Aug & \$1,739,156 & \textcolor{green!50!black}{\rule{0.8cm}{7pt}}\\
+Sep & -\$1,318,242 & \textcolor{red}{\rule{0.6cm}{7pt}}\\
+Oct & -\$360,903 & \textcolor{red}{\rule{0.2cm}{7pt}}\\
+Nov & -\$94,030 & \textcolor{red}{\rule{0.2cm}{7pt}}\\
+Dec & -\$22,764,799 & \textcolor{red}{\rule{10.0cm}{7pt}}\\
+\bottomrule
+\end{tabular}
+\caption{Month-wise fixed-gross PnL for K1 All 2024 Violations.}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Month & Cumulative PnL & Relative scale \\
+\midrule
+Jan & -\$1,718,643 & \textcolor{red}{\rule{1.3cm}{7pt}}\\
+Feb & -\$1,475,819 & \textcolor{red}{\rule{1.2cm}{7pt}}\\
+Mar & \$258,816 & \textcolor{green!50!black}{\rule{0.2cm}{7pt}}\\
+Apr & \$6,192,096 & \textcolor{green!50!black}{\rule{4.8cm}{7pt}}\\
+May & \$4,486,738 & \textcolor{green!50!black}{\rule{3.5cm}{7pt}}\\
+Jun & \$2,813,855 & \textcolor{green!50!black}{\rule{2.2cm}{7pt}}\\
+Jul & \$9,986,638 & \textcolor{green!50!black}{\rule{7.8cm}{7pt}}\\
+Aug & \$11,725,794 & \textcolor{green!50!black}{\rule{9.2cm}{7pt}}\\
+Sep & \$10,407,551 & \textcolor{green!50!black}{\rule{8.1cm}{7pt}}\\
+Oct & \$10,046,649 & \textcolor{green!50!black}{\rule{7.8cm}{7pt}}\\
+Nov & \$9,952,619 & \textcolor{green!50!black}{\rule{7.8cm}{7pt}}\\
+Dec & -\$12,812,181 & \textcolor{red}{\rule{10.0cm}{7pt}}\\
+\bottomrule
+\end{tabular}
+\caption{Month-end cumulative PnL path for K1 All 2024 Violations.}
+\end{figure}
+
+\section{Comparison Note}
+
+This is a no-ML all-violation comparison. It should be compared against the ML-selected fixed-gross benchmark and the other no-ML strategy reports using the same 2024 test period and \$1,000 gross exposure per accepted trade.
+
+\end{document}

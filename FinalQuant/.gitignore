@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+
+# Local environments
+.venv/
+
+# Large raw and generated research artifacts.
+archive/
+data/
+
+# Large trade-level exports. Keep summaries, PDFs, TeX, and scripts.
+reports/**/*_valid_trades.csv
+reports/**/*valid*_trades.csv
+reports/tables/*_selected_trades.csv
+
+# LaTeX build byproducts.
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk

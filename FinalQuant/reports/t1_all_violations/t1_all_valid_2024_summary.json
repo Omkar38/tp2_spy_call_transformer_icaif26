@@ -1,0 +1,32 @@
+{
+  "strategy": "T1",
+  "policy": "all_valid_violations_no_ml",
+  "target_gross_exposure": 1000.0,
+  "trades": 499801,
+  "net_pnl": 3591186.7179552726,
+  "avg_return": 0.007185233158707716,
+  "median_return": -0.03627592734307482,
+  "win_rate": 0.28949321830088376,
+  "profit_factor": 1.0898937815074534,
+  "max_drawdown": -7242614.426233015,
+  "daily_sharpe_like": 0.3043328540998321,
+  "avg_actual_holding_days": 5.352892451195576,
+  "exit_reasons": {
+    "5d": 277391,
+    "pre_expiration": 222410
+  },
+  "by_option_type": {
+    "call": {
+      "trades": 44074,
+      "net_pnl": 912569.0277608244,
+      "avg_return": 0.02070538248765314,
+      "win_rate": 0.20181966692380995
+    },
+    "put": {
+      "trades": 455727,
+      "net_pnl": 2678617.6901944513,
+      "avg_return": 0.005877680475799,
+      "win_rate": 0.29797225093093016
+    }
+  }
+}

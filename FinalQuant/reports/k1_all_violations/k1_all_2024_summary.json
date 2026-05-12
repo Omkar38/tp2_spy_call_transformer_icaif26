@@ -1,0 +1,35 @@
+{
+  "strategy": "K1",
+  "policy": "all_valid_violations_no_ml",
+  "target_gross_exposure": 1000.0,
+  "candidate_2024_violations": 1905494,
+  "valid_traded_2024_violations": 521974,
+  "invalid_skipped_2024_violations": 1383520,
+  "trades": 521974,
+  "net_pnl": -12812180.811995206,
+  "avg_return": -0.024545630265099806,
+  "median_return": -0.020028978983283235,
+  "win_rate": 0.30586580940813146,
+  "profit_factor": 0.746026049138613,
+  "max_drawdown": -24889120.011246312,
+  "daily_sharpe_like": -1.0198247093945292,
+  "avg_actual_holding_days": 5.330960929088422,
+  "exit_reasons": {
+    "5d": 286998,
+    "pre_expiration": 234976
+  },
+  "by_option_type": {
+    "call": {
+      "trades": 56411,
+      "net_pnl": -10238620.046987452,
+      "avg_return": -0.18150041741836614,
+      "win_rate": 0.06128237400506993
+    },
+    "put": {
+      "trades": 465563,
+      "net_pnl": -2573560.7650077567,
+      "avg_return": -0.0055278464246681,
+      "win_rate": 0.33550131775935804
+    }
+  }
+}
