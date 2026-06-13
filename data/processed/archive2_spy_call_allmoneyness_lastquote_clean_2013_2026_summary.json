@@ -1,0 +1,152 @@
+{
+  "archive2_root": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/Archive-2/spy_options_daily",
+  "output": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/data/processed/archive2_spy_call_allmoneyness_lastquote_clean_2013_2026.parquet",
+  "config": {
+    "min_dte": 1,
+    "max_dte": 90,
+    "calls_only": true,
+    "otm_calls_only": false,
+    "use_last_available_quote": true,
+    "min_quote_hour": 15,
+    "min_quote_minute": 55,
+    "max_spread_pct": 0.5,
+    "require_bid_ask": true,
+    "require_positive_bid": true,
+    "require_positive_size": false,
+    "require_positive_open_interest": false,
+    "require_positive_volume": false,
+    "exclude_rate_fallback": false
+  },
+  "years": [
+    {
+      "year": 2013,
+      "raw_rows": 1090018,
+      "deduped_rows": 529719,
+      "duplicate_rows_removed": 560299,
+      "clean_rows": 99129,
+      "raw_sessions": 189,
+      "clean_sessions": 189
+    },
+    {
+      "year": 2014,
+      "raw_rows": 1741109,
+      "deduped_rows": 830554,
+      "duplicate_rows_removed": 910555,
+      "clean_rows": 156479,
+      "raw_sessions": 249,
+      "clean_sessions": 249
+    },
+    {
+      "year": 2015,
+      "raw_rows": 2083775,
+      "deduped_rows": 977614,
+      "duplicate_rows_removed": 1106161,
+      "clean_rows": 181555,
+      "raw_sessions": 250,
+      "clean_sessions": 250
+    },
+    {
+      "year": 2016,
+      "raw_rows": 2406752,
+      "deduped_rows": 1099012,
+      "duplicate_rows_removed": 1307740,
+      "clean_rows": 225307,
+      "raw_sessions": 251,
+      "clean_sessions": 251
+    },
+    {
+      "year": 2017,
+      "raw_rows": 2441126,
+      "deduped_rows": 1214680,
+      "duplicate_rows_removed": 1226446,
+      "clean_rows": 242041,
+      "raw_sessions": 249,
+      "clean_sessions": 249
+    },
+    {
+      "year": 2018,
+      "raw_rows": 3332563,
+      "deduped_rows": 1490252,
+      "duplicate_rows_removed": 1842311,
+      "clean_rows": 340904,
+      "raw_sessions": 248,
+      "clean_sessions": 248
+    },
+    {
+      "year": 2019,
+      "raw_rows": 3836239,
+      "deduped_rows": 1673672,
+      "duplicate_rows_removed": 2162567,
+      "clean_rows": 355517,
+      "raw_sessions": 249,
+      "clean_sessions": 249
+    },
+    {
+      "year": 2020,
+      "raw_rows": 6143825,
+      "deduped_rows": 2338708,
+      "duplicate_rows_removed": 3805117,
+      "clean_rows": 528083,
+      "raw_sessions": 251,
+      "clean_sessions": 251
+    },
+    {
+      "year": 2021,
+      "raw_rows": 6107956,
+      "deduped_rows": 2535312,
+      "duplicate_rows_removed": 3572644,
+      "clean_rows": 567934,
+      "raw_sessions": 250,
+      "clean_sessions": 250
+    },
+    {
+      "year": 2022,
+      "raw_rows": 7062256,
+      "deduped_rows": 2252560,
+      "duplicate_rows_removed": 4809696,
+      "clean_rows": 539482,
+      "raw_sessions": 251,
+      "clean_sessions": 251
+    },
+    {
+      "year": 2023,
+      "raw_rows": 5746810,
+      "deduped_rows": 1928686,
+      "duplicate_rows_removed": 3818124,
+      "clean_rows": 410310,
+      "raw_sessions": 248,
+      "clean_sessions": 248
+    },
+    {
+      "year": 2024,
+      "raw_rows": 6044559,
+      "deduped_rows": 2147976,
+      "duplicate_rows_removed": 3896583,
+      "clean_rows": 483658,
+      "raw_sessions": 236,
+      "clean_sessions": 236
+    },
+    {
+      "year": 2025,
+      "raw_rows": 7119099,
+      "deduped_rows": 2256872,
+      "duplicate_rows_removed": 4862227,
+      "clean_rows": 523904,
+      "raw_sessions": 232,
+      "clean_sessions": 232
+    },
+    {
+      "year": 2026,
+      "raw_rows": 3677988,
+      "deduped_rows": 1314233,
+      "duplicate_rows_removed": 2363755,
+      "clean_rows": 258588,
+      "raw_sessions": 103,
+      "clean_sessions": 103
+    }
+  ],
+  "total_clean_rows": 4912891,
+  "total_raw_rows": 58834075,
+  "total_deduped_rows": 22589850,
+  "total_duplicate_rows_removed": 36244225
+}

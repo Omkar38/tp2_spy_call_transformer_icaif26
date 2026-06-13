@@ -7,9 +7,21 @@ data/processed/*.parquet
 data/features/*.parquet
 data/labels/*.parquet
 data/models/*.joblib
+data/**/*.parquet
+data/**/*.joblib
 reports/tables/*.csv
 reports/tables/*.json
 
 # Large raw/generated artifacts exceed GitHub's normal file size limits.
 archive/*.json
 reports/*/*valid*_trades.csv
+Archive-2/spy_options_daily/year=*/data.parquet
+Archive-2/spy_options_daily/**/*.parquet
+*.pyc
+*.aux
+*.log
+*.out
+*.toc
+*.nav
+*.snm
+*.vrb

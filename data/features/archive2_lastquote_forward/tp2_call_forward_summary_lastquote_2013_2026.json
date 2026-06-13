@@ -1,0 +1,154 @@
+{
+  "input": "data/processed/archive2_spy_call_allmoneyness_lastquote_clean_2013_2026.parquet",
+  "output_dir": "data/features/archive2_lastquote_forward",
+  "combined_output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2013_2026.parquet",
+  "summary_output": "data/features/archive2_lastquote_forward/tp2_call_forward_summary_lastquote_2013_2026.json",
+  "detection_method": "forward_adjusted_round_up",
+  "min_normalized_severity": 0.0001,
+  "max_strikes_per_expiration": 80,
+  "years": [
+    {
+      "year": 2013,
+      "rows_input": 99129,
+      "sessions_input": 189,
+      "rows_violations": 73619,
+      "rows_features": 73619,
+      "sessions_with_violations": 126,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2013.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2014,
+      "rows_input": 156479,
+      "sessions_input": 249,
+      "rows_violations": 14161,
+      "rows_features": 14161,
+      "sessions_with_violations": 158,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2014.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2015,
+      "rows_input": 181555,
+      "sessions_input": 250,
+      "rows_violations": 22101,
+      "rows_features": 22101,
+      "sessions_with_violations": 235,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2015.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2016,
+      "rows_input": 225307,
+      "sessions_input": 251,
+      "rows_violations": 90011,
+      "rows_features": 90011,
+      "sessions_with_violations": 250,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2016.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2017,
+      "rows_input": 242041,
+      "sessions_input": 249,
+      "rows_violations": 121186,
+      "rows_features": 121186,
+      "sessions_with_violations": 246,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2017.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2018,
+      "rows_input": 340904,
+      "sessions_input": 248,
+      "rows_violations": 162873,
+      "rows_features": 162873,
+      "sessions_with_violations": 248,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2018.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2019,
+      "rows_input": 355517,
+      "sessions_input": 249,
+      "rows_violations": 107568,
+      "rows_features": 107568,
+      "sessions_with_violations": 249,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2019.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2020,
+      "rows_input": 528083,
+      "sessions_input": 251,
+      "rows_violations": 370574,
+      "rows_features": 370574,
+      "sessions_with_violations": 250,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2020.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2021,
+      "rows_input": 567934,
+      "sessions_input": 250,
+      "rows_violations": 486076,
+      "rows_features": 486076,
+      "sessions_with_violations": 250,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2021.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2022,
+      "rows_input": 539482,
+      "sessions_input": 251,
+      "rows_violations": 177497,
+      "rows_features": 177497,
+      "sessions_with_violations": 251,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2022.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2023,
+      "rows_input": 410310,
+      "sessions_input": 248,
+      "rows_violations": 169882,
+      "rows_features": 169882,
+      "sessions_with_violations": 248,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2023.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2024,
+      "rows_input": 483658,
+      "sessions_input": 236,
+      "rows_violations": 297226,
+      "rows_features": 297226,
+      "sessions_with_violations": 236,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2024.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2025,
+      "rows_input": 523904,
+      "sessions_input": 232,
+      "rows_violations": 263803,
+      "rows_features": 263803,
+      "sessions_with_violations": 232,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2025.parquet",
+      "status": "completed"
+    },
+    {
+      "year": 2026,
+      "rows_input": 258588,
+      "sessions_input": 103,
+      "rows_violations": 73643,
+      "rows_features": 73643,
+      "sessions_with_violations": 103,
+      "output": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2026.parquet",
+      "status": "completed"
+    }
+  ],
+  "total_rows_features": 2430220,
+  "total_sessions_input": 3256,
+  "total_sessions_with_violations": 3082
+}

@@ -1,0 +1,11 @@
+{
+  "duplicate_by_date_csv": "reports/raw_archive2_eda/tables/raw_duplicate_by_date.csv",
+  "duplicate_examples_csv": "reports/raw_archive2_eda/tables/raw_duplicate_examples_top.csv",
+  "quote_quality_by_date_csv": "reports/raw_archive2_eda/tables/raw_quote_quality_by_date.csv",
+  "missingness_by_date_csv": "reports/raw_archive2_eda/tables/raw_missingness_by_date.csv",
+  "missing_or_skipped_sessions_csv": "reports/raw_archive2_eda/tables/raw_missing_or_skipped_sessions.csv",
+  "skipped_sessions_count": 57,
+  "dates_with_duplicate_contract_days": 2566,
+  "total_duplicate_extra_rows": 36244225,
+  "dates_with_any_missing_key_column": 3256
+}

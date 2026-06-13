@@ -7,7 +7,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 
 from tp2rr2.config import CONFIG
-from tp2rr2.model import DROP_COLUMNS, ID_COLUMNS, split_by_date, train_model
+from tp2rr2.model import DROP_COLUMNS, ID_COLUMNS, MODEL_TYPES, split_by_date, train_model
 
 
 def _training_columns(path) -> list[str]:
@@ -25,6 +25,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", default="data/labels/strategy_training_rows.parquet")
     parser.add_argument("--model-output", default="data/models/lightgbm_strategy_return.joblib")
+    parser.add_argument("--model-type", choices=sorted(MODEL_TYPES), default="lightgbm")
     parser.add_argument("--max-train-rows", type=int, default=None)
     parser.add_argument("--max-validation-rows", type=int, default=None)
     parser.add_argument("--random-state", type=int, default=42)
@@ -42,7 +43,7 @@ def main() -> None:
         train = train.sample(n=args.max_train_rows, random_state=args.random_state)
     if args.max_validation_rows and len(val) > args.max_validation_rows:
         val = val.sample(n=args.max_validation_rows, random_state=args.random_state)
-    metrics = train_model(train, val, CONFIG.paths.root / args.model_output)
+    metrics = train_model(train, val, CONFIG.paths.root / args.model_output, model_type=args.model_type)
     print(metrics)
 
 

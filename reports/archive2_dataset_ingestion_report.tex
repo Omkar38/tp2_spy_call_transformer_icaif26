@@ -1,0 +1,1147 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{graphicx}
+
+\newcommand{\ratebar}[1]{\textcolor{blue!65!black}{\rule{#1mm}{6pt}}}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue
+}
+
+\title{Archive-2 Dataset Audit and Clean Ingestion Report}
+\author{TP2-Inspired SPY Call Option Project}
+\date{June 8, 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Purpose}
+
+This report documents the first integration step for the professor-provided
+\texttt{Archive-2} SPY option dataset. The goal was to inspect whether the new
+2013--2026 dataset is suitable for the publishable call-only American-option
+research project, identify real data caveats, and create a clean derived dataset
+without modifying the raw professor-provided files.
+
+\section*{June 10 Restart: Active Clean Data Layer}
+
+After the raw EDA, we changed the active clean-data assumption. The earlier
+derived datasets required \texttt{quote\_time >= 15:55 ET}. That rule was too
+restrictive for this archive because the API appears to store the latest
+available scraped quote for many contracts even when the timestamp is earlier
+than 15:55. Therefore, the next pipeline rebuild will use the latest available
+quote per contract-day after duplicate collapse, not a hard 15:55 cutoff.
+
+The new active clean file is:
+
+\begin{quote}
+\small\path{data/processed/archive2_spy_call_allmoneyness_lastquote_clean_2013_2026.parquet}
+\end{quote}
+
+This file is derived from the raw professor-provided
+\texttt{Archive-2/spy\_options\_daily/year=*/data.parquet} files. The raw files
+remain unmodified. The cleaning rules are:
+
+\begin{enumerate}
+  \item Collapse raw duplicates to one row per \texttt{quote\_date,
+  contract\_id}, keeping the latest available quote fields and summing duplicate
+  volume rows.
+  \item Keep SPY calls only across all moneyness levels.
+  \item Keep DTE from 1 to 90 calendar days.
+  \item Require bid $>$ 0, ask $>$ bid, and mid $>$ 0.
+  \item Require spread percentage $\leq 50\%$.
+  \item Do not require \texttt{quote\_time >= 15:55}; the retained row is the
+  latest available quote for that contract-day.
+\end{enumerate}
+
+\begin{center}
+\begin{tabular}{lrrrrrr}
+\toprule
+Dataset Version & Rows & Sessions & Duplicate Rows & Call Rows & Min DTE & Max DTE \\
+\midrule
+Old near-close $\geq$15:55 & 804,809 & 3,255 & 0 & 804,809 & 1 & 90 \\
+New last-available quote & 4,912,891 & 3,256 & 0 & 4,912,891 & 1 & 90 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The session count increases by only one date because most dates already had at
+least one valid 15:55-or-later quote. The row count increases substantially
+because many individual option contracts have their latest available quote
+before 15:55 or have a missing quote timestamp but valid bid/ask prices. The
+one added session is November 25, 2022, an early-close style date whose retained
+quotes end around 13:15 ET.
+
+\subsection*{Pipeline To Rebuild From This Data}
+
+The previous day-by-day pipeline is now treated as a prototype. The next build
+will reconstruct the research path from the active last-available dataset in
+the following order:
+
+\begin{enumerate}
+  \item Run forward-adjusted TP2 detection on the new all-call clean panel.
+  \item Create a stable date-independent rectangle key from strikes,
+  expirations, and A/B/C/D option symbols.
+  \item Track violation episodes across consecutive trading dates so the same
+  continuing rectangle is counted once, not once per day.
+  \item Label episode starts for reversion, time-to-reversion, fixed-horizon
+  P\&L, and flexible-exit P\&L.
+  \item Expand episode starts into the five strategy families:
+  \texttt{full4}, \texttt{T1}, \texttt{T2}, \texttt{K1}, and \texttt{K2}.
+  \item Train ML only on point-in-time episode-start features using a
+  leakage-safe rolling walk-forward split by episode start date.
+  \item Backtest one entry per selected episode with invalid-selected accounting,
+  integer sizing, scale-factor caps, liquidity controls, and transaction costs.
+\end{enumerate}
+
+The main methodological correction is episode tracking. If the same TP2
+rectangle violates on multiple consecutive trading days, it should be one
+economic violation episode until it reverts, expires, disappears, or becomes
+untradeable. This prevents inflated violation counts and repeated entries into
+the same continuing mispricing.
+
+\subsection*{First Smoke Test on New Active Data}
+
+A four-session forward-adjusted TP2 detection smoke test was run on the new
+last-available all-call dataset for January 2--5, 2024:
+
+\begin{quote}
+\small\path{data/features/archive2_lastquote_smoke/tp2_call_forward_features_2024_0102_0105.parquet}
+\end{quote}
+
+\begin{center}
+\begin{tabular}{rrrrr}
+\toprule
+Input Rows & Sessions & Violation Rows & Sessions with Violations & Duplicate IDs \\
+\midrule
+7,232 & 4 & 661 & 4 & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This confirms that the existing forward-adjusted TP2 detector can consume the
+new last-available quote panel. The smoke output spans four trading sessions,
+has 122 feature columns, and has normalized severity ranging from 0.000103 to
+0.285714. No ML, label construction, or backtest has been rerun yet on the new
+active data.
+
+\section*{Current Pipeline Architecture}
+
+\begin{center}
+\includegraphics[width=0.98\textwidth]{figures/archive2_pipeline_architecture_detailed.png}
+\end{center}
+
+\section*{Raw Dataset Summary}
+
+The new archive is substantially stronger than the previous JSON archive. It
+contains SPY option data from April 1, 2013 through June 4, 2026, with yearly
+Parquet partitions. The documented source is Databento OPRA consolidated NBBO
+data, with raw SPY close, dividend fields, computed forward/rate fields, and
+Black--Scholes-derived IV/Greeks.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.25\textwidth}p{0.65\textwidth}}
+\toprule
+\textbf{Field Group} & \textbf{Available in Archive-2} \\
+\midrule
+Option identifiers & \texttt{contract\_id}, \texttt{option\_symbol}, expiration, strike, call/put flag \\
+Prices & bid, ask, mid \\
+Tradability & bid size, ask size, daily volume, open interest \\
+Underlying & raw \texttt{spy\_close} \\
+Dividend controls & next ex-dividend date and dividend amount \\
+Model features & implied volatility, delta, theta, vega \\
+Forward/rate inputs & parity-implied forward and risk-free rate \\
+\bottomrule
+\end{longtable}
+
+\section*{Caveats Found}
+
+Three caveats were audited before ingestion.
+
+\subsection*{Skipped Sessions}
+
+\texttt{skipped\_days.txt} contains 56 skipped sessions. Of these, 28 are
+known early-close or half-day style dates such as July 3, Black Friday, and
+Christmas Eve. The remaining 28 dates are normal weekdays in 2024--2025 and
+should be treated as recoverable data gaps, not market-calendar effects. The
+permanent vendor gap documented in \texttt{known\_gaps.txt} is June 18, 2021.
+
+\subsection*{Quote Freshness}
+
+The quote-time caveat is real. Normal full trading days contain many option rows
+whose \texttt{quote\_time} is much earlier than the market close, including
+morning and midday timestamps. This is not only a half-day effect. For a
+publishable TP2-style study, all legs in a detected rectangle should use fresh
+near-close quotes. The derived dataset therefore applies a closing freshness
+filter:
+
+\[
+\texttt{quote\_time} \geq \text{15:55 ET}.
+\]
+
+A stricter 15:58 ET filter can be used later as a robustness check.
+
+\subsection*{Duplicate Rows}
+
+The raw yearly files contain repeated rows for the same
+\texttt{quote\_date, contract\_id}. This appears to come from merging
+unaggregated daily volume records into quote rows. The quote fields are often
+identical, while the volume field can differ. This is not a natural market
+caveat; it is a data-construction issue. The clean ingestion step collapses to
+one row per \texttt{quote\_date, contract\_id} and sums duplicate volume rows.
+
+\section*{Clean Ingestion Added}
+
+Two new project files were added:
+
+\begin{itemize}
+  \item \texttt{src/tp2rr2/archive2\_ingest.py}
+  \item \texttt{scripts/run\_ingest\_archive2.py}
+\end{itemize}
+
+The ingestion script treats \texttt{Archive-2} as immutable raw data. It writes
+cleaned outputs under \texttt{data/processed/}; no professor-provided raw files
+are overwritten or modified.
+
+\section*{Cleaning Rules}
+
+The derived research dataset applies the following filters:
+
+\begin{enumerate}
+  \item Deduplicate to one row per \texttt{quote\_date + contract\_id}.
+  \item Sum duplicate daily volume rows.
+  \item Normalize column names for the existing project pipeline.
+  \item Keep calls only.
+  \item Keep out-of-the-money calls only: strike $>$ raw SPY close.
+  \item Keep DTE from 1 to 90 calendar days.
+  \item Require bid $>$ 0, ask $>$ bid, and mid $>$ 0.
+  \item Require spread percentage $\leq 50\%$.
+  \item Require fresh quote time at or after 15:55 ET.
+\end{enumerate}
+
+\section*{Cleaned Output}
+
+The main cleaned file is:
+
+\begin{center}
+\texttt{data/processed/archive2\_spy\_call\_otm\_clean\_2024\_2026.parquet}
+\end{center}
+
+The summary file is:
+
+\begin{center}
+\texttt{data/processed/archive2\_spy\_call\_otm\_clean\_2024\_2026\_summary.json}
+\end{center}
+
+A full-history cleaned file was later created using the same cleaning rules:
+
+\begin{center}
+\texttt{data/processed/archive2\_spy\_call\_otm\_clean\_2013\_2026.parquet}
+\end{center}
+
+with summary:
+
+\begin{center}
+\texttt{data/processed/archive2\_spy\_call\_otm\_clean\_2013\_2026\_summary.json}
+\end{center}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{rrrrr}
+\toprule
+Year & Raw Rows & Deduped Rows & Clean Rows & Clean Sessions \\
+\midrule
+2024 & 6,044,559 & 2,147,976 & 55,799 & 236 \\
+2025 & 7,119,099 & 2,256,872 & 65,726 & 232 \\
+2026 & 3,677,988 & 1,314,233 & 29,562 & 103 \\
+\midrule
+Total & 16,841,646 & 5,719,081 & 151,087 & 571 \\
+\bottomrule
+\end{tabular}
+\caption{Raw, deduplicated, and cleaned row counts for the 2024--2026 call-only OTM research sample.}
+\end{table}
+
+For the full 2013--2026 sample, the same ingestion rules produced 536,611
+cleaned rows across 3,255 sessions from 58,834,075 raw rows and 22,589,850
+deduplicated contract-date rows. The full-history cleaned dataset passed the
+same validation checks: calls only, OTM only, DTE 1--90, no duplicate
+\texttt{date, contractID} rows, valid bid/ask, and quote times from
+15:55:00--15:59:59 ET.
+
+\section*{Archive-2 Pipeline Files}
+
+The current Archive-2 project pipeline is separated from the older SPY JSON
+pipeline. The files below are part of the new call-only research path:
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.35\textwidth}p{0.55\textwidth}}
+\toprule
+\textbf{File} & \textbf{Role} \\
+\midrule
+\texttt{src/tp2rr2/archive2\_ingest.py} & Clean ingestion utilities for the professor-provided Archive-2 panel. \\
+\texttt{scripts/run\_ingest\_archive2.py} & Command-line runner that creates the cleaned OTM call dataset. \\
+\texttt{data/processed/archive2\_spy\_call\_otm\_clean\_2024\_2026.parquet} & Cleaned call-only OTM dataset used by the new pipeline. \\
+\texttt{data/processed/archive2\_spy\_call\_otm\_clean\_2024\_2026\_summary.json} & Cleaning summary and row-count audit. \\
+\texttt{data/processed/archive2\_spy\_call\_otm\_clean\_2013\_2026.parquet} & Full-history cleaned call-only OTM dataset using the same rules. \\
+\texttt{data/processed/archive2\_spy\_call\_otm\_clean\_2013\_2026\_summary.json} & Full-history cleaning summary and row-count audit. \\
+\texttt{src/tp2rr2/detect\_forward\_tp2.py} & Forward-adjusted TP2 call detector using rounded adjusted strikes. \\
+\texttt{scripts/run\_detect\_archive2\_forward.py} & Command-line runner for forward-adjusted TP2 detection and feature generation. \\
+\texttt{data/features/archive2\_forward/tp2\_call\_forward\_features\_2024\_2026.parquet} & Forward-adjusted TP2 call violation feature table. \\
+\texttt{data/features/archive2\_forward/tp2\_call\_forward\_summary\_2024\_2026.json} & Forward-adjusted detection summary. \\
+\texttt{data/features/archive2\_forward/tp2\_call\_forward\_features\_2013\_2026.parquet} & Full-history forward-adjusted TP2 call violation feature table. \\
+\texttt{data/features/archive2\_forward/tp2\_call\_forward\_summary\_2013\_2026.json} & Full-history forward-adjusted detection summary. \\
+\texttt{reports/archive2\_dataset\_ingestion\_report.tex} & Source for this report. \\
+\texttt{reports/archive2\_dataset\_ingestion\_report.pdf} & PDF version of this report. \\
+\bottomrule
+\end{longtable}
+
+\section*{Forward-Adjusted TP2 Detection}
+
+A main-specification forward-adjusted TP2 detector was added after the clean
+ingestion step. It implements the call inequality motivated by
+Glasserman--Li--Pirjol:
+
+\[
+C(K_1,T_1)C(K_2,T_2)
+\geq
+C(K_1F_{T_2}/F_{T_1},T_2)C(K_2F_{T_1}/F_{T_2},T_1),
+\]
+
+for $T_1 < T_2$ and $K_1/F_{T_1} < K_2/F_{T_2}$. The adjusted strikes are
+rounded up to the nearest available listed strike in the relevant expiration.
+This keeps the two-strike approximation available as a robustness design, while
+making the forward-adjusted condition the primary detection method for the
+publishable Archive-2 pipeline.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{rrrr}
+\toprule
+Year & Violation Rows & Sessions with Violations & Median Normalized Severity \\
+\midrule
+2024 & 13,643 & 182 & 0.087329 \\
+2025 & 37,910 & 194 & 0.097852 \\
+2026 & 9,054 & 88 & 0.111111 \\
+\midrule
+Total & 60,607 & 464 & 0.097473 \\
+\bottomrule
+\end{tabular}
+\caption{Forward-adjusted TP2 call violations detected on the cleaned 2024--2026 Archive-2 sample.}
+\end{table}
+
+The same detector was then run on the full 2013--2026 cleaned dataset.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{rrrr}
+\toprule
+Period & Violation Rows & Sessions with Violations & Median Normalized Severity \\
+\midrule
+2013--2026 & 109,160 & 1,286 & 0.075509 \\
+2024--2026 & 60,607 & 464 & 0.097473 \\
+\bottomrule
+\end{tabular}
+\caption{Forward-adjusted TP2 call detection totals for full-history and recent samples.}
+\end{table}
+
+The full-history output has no duplicate \texttt{violation\_id} values and spans
+June 20, 2013 through June 4, 2026. Violations are sparse in early years and
+increase substantially in 2020 and again in 2024--2026, which should be treated
+as an empirical finding to analyze later rather than assumed to be a model edge.
+
+\subsection*{Yearly Violation Percentages}
+
+The Glasserman--Li--Pirjol-style violation rate is the fraction of candidate
+strike-expiration rectangles that violate TP2, not the fraction of sessions that
+contain at least one violation. This distinction is important because each
+session can contain thousands of candidate rectangles; a low per-candidate
+violation rate can still imply that many sessions contain at least one
+violation.
+
+The table below reports the corrected candidate-rectangle violation rate by
+year:
+
+\begin{center}
+\begin{tabular}{rrrrl}
+\toprule
+Year & Candidate Rectangles & Violations & Candidate Violation \% & Visual Bar \\
+\midrule
+2013 & 38,899 & 19 & 0.0488\% & \ratebar{1.9} \\
+2014 & 75,401 & 30 & 0.0398\% & \ratebar{1.5} \\
+2015 & 198,179 & 146 & 0.0737\% & \ratebar{2.8} \\
+2016 & 224,309 & 282 & 0.1257\% & \ratebar{4.8} \\
+2017 & 102,245 & 130 & 0.1271\% & \ratebar{4.8} \\
+2018 & 658,754 & 1,510 & 0.2292\% & \ratebar{8.7} \\
+2019 & 613,731 & 292 & 0.0476\% & \ratebar{1.8} \\
+2020 & 3,531,543 & 26,653 & 0.7547\% & \ratebar{28.7} \\
+2021 & 1,787,279 & 3,526 & 0.1973\% & \ratebar{7.5} \\
+2022 & 4,946,796 & 10,905 & 0.2204\% & \ratebar{8.4} \\
+2023 & 2,313,380 & 5,060 & 0.2187\% & \ratebar{8.3} \\
+2024 & 2,338,601 & 13,643 & 0.5834\% & \ratebar{22.2} \\
+2025 & 3,568,863 & 37,910 & 1.0622\% & \ratebar{40.4} \\
+2026 & 1,502,185 & 9,054 & 0.6027\% & \ratebar{22.9} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+These corrected rates are consistent with the intuition that TP2 violations are
+rare at the candidate-pair level. The earlier session-incidence view is still
+useful operationally, because it tells us how often the strategy sees at least
+one possible signal, but it should not be called the theoretical violation rate.
+
+For reference, the next table reports the percentage of cleaned trading sessions
+in each year with at least one forward-adjusted TP2 call violation.
+
+\begin{center}
+\begin{tabular}{rrrrl}
+\toprule
+Year & Clean Sessions & Violation Sessions & Session \% & Visual Bar \\
+\midrule
+2013 & 189 & 8 & 4.23\% & \ratebar{2.1} \\
+2014 & 249 & 12 & 4.82\% & \ratebar{2.4} \\
+2015 & 250 & 31 & 12.40\% & \ratebar{6.2} \\
+2016 & 251 & 48 & 19.12\% & \ratebar{9.6} \\
+2017 & 249 & 21 & 8.43\% & \ratebar{4.2} \\
+2018 & 248 & 58 & 23.39\% & \ratebar{11.7} \\
+2019 & 249 & 33 & 13.25\% & \ratebar{6.6} \\
+2020 & 251 & 123 & 49.00\% & \ratebar{24.5} \\
+2021 & 250 & 150 & 60.00\% & \ratebar{30.0} \\
+2022 & 250 & 184 & 73.60\% & \ratebar{36.8} \\
+2023 & 248 & 154 & 62.10\% & \ratebar{31.1} \\
+2024 & 236 & 182 & 77.12\% & \ratebar{38.6} \\
+2025 & 232 & 194 & 83.62\% & \ratebar{41.8} \\
+2026 & 103 & 88 & 85.44\% & \ratebar{42.7} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{rrr}
+\toprule
+Year & Violation Rows & Violation Rows / Clean Rows \\
+\midrule
+2013 & 19 & 0.24\% \\
+2014 & 30 & 0.27\% \\
+2015 & 146 & 0.84\% \\
+2016 & 282 & 1.46\% \\
+2017 & 130 & 0.90\% \\
+2018 & 1,510 & 5.03\% \\
+2019 & 292 & 0.93\% \\
+2020 & 26,653 & 41.57\% \\
+2021 & 3,526 & 7.00\% \\
+2022 & 10,905 & 13.51\% \\
+2023 & 5,060 & 8.63\% \\
+2024 & 13,643 & 24.45\% \\
+2025 & 37,910 & 57.68\% \\
+2026 & 9,054 & 30.63\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The source tables for these rates are saved at
+\texttt{reports/figures/archive2\_forward\_candidate\_violation\_rates\_by\_year.csv}
+and
+\texttt{reports/figures/archive2\_forward\_violation\_rates\_by\_year.csv}.
+
+\subsection*{Yearly Chain Breadth}
+
+The number of TP2 candidate rectangles depends strongly on option-chain breadth:
+how many strikes and expirations are available each session. The cleaned
+OTM-call detection universe shows that recent years contain substantially more
+listed structure than the early sample. This helps explain why 2024--2025 can
+produce more selected TP2 trades even when many individual contracts have low
+or zero reported daily volume.
+
+\begin{center}
+\begin{tabular}{rrrrrr}
+\toprule
+Year & Sessions & Unique Strikes & Unique Expiries & Avg Strikes/Day & Avg Contracts/Day \\
+\midrule
+2013 & 189 & 79 & 49 & 14.1 & 41.3 \\
+2014 & 249 & 94 & 66 & 14.5 & 45.4 \\
+2015 & 250 & 83 & 63 & 21.8 & 69.7 \\
+2016 & 251 & 121 & 84 & 22.5 & 76.7 \\
+2017 & 249 & 108 & 118 & 17.3 & 58.2 \\
+2018 & 248 & 143 & 169 & 28.0 & 121.1 \\
+2019 & 249 & 191 & 174 & 25.4 & 126.0 \\
+2020 & 251 & 269 & 178 & 43.4 & 255.4 \\
+2021 & 250 & 183 & 176 & 35.6 & 201.6 \\
+2022 & 250 & 204 & 184 & 54.2 & 323.0 \\
+2023 & 248 & 156 & 266 & 38.4 & 236.3 \\
+2024 & 236 & 225 & 268 & 36.6 & 236.4 \\
+2025 & 232 & 289 & 268 & 46.6 & 283.3 \\
+2026 & 103 & 199 & 123 & 48.4 & 287.0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The source table is saved at
+\texttt{reports/tables/archive2\_otm\_call\_chain\_breadth\_by\_year.csv}.
+
+Validation checks on the forward-adjusted output:
+
+\begin{itemize}
+  \item 60,607 feature rows were produced from 151,087 cleaned option rows.
+  \item 464 sessions contain at least one forward-adjusted TP2 call violation.
+  \item No duplicate \texttt{violation\_id} values were found.
+  \item The output includes the forward prices, raw adjusted strikes, rounded
+  adjusted strikes, leg-level quote fields, and existing project feature fields.
+\end{itemize}
+
+\section*{Validation Results}
+
+The cleaned file passed the following checks:
+
+\begin{itemize}
+  \item 151,087 rows across 571 sessions.
+  \item No duplicate \texttt{date, contractID} rows.
+  \item Date range: January 2, 2024 through June 4, 2026.
+  \item Calls only.
+  \item DTE range: 1--90.
+  \item All rows are OTM calls.
+  \item Bid/ask validity holds for all rows.
+  \item Maximum spread percentage is 50\%.
+  \item Quote-time range is 15:55:00--15:59:59 ET.
+\end{itemize}
+
+\section*{Post-Ingestion Recheck}
+
+A follow-up audit was run after creating the cleaned dataset.
+
+\begin{itemize}
+  \item No raw \texttt{Archive-2} columns were lost. The cleaned file preserves all
+  original fields and adds normalized project columns such as \texttt{date},
+  \texttt{expiration}, \texttt{contractID}, \texttt{type},
+  \texttt{underlying\_price}, \texttt{spread}, and \texttt{spread\_pct}.
+  \item Important model and control fields survived ingestion: bid, ask, mid,
+  bid/ask size, volume, open interest, raw SPY close, dividend fields, forward,
+  risk-free rate, implied volatility, delta, theta, and vega.
+  \item The cleaned file has no duplicate \texttt{date, contractID} rows.
+  \item The current TP2 detector successfully ran on a four-session smoke test
+  using the cleaned file and produced 238 call-violation feature rows.
+  \item The 15:55 quote-freshness filter is restrictive but not destructive. It
+  keeps 151,087 rows across all 571 available sessions in 2024--2026.
+\end{itemize}
+
+One caution remains: duplicate raw rows often differ only in the daily-volume
+field. The ingestion currently sums duplicate volume values because they appear
+to originate from unaggregated daily-volume records. For liquidity filtering,
+positive-volume indicators are reliable enough for the next stage; exact volume
+magnitudes should be interpreted cautiously until the duplicate-volume source is
+fully validated against vendor documentation or a direct Databento query.
+
+Additional full-history notes:
+
+\begin{itemize}
+  \item 2023 has much weaker positive-open-interest coverage after filtering
+  than surrounding years and should be checked before using OI as a strict model
+  gate.
+  \item 2026 dividend fields are only partly populated because future realized
+  dividend dates and amounts are not fully known in the source fields. For
+  point-in-time backtests, dividend features should be handled as risk controls,
+  not as predictive look-ahead inputs.
+\end{itemize}
+
+\section*{Project Impact}
+
+The new dataset is suitable for the publishable American-style SPY call-option
+project after cleaning. The main research framing should remain:
+
+\begin{quote}
+We use TP2 theory for European call prices as motivation, then study
+TP2-inspired relative-value violations in American-style SPY calls with
+dividend, liquidity, quote freshness, and after-cost trading controls.
+\end{quote}
+
+The current cleaned sample is appropriate for the next pipeline stage:
+forward-adjusted TP2 detection, two-strike robustness, label construction, and
+machine-learning-based trade selection.
+
+\section*{June 8 Full Pipeline Recheck}
+
+A full recheck was run from raw data assumptions through the current
+forward-adjusted feature table.
+
+\begin{itemize}
+  \item The professor-provided raw \texttt{Archive-2} files remain unmodified.
+  \item The old JSON archive was removed from the active path; the new pipeline
+  uses \texttt{Archive-2} Parquet data.
+  \item The full 2013--2026 cleaned file has 536,611 rows across 3,255 sessions,
+  no duplicate \texttt{date, contractID} rows, calls only, OTM calls only, DTE
+  1--90, valid bid/ask, maximum spread percentage 50\%, and no quotes earlier
+  than 15:55 in the retained sample.
+  \item The full forward-adjusted feature file has 109,160 violation rows across
+  1,286 sessions, no duplicate \texttt{violation\_id} values, valid
+  $T_1<T_2$, valid forward-moneyness ordering, and no failed TP2 inequality
+  checks among retained violations.
+  \item Every A/B/C/D entry leg in the forward-adjusted feature table maps back
+  to a retained cleaned quote on the same entry date.
+  \item The corrected candidate-rectangle violation percentages remain the
+  right theoretical rate to report; session incidence should be presented only
+  as an operational signal-frequency statistic.
+\end{itemize}
+
+The recheck also found one important next-stage issue. A label-construction
+smoke test on 100 recent forward-adjusted violations produced only 4 valid
+strategy labels out of 500 expanded strategy rows when using the OTM-only
+cleaned file as the exit quote lookup. This is expected but not acceptable for
+final research labels: a contract that is OTM at signal time can become ATM or
+ITM by the exit date and therefore disappear from an OTM-only exit universe.
+The detection universe should remain OTM call focused, but the exit-quote panel
+must be broader: fresh, valid SPY call quotes across all moneyness levels, still
+deduplicated and bid/ask filtered.
+
+\subsection*{Step 1: Broad Exit Quote Panel}
+
+A broad call-only exit quote panel was created for label construction:
+
+\begin{center}
+\texttt{data/processed/archive2\_spy\_call\_allmoneyness\_clean\_2013\_2026.parquet}
+\end{center}
+
+This file uses the same raw \texttt{Archive-2} source and the same quote-quality
+rules as the OTM detection dataset, but it does not apply the OTM-only filter.
+It keeps valid SPY calls across all moneyness levels. The output has 804,809
+rows across 3,255 sessions, no duplicate \texttt{date, contractID} rows, calls
+only, DTE 1--90, valid bid/ask, maximum spread percentage 50\%, and quote times
+at or after 15:55 in the retained sample. It contains the original 536,611 OTM
+call rows plus 268,198 ATM/ITM call rows for exit pricing.
+
+\subsection*{Step 2: Stable Option Symbol for Exit Lookup}
+
+The first broad-panel label smoke test still produced too few valid labels.
+The cause was not the TP2 detector: \texttt{contract\_id} changed across days for
+the same listed option in the professor-provided data. For example, the same
+OSI option symbol \texttt{SPY 240108C00471000} had different contract IDs on
+January 4 and January 5, 2024. The label pipeline was therefore patched to carry
+\texttt{option\_symbol} on each A/B/C/D leg and to use the option symbol as the
+primary exit lookup key, with contract ID retained only as a fallback.
+
+After this fix, the 100-violation smoke test improved from 10 valid strategy
+rows to 215 valid strategy rows out of 500. The remaining invalid labels are
+mostly genuine target-date quote availability or short-expiration cases.
+
+\subsection*{Step 3: Full 2013--2026 Labels}
+
+The full forward-adjusted feature table was regenerated with A/B/C/D option
+symbols. The violation count remained unchanged at 109,160 rows, confirming
+that the metadata fix did not alter detection math.
+
+Full strategy labels were then built using OTM-entry features and the broad
+all-moneyness call exit panel:
+
+\begin{center}
+\texttt{data/labels/archive2\_forward\_strategy\_training\_rows\_2013\_2026.parquet}
+\end{center}
+
+The label file has 545,800 strategy rows, equal to 109,160 violations times
+five strategy variants. Of these, 105,231 rows have valid realized-return labels
+under the current 5-trading-day/pre-expiration exit rule, a valid-label rate of
+19.28\%.
+
+\begin{center}
+\begin{tabular}{rrrr}
+\toprule
+Strategy & Rows & Valid Labels & Valid \% \\
+\midrule
+K1 & 109,160 & 34,820 & 31.90\% \\
+K2 & 109,160 & 10,948 & 10.03\% \\
+T1 & 109,160 & 12,510 & 11.46\% \\
+T2 & 109,160 & 38,312 & 35.10\% \\
+full4 & 109,160 & 8,641 & 7.92\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The main invalid-label reasons are 326,573 rows with invalid/missing target-date
+quotes and 113,991 rows with no pre-expiration quote day under the current
+horizon rule. This is acceptable for a first training dataset, but the final
+paper backtest should not silently drop these rows after trade selection.
+
+\subsection*{Step 4: Leakage-Safe Baseline Backtest Accounting}
+
+The backtest code was patched so trade selection no longer prefilters the test
+universe on \texttt{is\_valid\_label}. The model now scores the full
+point-in-time candidate universe first; selected trades with missing or invalid
+future exits are counted separately from executable trades. Label construction
+was also patched to retain entry gross exposure for invalid-exit rows, since
+entry exposure is known at decision time.
+
+A first LightGBM baseline was trained only to test the new path, not as a final
+research result. The train/validation split used the existing project dates:
+2019--2022 for training and 2023 for validation. The model used 42,266 training
+rows and 4,843 validation rows, with validation MAE 0.3598 and RMSE 0.6309.
+
+On the 2024 test split, the leakage-safe baseline selected 54 trades. Only 11
+had executable realized exits under the current strict target-date quote rule;
+43 selected rows had invalid or unavailable exits. Executable-trade P\&L was
+\$-103.64 at the current normalized gross-exposure convention, with average
+return -0.94\%, median return -0.12\%, and win rate 45.45\%. This result should
+be interpreted as a pipeline diagnostic. It shows that the next publishable
+step is to define a stronger point-in-time execution and exit policy before
+claiming profitability.
+
+\subsection*{Step 5: Three-Month Rolling ML Backtests}
+
+The one-shot train/validation/test split was replaced with an expanding-window
+rolling experiment. Each test period is a 3-month calendar window. For each
+window, the model trains only on valid realized-return labels from dates before
+the test window, then scores all candidate strategy rows in the next 3-month
+window. Early windows are skipped until at least 500 prior valid labels exist.
+This is not data removal; it is the minimum needed for honest out-of-sample ML
+training.
+
+Two LightGBM rolling variants were run:
+
+\begin{enumerate}
+  \item \textbf{Strict gates}: prediction $>$ 0, normalized severity $\geq$
+  0.0005, max leg spread $\leq$ 25\%, average leg spread $\leq$ 15\%, positive
+  volume, positive open interest.
+  \item \textbf{All-cleaned gates}: prediction $>$ 0, normalized severity
+  $\geq$ 0.0001, max and average spread allowed up to the cleaned-data 50\%
+  limit, no volume/OI minimum. This scores and admits much more of the cleaned
+  candidate universe, while still using only rows that passed the original
+  quote-quality cleaning.
+\end{enumerate}
+
+\begin{center}
+\begin{tabular}{lrrrrr}
+\toprule
+Variant & Completed Windows & Test Rows & Selected & Executable & Net P\&L \\
+\midrule
+Strict gates & 36 & 543,080 & 1,350 & 400 & \$120,523 \\
+All-cleaned gates & 36 & 543,080 & 10,279 & 1,005 & \$903,499 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The strict run selected only 2.49 trades per 1,000 scored test rows. The
+all-cleaned run selected 18.93 trades per 1,000 scored test rows. This explains
+the earlier low trade count: the issue was conservative trade gating, not that
+the dataset or rolling pipeline ignored most rows.
+
+However, the all-cleaned run also exposes the next major research caveat:
+only 1,005 of 10,279 selected trades currently have executable realized exits
+under the strict target-date quote rule. The remaining selected rows are mostly
+\texttt{invalid\_quote} exit cases. Therefore, the promising P\&L numbers should
+be treated as signal diagnostics, not final profitability claims, until the
+exit policy is made more realistic and point-in-time.
+
+\begin{center}
+\begin{tabular}{rrrrr}
+\toprule
+Year & Test Rows & Selected & Executable & Net P\&L \\
+\midrule
+2020 & 133,265 & 1,010 & 221 & \$145,092 \\
+2021 & 17,630 & 874 & 69 & \$69,284 \\
+2022 & 54,525 & 1,663 & 95 & \$15,818 \\
+2023 & 25,300 & 1,049 & 135 & \$154,659 \\
+2024 & 68,215 & 1,463 & 164 & \$162,835 \\
+2025 & 189,550 & 2,615 & 165 & \$208,510 \\
+2026 & 45,270 & 1,008 & 60 & \$143,336 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The rolling outputs are saved under:
+
+\begin{itemize}
+  \item \texttt{reports/rolling\_3m\_lightgbm/}
+  \item \texttt{reports/rolling\_3m\_lightgbm\_all\_cleaned\_gates/}
+\end{itemize}
+
+\subsection*{Step 6: Exact 3/1/2 Walk-Forward Protocol}
+
+The previous rolling test used expanding historical training. A stricter
+walk-forward protocol was then added to match the requested design:
+
+\[
+\text{Train months }1,2,3
+\quad\rightarrow\quad
+\text{Validate month }4
+\quad\rightarrow\quad
+\text{Test months }5,6.
+\]
+
+The window advances by 2 months so the test windows do not overlap. The
+validation month is used to choose the prediction threshold before testing.
+The run starts from June 2013, the first month with detected labels. Early
+windows are still included in the audit table, but are skipped when a 3-month
+training slice has fewer than 20 valid labels or the validation month has no
+valid labels. This is an honest ML limitation caused by sparse early violations,
+not a data-loading failure.
+
+Important implementation facts:
+
+\begin{itemize}
+  \item The label horizon is currently 5 trading days, with fallback to the last
+  quote before the earliest selected expiration.
+  \item Transaction cost is included as \$0.65 per contract per side; each leg
+  pays a round-trip fee of $2 \times 0.65 \times |\text{quantity}|$.
+  \item The model uses 104 numeric features and 5 categorical features. It uses
+  severity, forward-adjusted strike information, leg-level quotes, IV/Greeks,
+  liquidity, moneyness, IV slope/term features, delta gaps, and persistence
+  features.
+  \item Exact option symbols are \emph{not} used as ML features. They are used
+  only as stable quote-lookup keys for exits.
+\end{itemize}
+
+The exact 3/1/2 all-cleaned-gates run produced:
+
+\begin{center}
+\begin{tabular}{rrrrr}
+\toprule
+Completed Windows & Test Rows & Selected & Executable & Net P\&L \\
+\midrule
+55 & 418,155 & 6,027 & 956 & \$268,393 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{rrrrr}
+\toprule
+Year & Test Rows & Selected & Executable & Net P\&L \\
+\midrule
+2020 & 12,725 & 557 & 108 & \$58,636 \\
+2021 & 34,860 & 461 & 40 & \$37,964 \\
+2022 & 37,120 & 918 & 112 & \$3,279 \\
+2023 & 25,575 & 693 & 97 & \$38,282 \\
+2024 & 73,530 & 1,157 & 172 & \$66,941 \\
+2025 & 184,800 & 1,668 & 348 & \$78,528 \\
+2026 & 43,950 & 441 & 48 & \$-16,446 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The exact 3/1/2 protocol is more faithful to short rolling model adaptation,
+but less stable than expanding-window training because only 3 months of labels
+are used for each model fit. The expanding all-cleaned run produced higher
+aggregate P\&L, while the exact 3/1/2 run is more conservative and structurally
+closer to the requested research design.
+
+\begin{center}
+\begin{tabular}{lrrrr}
+\toprule
+Protocol & Test Rows & Selected & Executable & Net P\&L \\
+\midrule
+Expanding strict & 543,080 & 1,350 & 400 & \$120,523 \\
+Expanding all-cleaned & 543,080 & 10,279 & 1,005 & \$903,499 \\
+Exact 3/1/2 all-cleaned & 418,155 & 6,027 & 956 & \$268,393 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\includegraphics[width=0.92\textwidth]{walkforward_3_1_2_lightgbm_all_cleaned_gates/walkforward_yearly_pnl_pil.png}
+\end{center}
+
+\begin{center}
+\includegraphics[width=0.92\textwidth]{walkforward_3_1_2_lightgbm_all_cleaned_gates/walkforward_selected_vs_executable_pil.png}
+\end{center}
+
+The exact walk-forward outputs are saved under:
+
+\begin{itemize}
+  \item \texttt{reports/walkforward\_3\_1\_2\_lightgbm\_all\_cleaned\_gates/}
+  \item \texttt{walkforward\_3\_1\_2\_summary.csv}
+  \item \texttt{walkforward\_3\_1\_2\_yearly\_summary.csv}
+  \item \texttt{walkforward\_3\_1\_2\_window\_table.csv}
+  \item \texttt{walkforward\_3\_1\_2\_cumulative\_pnl.csv}
+  \item \texttt{protocol\_comparison.csv}
+\end{itemize}
+
+\section*{June 9 Moneyness Comparison Extension}
+
+The pipeline was extended from the original OTM-only call universe into a
+controlled moneyness comparison. This was done to test whether the TP2-inspired
+signal is truly strongest in OTM calls, or whether ATM/ITM/all-call universes
+provide stronger publishable evidence. The raw Archive-2 files were not
+modified. A new derived splitter was added:
+\texttt{scripts/build\_archive2\_moneyness\_universes.py}.
+
+The moneyness buckets are defined using strike divided by raw SPY close:
+
+\begin{itemize}
+  \item ITM calls: $K/S < 0.98$.
+  \item ATM calls: $0.98 \leq K/S \leq 1.02$.
+  \item OTM calls: $K/S > 1.02$.
+  \item All calls: all cleaned SPY calls, used as a combined benchmark.
+\end{itemize}
+
+Each bucket was processed independently through the same forward-adjusted TP2
+detector, the same five strategy-label construction, and the same exact 3/1/2
+walk-forward LightGBM protocol. The exit quote panel remained the broad
+all-cleaned call panel, so an exit was not lost merely because a contract moved
+between moneyness regions after entry.
+
+\begin{center}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Universe & Clean Rows & Violations & Valid Labels & Windows & Selected & Executable & Net P\&L \\
+\midrule
+ITM & 90,760 & 1,199 & 45.9\% & 2 & 19 & 2 & \$42 \\
+ATM & 423,116 & 5,555 & 40.7\% & 38 & 774 & 365 & \$7,255 \\
+OTM & 290,933 & 92,458 & 18.4\% & 51 & 4,780 & 780 & \$213,059 \\
+All calls & 804,809 & 115,803 & 21.5\% & 55 & 6,930 & 1,184 & \$362,829 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\includegraphics[width=0.92\textwidth]{figures/moneyness_walkforward_comparison.png}
+\end{center}
+
+The comparison supports a stronger paper framing than an OTM-only study. ITM
+calls are too sparse as a standalone ML universe under the strict $K/S < 0.98$
+definition. ATM calls are executable and positive, but materially weaker than
+OTM. OTM remains the cleanest theoretically motivated universe and produces a
+large positive result. The all-call benchmark produces the largest aggregate
+P\&L, but it also has the largest number of invalid selected trades and mixes
+OTM, ATM, and ITM mechanics. Therefore, the preferred research claim is not
+``all calls are better'' or ``only OTM matters.'' The stronger claim is that
+TP2-inspired trading performance is moneyness-dependent, with OTM as the
+primary clean universe and all-calls as a high-capacity benchmark requiring
+stricter execution robustness.
+
+The new comparison artifacts are saved at:
+
+\begin{itemize}
+  \item \texttt{data/processed/archive2\_moneyness/}
+  \item \texttt{data/features/archive2\_moneyness/}
+  \item \texttt{data/labels/archive2\_moneyness\_strategy\_training\_rows\_*\_2013\_2026.parquet}
+  \item \texttt{reports/moneyness\_walkforward\_3\_1\_2/}
+  \item \texttt{reports/tables/moneyness\_pipeline\_walkforward\_summary.csv}
+  \item \texttt{reports/tables/moneyness\_walkforward\_yearly\_summary.csv}
+\end{itemize}
+
+\section*{June 9 Mixed-Rectangle Moneyness Check}
+
+One important issue with pre-splitting the universe by moneyness is that a TP2
+rectangle has four option legs. A detected rectangle can therefore mix ATM and
+OTM legs, or ITM and ATM legs. The independent ITM/ATM/OTM runs above are valid
+``within-bucket'' tests, but they intentionally exclude mixed-moneyness
+rectangles.
+
+To check whether the ML pipeline was missing useful mixed rectangles, the
+detector was run on the all-call universe first. Each detected rectangle was
+then labelled by the entry-time moneyness of its four legs using
+\texttt{scripts/add\_archive2\_rectangle\_moneyness.py}. These moneyness
+labels are point-in-time features only; they do not use future exits or future
+profit information.
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Rectangle Type & Violations & Share of All-Call Violations \\
+\midrule
+Pure OTM & 89,014 & 76.9\% \\
+Mixed ATM/OTM & 16,660 & 14.4\% \\
+Pure ATM & 5,580 & 4.8\% \\
+Mixed ITM/ATM & 1,972 & 1.7\% \\
+Pure ITM & 1,226 & 1.1\% \\
+Mixed ITM/OTM & 1,076 & 0.9\% \\
+Mixed ITM/ATM/OTM & 275 & 0.2\% \\
+\midrule
+Total & 115,803 & 100.0\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The category-aware all-call label file contains 579,015 strategy rows, exactly
+five candidate strategies for each of the 115,803 violations. The ML feature
+audit confirmed that target and future columns such as
+\texttt{realized\_return}, \texttt{net\_pnl}, \texttt{exit\_date},
+\texttt{is\_valid\_label}, and contract identifiers are excluded from the model
+feature set. The newly added rectangle moneyness fields are retained because
+they are known at entry.
+
+\begin{center}
+\begin{tabular}{lrrrr}
+\toprule
+Rectangle Type & Selected & Executable & Invalid Selected & Net P\&L \\
+\midrule
+Pure OTM & 4,968 & 694 & 4,274 & \$380,026 \\
+Mixed ATM/OTM & 1,342 & 213 & 1,129 & \$17,344 \\
+Pure ATM & 661 & 287 & 374 & -\$1,914 \\
+Pure ITM & 54 & 9 & 45 & -\$491 \\
+Mixed ITM/ATM & 57 & 20 & 37 & -\$771 \\
+Mixed ITM/OTM & 8 & 1 & 7 & -\$177 \\
+Mixed ITM/ATM/OTM & 1 & 1 & 0 & \$195 \\
+\midrule
+Total & 7,091 & 1,225 & 5,866 & \$394,212 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\includegraphics[width=0.92\textwidth]{figures/rectangle_moneyness_category_pnl.png}
+\end{center}
+
+The category-aware all-call run is stronger than the earlier all-call run that
+did not explicitly expose rectangle moneyness to the model:
+
+\begin{center}
+\begin{tabular}{lrrrr}
+\toprule
+Run & Selected & Executable & Invalid Selected & Net P\&L \\
+\midrule
+All calls without explicit rectangle category & 6,930 & 1,184 & 5,746 & \$362,829 \\
+All calls with rectangle category features & 7,091 & 1,225 & 5,866 & \$394,212 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This resolves the main concern about splitting before training. Pure OTM
+rectangles remain the dominant economic source of profit, while mixed ATM/OTM
+rectangles add a meaningful secondary contribution. Pure ATM is more executable
+but negative in this run, and ITM-related rectangles are too small or weak to
+support a standalone claim. For the paper, the clean framing is: detect on all
+calls, label the rectangle moneyness structure, and report that TP2-inspired
+profitability is concentrated in OTM-heavy rectangles rather than uniformly
+across all call moneyness regions.
+
+The remaining execution caveat is the high invalid-selected count. The current
+walk-forward code scores the full test set and reports invalid selected trades
+instead of filtering them away before selection, so there is no future-label
+selection leakage in the test accounting. However, before paper submission the
+strategy should still add stricter liquidity and exit-policy robustness checks,
+including flexible exits rather than only the current five-trading-day target
+exit.
+
+\section*{June 9 Flexible Exit Robustness Check}
+
+The fixed five-trading-day exit is useful as a clean baseline, but it is not a
+complete trading policy. If a selected contract cannot be quoted cleanly on the
+target exit date, the backtest cannot assume an automatic fifth-day sale. A
+stronger paper needs to report this explicitly and test a more realistic exit
+rule.
+
+A separate flexible-exit label builder was therefore added:
+\texttt{src/tp2rr2/flexible\_labels.py} with runner
+\texttt{scripts/run\_flexible\_exit\_labels.py}. The original fixed-exit label
+files were not overwritten. The flexible policy is:
+
+\begin{enumerate}
+  \item Enter only after a TP2 violation is observed.
+  \item For each future trading day, check same-contract quotes for the four
+  rectangle legs.
+  \item Exit on the first valid day when the rectangle no longer violates by the
+  entry threshold, i.e. normalized severity falls to $\leq 0.0001$.
+  \item If no valid reversion appears before the relevant expiration, exit on
+  the latest valid pre-expiration quote for the selected strategy legs.
+  \item If no valid exit quote exists, mark the selected row as invalid rather
+  than silently dropping it before selection.
+\end{enumerate}
+
+This raised the label validity rate from roughly 21.5\% under the fixed
+five-day all-call labels to 42.0\% under flexible exits. The flexible label file
+contains the same 579,015 strategy rows and the same 115,803 violation IDs as
+the fixed-exit file.
+
+During this check, two future-known label fields were also removed from the ML
+feature set: \texttt{actual\_holding\_days} and
+\texttt{exit\_normalized\_severity}. The corrected model exclusion list now
+drops target, exit, validity, and identifier fields before training. The
+fixed-exit category-aware model was rerun after this correction, so the
+comparison below is leakage-clean.
+
+\begin{center}
+\begin{tabular}{lrrrrr}
+\toprule
+Exit Policy & Completed Windows & Selected & Executable & Invalid Selected & Net P\&L \\
+\midrule
+Fixed 5-day, corrected no-leakage & 55 & 7,304 & 1,192 & 6,112 & \$384,129 \\
+Flexible reversion/fallback & 57 & 5,597 & 2,309 & 3,288 & \$195,221 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\includegraphics[width=0.92\textwidth]{figures/exit_policy_walkforward_comparison.png}
+\end{center}
+
+The flexible exit materially improves executability: executable selected trades
+rise from 16.3\% to 41.3\% of selected trades, and invalid selected trades fall
+from 83.7\% to 58.7\%. However, aggregate P\&L falls from about \$384k to
+\$195k. The selected flexible-exit trades split as follows: 1,232 reversion
+exits produced about \$276.8k, while 1,077 latest-valid pre-expiration fallback
+exits lost about \$81.6k. This means the reversion idea is economically useful,
+but the fallback component needs stricter gates before it can be treated as a
+production-quality trading rule.
+
+The paper-safe interpretation is therefore not that flexible exits dominate the
+fixed baseline. The stronger claim is that the TP2 signal survives a
+leakage-clean ML rerun, and that a realistic reversion/fallback exit policy
+substantially improves execution validity while revealing where additional
+liquidity and fallback-exit controls are needed. For the main paper tables, the
+corrected fixed-exit result should be reported as the high-P\&L baseline and
+the flexible-exit result should be reported as an execution robustness
+specification.
+
+\section*{Active Pipeline Versus Legacy Artifacts}
+
+The active Archive-2 research pipeline is now:
+
+\begin{enumerate}
+  \item \texttt{scripts/run\_ingest\_archive2.py}
+  \item \texttt{src/tp2rr2/archive2\_ingest.py}
+  \item \texttt{scripts/build\_archive2\_moneyness\_universes.py}
+  \item \texttt{scripts/add\_archive2\_rectangle\_moneyness.py}
+  \item \texttt{scripts/run\_detect\_archive2\_forward.py}
+  \item \texttt{src/tp2rr2/detect\_forward\_tp2.py}
+  \item \texttt{scripts/run\_labels.py}
+  \item \texttt{src/tp2rr2/flexible\_labels.py}
+  \item \texttt{scripts/run\_flexible\_exit\_labels.py}
+  \item \texttt{scripts/run\_walkforward\_3\_1\_2.py}
+\end{enumerate}
+
+Older phase reports, SHAP reports, and earlier JSON-archive outputs should be
+treated as legacy artifacts from the previous project stage. They should not be
+used for the current ICAIF Archive-2 result unless explicitly re-run on the new
+forward-adjusted Archive-2 pipeline. The literature PDFs should remain in place.
+
+Remaining implementation caveats before paper-quality ML/backtesting:
+
+\begin{itemize}
+  \item The ingestion should make the \texttt{quote\_time} timezone convention
+  explicit, because the raw README describes UTC instants while the retained
+  timestamps appear as 15:55--15:59 after local reading.
+  \item The flexible fallback exit should be tightened. Reversion exits are
+  profitable in the current robustness run, but latest-valid pre-expiration
+  fallback exits are negative and should require additional liquidity,
+  moneyness, and holding-period controls.
+\end{itemize}
+
+\section*{Next Updates}
+
+Future project-affecting changes should be documented side by side in report
+files. The next report updates should cover:
+
+\begin{itemize}
+  \item Create a broad call-only exit quote panel for label construction.
+  \item Rebuild 2013--2026 strategy labels using OTM-only detection features
+  and the broad exit quote panel.
+  \item Update backtesting so trade selection is point-in-time and no longer
+  prefilters on future label availability.
+  \item Define and test a stronger execution policy for selected trades whose
+  target-date exit quotes are missing, including DTE/liquidity gates and a
+  transparent fallback exit convention.
+  \item Add rolling-window result tables and compare strict gates against
+  all-cleaned gates in the paper draft.
+  \item Add dividend and ex-dividend risk filters for American-call assignment
+  and early-exercise risk.
+  \item Run robustness checks for strike caps, severity thresholds, quote-time
+  strictness, spread thresholds, open-interest/volume gates, and two-strike
+  approximation comparison.
+  \item Only after those checks, train machine-learning/deep-learning trade
+  selectors and report validation/test results.
+\end{itemize}
+
+\end{document}

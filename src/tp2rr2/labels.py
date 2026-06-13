@@ -26,9 +26,16 @@ def _valid_quote(row, max_spread_pct: float) -> bool:
     )
 
 
+def _quote_key(row) -> str:
+    symbol = getattr(row, "option_symbol", None)
+    if symbol is not None and pd.notna(symbol):
+        return str(symbol)
+    return str(row.contractID)
+
+
 def _build_quote_lookup(options: pd.DataFrame) -> dict[tuple[pd.Timestamp, str], pd.Series]:
     return {
-        (row.date, row.contractID): row
+        (row.date, _quote_key(row)): row
         for row in options.itertuples(index=False)
     }
 
@@ -104,7 +111,8 @@ def label_one_strategy(
             base["exit_reason"] = "invalid_entry_quote"
             return base
 
-        exit_quote = quote_lookup.get((exit_dt, leg.contract_id))
+        quote_key = leg.option_symbol if leg.option_symbol else leg.contract_id
+        exit_quote = quote_lookup.get((exit_dt, quote_key))
         if exit_quote is None or not _valid_quote(exit_quote, config.max_label_spread_pct):
             base["exit_reason"] = "invalid_exit_quote"
             return base
@@ -150,7 +158,12 @@ def build_labels(
 
 
 def prepare_quote_frame(options: pd.DataFrame) -> pd.DataFrame:
-    return options[["date", "contractID", "bid", "ask", "mid", "spread_pct"]].copy()
+    columns = ["date", "contractID", "bid", "ask", "mid", "spread_pct"]
+    if "option_symbol" in options.columns:
+        columns.insert(2, "option_symbol")
+    out = options[columns].copy()
+    out["quote_key"] = out["option_symbol"].astype(str) if "option_symbol" in out.columns else out["contractID"].astype(str)
+    return out
 
 
 def build_strategy_training_rows(
@@ -263,10 +276,14 @@ def build_strategy_training_rows(
                 {
                     "_row": np.flatnonzero(key_mask),
                     "exit_date": rows.loc[key_mask, "exit_date"].to_numpy(),
-                    "contractID": rows.loc[key_mask, f"{leg}_contract_id"].to_numpy(),
+                    "quote_key": (
+                        rows.loc[key_mask, f"{leg}_option_symbol"].astype(str).to_numpy()
+                        if f"{leg}_option_symbol" in rows.columns
+                        else rows.loc[key_mask, f"{leg}_contract_id"].astype(str).to_numpy()
+                    ),
                 }
             )
-            merged = keys.merge(quote_lookup, on=["exit_date", "contractID"], how="left")
+            merged = keys.merge(quote_lookup, on=["exit_date", "quote_key"], how="left")
             row_idx = merged["_row"].to_numpy(dtype=int)
             exit_bid[row_idx] = merged["exit_bid"].to_numpy(dtype=float)
             exit_ask[row_idx] = merged["exit_ask"].to_numpy(dtype=float)
@@ -287,9 +304,10 @@ def build_strategy_training_rows(
         net_pnl += np.where(selected, price_pnl - fees, 0.0)
 
     valid &= np.isfinite(gross) & (gross > 0)
+    gross_valid = np.isfinite(gross) & (gross > 0)
+    rows.loc[gross_valid, "entry_gross_exposure"] = gross[gross_valid]
     rows.loc[valid, "is_valid_label"] = True
     rows.loc[valid, "net_pnl"] = net_pnl[valid]
-    rows.loc[valid, "entry_gross_exposure"] = gross[valid]
     rows.loc[valid, "realized_return"] = net_pnl[valid] / gross[valid]
     rows.loc[valid, "actual_holding_days"] = (
         pd.to_datetime(rows.loc[valid, "exit_date"]) - pd.to_datetime(rows.loc[valid, "date"])

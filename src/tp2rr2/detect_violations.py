@@ -221,6 +221,7 @@ def detect_day(day_options: pd.DataFrame, config: DetectionConfig) -> pd.DataFra
 def _append_leg_columns(out: pd.DataFrame, prefix: str, rows: pd.DataFrame) -> None:
     leg_columns = {
         "contract_id": "contractID",
+        "option_symbol": "option_symbol",
         "expiration": "expiration",
         "strike": "strike",
         "bid": "bid",

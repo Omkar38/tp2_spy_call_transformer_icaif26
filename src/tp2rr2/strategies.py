@@ -14,6 +14,7 @@ class StrategyLeg:
     side: int
     quantity: float
     contract_id: str
+    option_symbol: str | None
     expiration: pd.Timestamp
     strike: float
 
@@ -70,6 +71,7 @@ def strategy_legs(row: pd.Series, strategy: str) -> list[StrategyLeg]:
                 side=side,
                 quantity=float(qty),
                 contract_id=str(row[f"{name}_contract_id"]),
+                option_symbol=str(row[f"{name}_option_symbol"]) if f"{name}_option_symbol" in row else None,
                 expiration=row[f"{name}_expiration"],
                 strike=float(row[f"{name}_strike"]),
             )

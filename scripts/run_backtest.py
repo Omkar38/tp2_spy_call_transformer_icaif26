@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import replace
 
 import pandas as pd
 import pyarrow.parquet as pq
@@ -14,6 +15,8 @@ from tp2rr2.model import load_model
 
 
 def _model_columns(model) -> list[str]:
+    if hasattr(model, "feature_columns_"):
+        return list(model.feature_columns_)
     pre = model.named_steps["preprocess"]
     columns: list[str] = []
     for _, _, transformer_columns in pre.transformers_:
@@ -30,6 +33,7 @@ def _backtest_columns(path, model) -> list[str]:
         "is_valid_label",
         "realized_return",
         "net_pnl",
+        "entry_gross_exposure",
         "normalized_severity",
         "max_spread_pct",
         "avg_spread_pct",
@@ -51,22 +55,31 @@ def main() -> None:
     parser.add_argument("--model", default="data/models/lightgbm_strategy_return.joblib")
     parser.add_argument("--trades-output", default="reports/tables/test_selected_trades.csv")
     parser.add_argument("--summary-output", default="reports/tables/test_summary.json")
+    parser.add_argument("--prediction-threshold", type=float, default=None)
+    parser.add_argument("--strategies", nargs="+", default=None)
+    parser.add_argument("--option-types", nargs="+", default=None)
     args = parser.parse_args()
 
     model = load_model(CONFIG.paths.root / args.model)
+    backtest_config = CONFIG.backtest
+    if args.prediction_threshold is not None:
+        backtest_config = replace(backtest_config, prediction_threshold=args.prediction_threshold)
     input_path = CONFIG.paths.root / args.input
     test = pd.read_parquet(
         input_path,
         columns=_backtest_columns(input_path, model),
         filters=[
-            ("is_valid_label", "=", True),
             ("date", ">=", pd.Timestamp(CONFIG.splits.test_start)),
             ("date", "<=", pd.Timestamp(CONFIG.splits.test_end)),
         ],
     )
     test = test.copy()
+    if args.strategies:
+        test = test[test["strategy"].isin(args.strategies)].copy()
+    if args.option_types:
+        test = test[test["option_type"].isin(args.option_types)].copy()
     test["predicted_return"] = model.predict(test)
-    trades = select_trades(test, CONFIG.backtest)
+    trades = select_trades(test, backtest_config)
     summary = summarize_trades(trades)
     write_table(trades, CONFIG.paths.root / args.trades_output)
     summary_path = CONFIG.paths.root / args.summary_output

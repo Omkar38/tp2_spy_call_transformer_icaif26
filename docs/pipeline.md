@@ -111,7 +111,7 @@ Execution:
 
 ## 6. ML Backtest
 
-One LightGBM model scores all five strategy rows for each violation.
+One gradient-boosted model scores all five strategy rows for each violation. The default is LightGBM; `scripts/run_train.py --model-type catboost_native` trains the CatBoost variant with native categorical handling and the same target.
 
 Backtest rules:
 

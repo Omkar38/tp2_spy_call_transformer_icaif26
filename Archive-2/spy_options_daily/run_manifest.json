@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-06-05T04:23:20.901997+00:00",
+  "config": {
+    "out_dir": "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily",
+    "start": "2013-04-01",
+    "end": "2026-06-04",
+    "dataset": "OPRA.PILLAR",
+    "parent_symbol": "SPY.OPT",
+    "market_close": "16:00:00",
+    "eod_window_min": "2",
+    "option_multiplier": "100",
+    "equity_source": "yfinance",
+    "equity_dataset": "XNAS.BASIC",
+    "day_count": "365.0",
+    "r_fallback": "0.04",
+    "iv_lower": "0.0001",
+    "iv_upper": "5.0",
+    "iv_init": "0.3",
+    "iv_max_iter": "100",
+    "iv_tol": "1e-08",
+    "seed": "0",
+    "max_retries": "5",
+    "retry_backoff_s": "2.0",
+    "max_workers": "8",
+    "log_level": "INFO"
+  },
+  "rows_total": 35758668,
+  "partitions": [
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2013/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2014/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2015/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2016/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2017/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2018/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2019/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2020/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2021/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2022/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2023/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2024/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2025/data.parquet",
+    "/Users/pawelpolak/Documents/Claude/Projects/TP2/spy_options_daily/year=2026/data.parquet"
+  ],
+  "versions": {
+    "databento": "0.64.0",
+    "pandas": "2.3.3",
+    "numpy": "1.26.4",
+    "scipy": "1.13.1",
+    "pyarrow": "21.0.0",
+    "yfinance": "1.2.0"
+  },
+  "python": "3.9.7 (default, Sep 16 2021, 08:50:36) \n[Clang 10.0.0 ]"
+}

@@ -37,6 +37,7 @@ PYTHONPATH=src python scripts/run_detect.py
 PYTHONPATH=src python scripts/run_labels.py
 PYTHONPATH=src python scripts/run_train.py
 PYTHONPATH=src python scripts/run_backtest.py
+PYTHONPATH=src python reports/generate_ml_monthly_summary.py
 ```
 
 For a small smoke test, pass a single year to ingestion:
@@ -57,7 +58,31 @@ K1
 K2
 ```
 
-One LightGBM regressor predicts after-cost return with `strategy` as a categorical feature. The backtest scores all five rows and chooses at most one strategy per violation after liquidity/cost gates.
+One gradient-boosted regressor predicts after-cost return with `strategy` as a categorical feature. LightGBM is the default model; CatBoost can be trained with:
+
+```bash
+PYTHONPATH=src python scripts/run_train.py \
+  --model-type catboost_native \
+  --model-output data/models/catboost_strategy_return.joblib \
+  --max-train-rows 2000000 \
+  --max-validation-rows 750000
+
+PYTHONPATH=src python scripts/run_backtest.py \
+  --model data/models/catboost_strategy_return.joblib \
+  --prediction-threshold 0.2 \
+  --strategies T1 \
+  --option-types call put \
+  --trades-output reports/tables/catboost_selected_trades.csv \
+  --summary-output reports/tables/catboost_summary.json
+
+PYTHONPATH=src python reports/generate_ml_monthly_summary.py \
+  --model-name CatBoost \
+  --trades reports/tables/catboost_selected_trades.csv \
+  --summary reports/tables/catboost_summary.json \
+  --output-dir reports/catboost_monthly_summary
+```
+
+The backtest scores all five rows and chooses at most one strategy per violation after liquidity/cost gates.
 
 ## Splits
 
