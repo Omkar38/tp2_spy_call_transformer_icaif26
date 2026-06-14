@@ -17,19 +17,30 @@ from tp2rr2.config import CONFIG
 def main() -> None:
     parser = argparse.ArgumentParser(description="Clean professor-provided Archive-2 SPY option panel.")
     parser.add_argument("--archive2-root", default="Archive-2/spy_options_daily")
-    parser.add_argument("--years", nargs="+", type=int, default=[2024, 2025, 2026])
-    parser.add_argument("--output", default="data/processed/archive2_spy_call_otm_clean_2024_2026.parquet")
-    parser.add_argument("--summary-output", default="data/processed/archive2_spy_call_otm_clean_2024_2026_summary.json")
+    parser.add_argument("--years", nargs="+", type=int, default=list(range(2013, 2027)))
+    parser.add_argument(
+        "--output",
+        default="data/processed/archive2_spy_call_allmoneyness_lastquote_clean_2013_2026.parquet",
+    )
+    parser.add_argument(
+        "--summary-output",
+        default="data/processed/archive2_spy_call_allmoneyness_lastquote_clean_2013_2026_summary.json",
+    )
     parser.add_argument("--min-dte", type=int, default=1)
     parser.add_argument("--max-dte", type=int, default=90)
     parser.add_argument("--min-quote-time", default="15:55")
     parser.add_argument(
         "--use-last-available-quote",
-        action="store_true",
-        help="Do not require a minimum quote time; after raw duplicate collapse, keep the latest available quote for each contract-day.",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="After raw duplicate collapse, keep the latest available quote for each contract-day. Use --no-use-last-available-quote to enforce --min-quote-time.",
     )
     parser.add_argument("--max-spread-pct", type=float, default=0.50)
-    parser.add_argument("--include-atm-itm", action="store_true")
+    parser.add_argument(
+        "--otm-only",
+        action="store_true",
+        help="Restrict calls to OTM only. Default keeps all call moneyness buckets.",
+    )
     parser.add_argument("--allow-puts", action="store_true")
     parser.add_argument("--require-positive-size", action="store_true")
     parser.add_argument("--require-positive-open-interest", action="store_true")
@@ -42,7 +53,7 @@ def main() -> None:
         min_dte=args.min_dte,
         max_dte=args.max_dte,
         calls_only=not args.allow_puts,
-        otm_calls_only=not args.include_atm_itm,
+        otm_calls_only=args.otm_only,
         use_last_available_quote=args.use_last_available_quote,
         min_quote_hour=hour,
         min_quote_minute=minute,
