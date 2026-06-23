@@ -17,6 +17,7 @@ archive/*.json
 reports/*/*valid*_trades.csv
 Archive-2/spy_options_daily/year=*/data.parquet
 Archive-2/spy_options_daily/**/*.parquet
+reports/**/*.parquet
 *.pyc
 *.aux
 *.log
@@ -25,3 +26,7 @@ Archive-2/spy_options_daily/**/*.parquet
 *.nav
 *.snm
 *.vrb
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+reports/**/*.html

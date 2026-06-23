@@ -1,0 +1,37 @@
+Gate,predicted_action,leg_bucket,selected_legs,executed_legs
+Base,K1,ATM,2175,1734
+Base,K1,ITM,1731,1068
+Base,K1,OTM,2688,2230
+Base,K2,ATM,1194,950
+Base,K2,ITM,844,661
+Base,K2,OTM,1488,1077
+Base,T1,ATM,700,600
+Base,T1,ITM,920,754
+Base,T1,OTM,376,314
+Base,T2,ATM,1550,921
+Base,T2,ITM,6504,2628
+Base,T2,OTM,9578,4407
+Strict Quality,K1,ATM,326,303
+Strict Quality,K1,ITM,140,125
+Strict Quality,K1,OTM,688,636
+Strict Quality,K2,ATM,231,229
+Strict Quality,K2,ITM,69,67
+Strict Quality,K2,OTM,512,470
+Strict Quality,T1,ATM,152,152
+Strict Quality,T1,ITM,154,148
+Strict Quality,T1,OTM,410,330
+Strict Quality,T2,ATM,141,123
+Strict Quality,T2,ITM,316,243
+Strict Quality,T2,OTM,161,152
+Volume + Delta,K1,ATM,380,357
+Volume + Delta,K1,ITM,162,150
+Volume + Delta,K1,OTM,894,823
+Volume + Delta,K2,ATM,79,73
+Volume + Delta,K2,ITM,84,66
+Volume + Delta,K2,OTM,269,245
+Volume + Delta,T1,ATM,333,332
+Volume + Delta,T1,ITM,521,505
+Volume + Delta,T1,OTM,466,425
+Volume + Delta,T2,ATM,173,151
+Volume + Delta,T2,ITM,237,185
+Volume + Delta,T2,OTM,132,128

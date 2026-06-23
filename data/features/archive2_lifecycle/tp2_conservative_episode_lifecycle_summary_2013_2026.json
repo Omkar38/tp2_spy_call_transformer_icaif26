@@ -1,0 +1,25 @@
+{
+  "labels_input": "data/labels/archive2_episode_start_labels_conservative_bidask_2013_2026.parquet",
+  "quote_input": "data/processed/archive2_spy_call_quote_availability_nospread_2013_2026.parquet",
+  "product_backtest_input": "data/labels/archive2_episode_strategy_mini_backtest_conservative_bidask_2013_2026.parquet",
+  "unit_backtest_input": "data/labels/archive2_episode_strategy_mini_backtest_unit_conservative_bidask_2013_2026.parquet",
+  "output": "data/features/archive2_lifecycle/tp2_conservative_episode_lifecycle_2013_2026.parquet",
+  "lookback_sessions": 20,
+  "max_episodes": null,
+  "episode_count": 226577,
+  "lifecycle_rows": 6356278,
+  "event_day_min": -20,
+  "event_day_max": 53,
+  "status_counts": {
+    "missing_A_or_B": 3322542,
+    "observable": 2364764,
+    "liquidity_failure_wide_spread": 260828,
+    "missing_C_or_D": 209150,
+    "missing_forward": 192761,
+    "not_forward_ordered": 6233
+  },
+  "observable_rows": 2364764,
+  "liquidity_failure_wide_spread_rows": 260828,
+  "violation_rows": 512933,
+  "conservative_bidask_violation_rows": 364024
+}

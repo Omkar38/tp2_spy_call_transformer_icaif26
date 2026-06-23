@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import pandas as pd
 
 
-STRATEGIES = ["full4", "T1", "T2", "K1", "K2"]
+STRATEGIES = ["T1", "T2", "K1", "K2"]
 
 
 @dataclass(frozen=True)
@@ -19,7 +19,7 @@ class StrategyLeg:
     strike: float
 
 
-def _full4_directions(row: pd.Series) -> dict[str, tuple[int, float]]:
+def _tp2_leg_directions(row: pd.Series) -> dict[str, tuple[int, float]]:
     """Return side and product quantity for A/B/C/D.
 
     side: +1 long, -1 short. Quantities are inherited from product replication.
@@ -47,8 +47,6 @@ def _full4_directions(row: pd.Series) -> dict[str, tuple[int, float]]:
 
 
 def selected_leg_names(strategy: str) -> list[str]:
-    if strategy == "full4":
-        return ["A", "B", "C", "D"]
     if strategy == "T1":
         return ["A", "D"]
     if strategy == "T2":
@@ -61,7 +59,7 @@ def selected_leg_names(strategy: str) -> list[str]:
 
 
 def strategy_legs(row: pd.Series, strategy: str) -> list[StrategyLeg]:
-    directions = _full4_directions(row)
+    directions = _tp2_leg_directions(row)
     legs = []
     for name in selected_leg_names(strategy):
         side, qty = directions[name]

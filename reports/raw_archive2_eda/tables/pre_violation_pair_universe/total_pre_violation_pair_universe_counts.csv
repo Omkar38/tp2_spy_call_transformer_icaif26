@@ -1,0 +1,3 @@
+universe,sessions,clean_call_rows,expiration_pairs,raw_cross_expiration_pairs,forward_order_pairs,valid_four_leg_rectangles,avg_raw_pairs_per_session,avg_forward_order_pairs_per_session,avg_valid_rectangles_per_session
+all_clean_strikes,3256,4912891,385222,4140337398,2119251213,1695489562,1271602.394963145,650875.6796683046,520727.75245700247
+detector_max80_near_underlying,3256,4912891,385222,1908491013,1062894485,848906267,586145.8885135135,326441.79514742014,260720.59797297296

@@ -1,0 +1,20 @@
+{
+  "rows": 226577,
+  "gates": {
+    "base_conservative_bidask": 226577,
+    "all_legs_volume_positive": 30468,
+    "all_legs_open_interest_positive": 120604,
+    "paper_delta_01_99": 60532,
+    "all_bidask_size_positive": 226577,
+    "max_spread_le_25pct": 111489,
+    "max_spread_le_10pct": 93400,
+    "round_distance_le_1": 189680,
+    "round_distance_le_2_5": 211541,
+    "round_distance_le_5": 225293,
+    "volume_and_delta": 15772,
+    "strict_quality_combo": 8953
+  },
+  "strict_quality_rows": 8953,
+  "base_rows": 226577,
+  "strict_quality_share": 0.03951416074888448
+}

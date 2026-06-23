@@ -1,0 +1,16 @@
+Gate,Stress,Net P&L
+Base,Original,1993214.4120000005
+Base,Remove top 1% executed trades,186560.2925000002
+Base,Remove top 5% executed trades,-2414638.1465
+Base,Winsorize 1/99%,2172145.1848049974
+Base,Winsorize 5/95%,1782628.7993500032
+Volume + Delta,Original,5654.105000000214
+Volume + Delta,Remove top 1% executed trades,-130116.50599999979
+Volume + Delta,Remove top 5% executed trades,-281086.54449999984
+Volume + Delta,Winsorize 1/99%,-6034.753389999867
+Volume + Delta,Winsorize 5/95%,13449.787799999875
+Strict Quality,Original,195041.47450000016
+Strict Quality,Remove top 1% executed trades,90021.72600000014
+Strict Quality,Remove top 5% executed trades,-49410.9904999999
+Strict Quality,Winsorize 1/99%,197637.12039999993
+Strict Quality,Winsorize 5/95%,227782.02949999974

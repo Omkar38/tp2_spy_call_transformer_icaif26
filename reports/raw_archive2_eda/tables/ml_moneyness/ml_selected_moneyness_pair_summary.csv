@@ -1,0 +1,185 @@
+Gate,View,pair_bucket,selected,executed,pnl,predicted_action,year
+Base,pair_bucket,ATM,1442,1141,115174.76300000004,,
+Base,pair_bucket,ATM-OTM,851,641,156376.35399999996,,
+Base,pair_bucket,ITM,4053,1928,776446.8980000007,,
+Base,pair_bucket,ITM-ATM,1615,1057,390753.89700000006,,
+Base,pair_bucket,ITM-OTM,530,394,435799.3445,,
+Base,pair_bucket,OTM,6383,3511,118663.15549999995,,
+Base,predicted_action+pair_bucket,ATM,770,623,110977.02199999998,K1,
+Base,predicted_action+pair_bucket,ATM-OTM,326,255,52304.270499999984,K1,
+Base,predicted_action+pair_bucket,ITM,693,409,450908.9815000003,K1,
+Base,predicted_action+pair_bucket,ITM-ATM,230,165,112134.43699999995,K1,
+Base,predicted_action+pair_bucket,OTM,1278,1064,116686.38849999997,K1,
+Base,predicted_action+pair_bucket,ATM,325,258,-42370.33649999997,K2,
+Base,predicted_action+pair_bucket,ATM-OTM,144,101,6283.930999999999,K2,
+Base,predicted_action+pair_bucket,ITM,421,329,-678225.4510000001,K2,
+Base,predicted_action+pair_bucket,ITM-ATM,276,220,-204786.88549999992,K2,
+Base,predicted_action+pair_bucket,ITM-OTM,16,15,8447.262499999992,K2,
+Base,predicted_action+pair_bucket,OTM,581,421,-25379.513000000003,K2,
+Base,predicted_action+pair_bucket,ATM,138,121,1504.2639999999974,T1,
+Base,predicted_action+pair_bucket,ATM-OTM,118,92,25476.37099999998,T1,
+Base,predicted_action+pair_bucket,ITM,232,179,-784407.7675000001,T1,
+Base,predicted_action+pair_bucket,ITM-ATM,293,253,27537.266000000058,T1,
+Base,predicted_action+pair_bucket,ITM-OTM,164,144,-19090.912499999995,T1,
+Base,predicted_action+pair_bucket,OTM,53,45,10543.020499999997,T1,
+Base,predicted_action+pair_bucket,ATM,209,139,45063.81350000003,T2,
+Base,predicted_action+pair_bucket,ATM-OTM,263,193,72311.78150000001,T2,
+Base,predicted_action+pair_bucket,ITM,2707,1011,1788171.1350000007,T2,
+Base,predicted_action+pair_bucket,ITM-ATM,816,419,455869.07949999993,T2,
+Base,predicted_action+pair_bucket,ITM-OTM,350,235,446442.99450000003,T2,
+Base,predicted_action+pair_bucket,OTM,4471,1981,16813.259499999975,T2,
+Base,year+pair_bucket,ATM,61,61,-20643.441999999995,,2021.0
+Base,year+pair_bucket,ATM-OTM,11,11,2977.682500000001,,2021.0
+Base,year+pair_bucket,ITM,87,87,-1001384.487,,2021.0
+Base,year+pair_bucket,ITM-ATM,100,99,-112946.57149999996,,2021.0
+Base,year+pair_bucket,ITM-OTM,43,43,-37247.708500000015,,2021.0
+Base,year+pair_bucket,OTM,90,83,-7839.517500000002,,2021.0
+Base,year+pair_bucket,ATM,87,87,-12873.96699999998,,2022.0
+Base,year+pair_bucket,ATM-OTM,92,92,3538.8809999999926,,2022.0
+Base,year+pair_bucket,ITM,45,44,8211.270500000042,,2022.0
+Base,year+pair_bucket,ITM-ATM,50,50,-14633.594500000003,,2022.0
+Base,year+pair_bucket,ITM-OTM,58,58,3599.21200000004,,2022.0
+Base,year+pair_bucket,OTM,745,648,2083.08100000001,,2022.0
+Base,year+pair_bucket,ATM,77,70,9371.621999999992,,2023.0
+Base,year+pair_bucket,ATM-OTM,40,38,2552.564,,2023.0
+Base,year+pair_bucket,ITM,422,144,750806.5460000001,,2023.0
+Base,year+pair_bucket,ITM-ATM,112,78,4815.6010000000015,,2023.0
+Base,year+pair_bucket,ITM-OTM,17,16,4512.087499999999,,2023.0
+Base,year+pair_bucket,OTM,95,89,6101.169000000001,,2023.0
+Base,year+pair_bucket,ATM,685,526,87766.93200000002,,2024.0
+Base,year+pair_bucket,ATM-OTM,381,289,97395.078,,2024.0
+Base,year+pair_bucket,ITM,2248,858,869639.9085000003,,2024.0
+Base,year+pair_bucket,ITM-ATM,862,494,587069.6915,,2024.0
+Base,year+pair_bucket,ITM-OTM,243,181,452074.384,,2024.0
+Base,year+pair_bucket,OTM,715,564,53611.133499999996,,2024.0
+Base,year+pair_bucket,ATM,495,371,41764.43199999999,,2025.0
+Base,year+pair_bucket,ATM-OTM,309,203,49627.560499999985,,2025.0
+Base,year+pair_bucket,ITM,1216,783,141816.77300000036,,2025.0
+Base,year+pair_bucket,ITM-ATM,483,330,-86141.72800000002,,2025.0
+Base,year+pair_bucket,ITM-OTM,169,96,12861.3695,,2025.0
+Base,year+pair_bucket,OTM,870,590,23998.24500000001,,2025.0
+Base,year+pair_bucket,ATM,37,26,9789.186000000018,,2026.0
+Base,year+pair_bucket,ATM-OTM,18,8,284.5880000000045,,2026.0
+Base,year+pair_bucket,ITM,35,12,7356.887000000024,,2026.0
+Base,year+pair_bucket,ITM-ATM,8,6,12590.49849999999,,2026.0
+Base,year+pair_bucket,OTM,3868,1537,40709.04449999993,,2026.0
+Volume + Delta,pair_bucket,ATM,186,178,2562.3820000000255,,
+Volume + Delta,pair_bucket,ATM-OTM,228,217,35473.41849999999,,
+Volume + Delta,pair_bucket,ITM,247,209,-27760.18049999985,,
+Volume + Delta,pair_bucket,ITM-ATM,297,281,-15166.211499999958,,
+Volume + Delta,pair_bucket,ITM-OTM,215,205,-4078.043000000009,,
+Volume + Delta,pair_bucket,OTM,692,630,14622.739500000009,,
+Volume + Delta,predicted_action+pair_bucket,ATM,93,89,-6571.059499999979,K1,
+Volume + Delta,predicted_action+pair_bucket,ATM-OTM,97,89,19394.363499999996,K1,
+Volume + Delta,predicted_action+pair_bucket,ITM,47,42,6866.853000000038,K1,
+Volume + Delta,predicted_action+pair_bucket,ITM-ATM,43,41,246.43349999998682,K1,
+Volume + Delta,predicted_action+pair_bucket,ITM-OTM,3,3,628.680000000003,K1,
+Volume + Delta,predicted_action+pair_bucket,OTM,435,401,12440.02400000001,K1,
+Volume + Delta,predicted_action+pair_bucket,ATM,19,17,2442.0700000000024,K2,
+Volume + Delta,predicted_action+pair_bucket,ATM-OTM,21,21,1441.2274999999975,K2,
+Volume + Delta,predicted_action+pair_bucket,ITM,42,33,-54197.99799999991,K2,
+Volume + Delta,predicted_action+pair_bucket,ITM-ATM,20,19,12272.4285,K2,
+Volume + Delta,predicted_action+pair_bucket,ITM-OTM,4,4,-1063.4560000000017,K2,
+Volume + Delta,predicted_action+pair_bucket,OTM,110,98,572.0674999999991,K2,
+Volume + Delta,predicted_action+pair_bucket,ATM,49,49,1676.6810000000062,T1,
+Volume + Delta,predicted_action+pair_bucket,ATM-OTM,75,75,-1224.2954999999947,T1,
+Volume + Delta,predicted_action+pair_bucket,ITM,88,85,-9463.459499999986,T1,
+Volume + Delta,predicted_action+pair_bucket,ITM-ATM,150,149,-39829.27149999996,T1,
+Volume + Delta,predicted_action+pair_bucket,ITM-OTM,186,177,-55797.451,T1,
+Volume + Delta,predicted_action+pair_bucket,OTM,112,96,601.6504999999997,T1,
+Volume + Delta,predicted_action+pair_bucket,ATM,25,23,5014.690499999996,T2,
+Volume + Delta,predicted_action+pair_bucket,ATM-OTM,35,32,15862.122999999998,T2,
+Volume + Delta,predicted_action+pair_bucket,ITM,70,49,29034.42400000001,T2,
+Volume + Delta,predicted_action+pair_bucket,ITM-ATM,84,72,12144.198000000017,T2,
+Volume + Delta,predicted_action+pair_bucket,ITM-OTM,22,21,52154.18399999999,T2,
+Volume + Delta,predicted_action+pair_bucket,OTM,35,35,1008.9974999999994,T2,
+Volume + Delta,year+pair_bucket,ATM,52,52,2913.7155000000107,,2021.0
+Volume + Delta,year+pair_bucket,ATM-OTM,46,46,-9517.608499999995,,2021.0
+Volume + Delta,year+pair_bucket,ITM,92,90,37252.95299999998,,2021.0
+Volume + Delta,year+pair_bucket,ITM-ATM,151,150,-43845.530999999966,,2021.0
+Volume + Delta,year+pair_bucket,ITM-OTM,168,164,-82775.6425,,2021.0
+Volume + Delta,year+pair_bucket,OTM,245,208,-127.37199999999963,,2021.0
+Volume + Delta,year+pair_bucket,ATM,57,57,1780.2410000000114,,2022.0
+Volume + Delta,year+pair_bucket,ATM-OTM,113,113,24122.671499999993,,2022.0
+Volume + Delta,year+pair_bucket,ITM,34,34,11453.592500000037,,2022.0
+Volume + Delta,year+pair_bucket,ITM-ATM,41,41,18288.624499999994,,2022.0
+Volume + Delta,year+pair_bucket,ITM-OTM,12,12,9400.611500000005,,2022.0
+Volume + Delta,year+pair_bucket,OTM,311,300,9688.375500000006,,2022.0
+Volume + Delta,year+pair_bucket,ATM,42,41,9197.354999999994,,2023.0
+Volume + Delta,year+pair_bucket,ATM-OTM,39,35,4225.622500000002,,2023.0
+Volume + Delta,year+pair_bucket,ITM,41,39,9569.734500000011,,2023.0
+Volume + Delta,year+pair_bucket,ITM-ATM,46,46,16390.602000000006,,2023.0
+Volume + Delta,year+pair_bucket,ITM-OTM,10,10,2678.1104999999993,,2023.0
+Volume + Delta,year+pair_bucket,OTM,64,64,1911.2390000000007,,2023.0
+Volume + Delta,year+pair_bucket,ATM,20,15,-5165.640000000004,,2024.0
+Volume + Delta,year+pair_bucket,ATM-OTM,25,18,15827.439999999997,,2024.0
+Volume + Delta,year+pair_bucket,ITM,40,25,1255.2450000000358,,2024.0
+Volume + Delta,year+pair_bucket,ITM-ATM,38,30,20424.743500000008,,2024.0
+Volume + Delta,year+pair_bucket,ITM-OTM,8,7,40846.05899999999,,2024.0
+Volume + Delta,year+pair_bucket,OTM,48,41,1819.1154999999992,,2024.0
+Volume + Delta,year+pair_bucket,ATM,15,13,-6163.289499999988,,2025.0
+Volume + Delta,year+pair_bucket,ATM-OTM,5,5,815.293,,2025.0
+Volume + Delta,year+pair_bucket,ITM,40,21,-87291.70549999991,,2025.0
+Volume + Delta,year+pair_bucket,ITM-ATM,20,13,-26838.739,,2025.0
+Volume + Delta,year+pair_bucket,ITM-OTM,17,12,25772.8185,,2025.0
+Volume + Delta,year+pair_bucket,OTM,24,17,1331.381500000004,,2025.0
+Volume + Delta,year+pair_bucket,ITM-ATM,1,1,414.08849999999836,,2026.0
+Strict Quality,pair_bucket,ATM,194,185,12575.744500000008,,
+Strict Quality,pair_bucket,ATM-OTM,191,184,24615.902499999986,,
+Strict Quality,pair_bucket,ITM,217,179,49644.06700000017,,
+Strict Quality,pair_bucket,ITM-ATM,216,203,72215.256,,
+Strict Quality,pair_bucket,ITM-OTM,121,112,8442.46650000001,,
+Strict Quality,pair_bucket,OTM,711,626,27548.038000000008,,
+Strict Quality,predicted_action+pair_bucket,ATM,106,100,5720.59650000002,K1,
+Strict Quality,predicted_action+pair_bucket,ATM-OTM,55,50,12617.578999999989,K1,
+Strict Quality,predicted_action+pair_bucket,ITM,44,38,20187.41250000002,K1,
+Strict Quality,predicted_action+pair_bucket,ITM-ATM,35,32,21114.515999999992,K1,
+Strict Quality,predicted_action+pair_bucket,OTM,337,312,16187.983000000007,K1,
+Strict Quality,predicted_action+pair_bucket,ATM,42,41,2813.8315000000052,K2,
+Strict Quality,predicted_action+pair_bucket,ATM-OTM,47,47,1602.854000000002,K2,
+Strict Quality,predicted_action+pair_bucket,ITM,33,32,10849.31200000003,K2,
+Strict Quality,predicted_action+pair_bucket,ITM-ATM,71,71,15309.67299999999,K2,
+Strict Quality,predicted_action+pair_bucket,ITM-OTM,37,37,-5073.958499999996,K2,
+Strict Quality,predicted_action+pair_bucket,OTM,176,155,5942.681500000001,K2,
+Strict Quality,predicted_action+pair_bucket,ATM,27,27,-353.1315000000127,T1,
+Strict Quality,predicted_action+pair_bucket,ATM-OTM,62,62,1610.3084999999996,T1,
+Strict Quality,predicted_action+pair_bucket,ITM,41,40,-64536.24049999996,T1,
+Strict Quality,predicted_action+pair_bucket,ITM-ATM,38,38,19597.251500000006,T1,
+Strict Quality,predicted_action+pair_bucket,ITM-OTM,31,27,-3701.401500000003,T1,
+Strict Quality,predicted_action+pair_bucket,OTM,159,121,4561.321999999999,T1,
+Strict Quality,predicted_action+pair_bucket,ATM,19,17,4394.447999999997,T2,
+Strict Quality,predicted_action+pair_bucket,ATM-OTM,27,25,8785.160999999996,T2,
+Strict Quality,predicted_action+pair_bucket,ITM,99,69,83143.58300000007,T2,
+Strict Quality,predicted_action+pair_bucket,ITM-ATM,72,62,16193.815500000004,T2,
+Strict Quality,predicted_action+pair_bucket,ITM-OTM,53,48,17217.82650000001,T2,
+Strict Quality,predicted_action+pair_bucket,OTM,39,38,856.0515000000001,T2,
+Strict Quality,year+pair_bucket,ATM,46,46,1909.6535000000054,,2021.0
+Strict Quality,year+pair_bucket,ATM-OTM,39,39,-2917.5549999999957,,2021.0
+Strict Quality,year+pair_bucket,ITM,84,81,59657.241000000016,,2021.0
+Strict Quality,year+pair_bucket,ITM-ATM,100,100,20722.304999999997,,2021.0
+Strict Quality,year+pair_bucket,ITM-OTM,78,76,16872.053500000016,,2021.0
+Strict Quality,year+pair_bucket,OTM,168,135,549.7370000000001,,2021.0
+Strict Quality,year+pair_bucket,ATM,69,69,18668.003000000004,,2022.0
+Strict Quality,year+pair_bucket,ATM-OTM,113,113,17054.80949999998,,2022.0
+Strict Quality,year+pair_bucket,ITM,25,25,4371.673500000004,,2022.0
+Strict Quality,year+pair_bucket,ITM-ATM,43,43,28953.992,,2022.0
+Strict Quality,year+pair_bucket,ITM-OTM,16,16,7989.839999999997,,2022.0
+Strict Quality,year+pair_bucket,OTM,393,375,16515.146000000004,,2022.0
+Strict Quality,year+pair_bucket,ATM,33,32,7857.268499999993,,2023.0
+Strict Quality,year+pair_bucket,ATM-OTM,9,9,2075.145000000001,,2023.0
+Strict Quality,year+pair_bucket,ITM,27,27,7739.037000000004,,2023.0
+Strict Quality,year+pair_bucket,ITM-ATM,31,31,13053.59650000001,,2023.0
+Strict Quality,year+pair_bucket,ITM-OTM,3,3,616.2080000000007,,2023.0
+Strict Quality,year+pair_bucket,OTM,42,42,1494.9630000000016,,2023.0
+Strict Quality,year+pair_bucket,ATM,16,13,-5565.022500000005,,2024.0
+Strict Quality,year+pair_bucket,ATM-OTM,22,15,10328.499499999996,,2024.0
+Strict Quality,year+pair_bucket,ITM,19,13,15067.195500000023,,2024.0
+Strict Quality,year+pair_bucket,ITM-ATM,23,19,20643.433499999996,,2024.0
+Strict Quality,year+pair_bucket,ITM-OTM,3,2,1132.6859999999967,,2024.0
+Strict Quality,year+pair_bucket,OTM,45,38,6430.0239999999985,,2024.0
+Strict Quality,year+pair_bucket,ATM,30,25,-10294.15799999999,,2025.0
+Strict Quality,year+pair_bucket,ATM-OTM,8,8,-1924.9964999999968,,2025.0
+Strict Quality,year+pair_bucket,ITM,62,33,-37191.07999999988,,2025.0
+Strict Quality,year+pair_bucket,ITM-ATM,19,10,-11158.071000000004,,2025.0
+Strict Quality,year+pair_bucket,ITM-OTM,21,15,-18168.321,,2025.0
+Strict Quality,year+pair_bucket,OTM,63,36,2558.168000000002,,2025.0

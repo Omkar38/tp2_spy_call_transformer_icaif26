@@ -1,0 +1,8 @@
+exit_reason,strategy_rows,row_share
+true_reversion_exit,4202430,0.5007153706511207
+right_leg_missing_or_expired,2146396,0.2557409567093522
+liquidity_filter_failure,1255124,0.14954678099887858
+left_leg_expired_or_missing,611116,0.07281386589445399
+still_violation_or_reappeared,114496,0.01364208495514993
+invalid_entry_or_exit_quote,58014,0.006912310618607358
+sample_ended,5276,0.000628630172437212

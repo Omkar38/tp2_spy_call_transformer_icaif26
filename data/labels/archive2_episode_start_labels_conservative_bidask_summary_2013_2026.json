@@ -1,0 +1,117 @@
+{
+  "episode_start_rows": 2091823,
+  "conservative_bidask_rows": 226577,
+  "conservative_bidask_share": 0.10831556972076509,
+  "median_conservative_bidask_normalized_severity": 0.04498642749628903,
+  "mean_conservative_bidask_normalized_severity": 0.0936183847554312,
+  "by_signal_year": {
+    "2013": {
+      "episode_starts": 68391,
+      "conservative_bidask_starts": 49090,
+      "conservative_bidask_share": 0.7177845038089807,
+      "median_mid_normalized_severity": 0.03144426717803232,
+      "median_bidask_normalized_severity": 0.01678152220522639
+    },
+    "2014": {
+      "episode_starts": 12081,
+      "conservative_bidask_starts": 438,
+      "conservative_bidask_share": 0.03625527688105289,
+      "median_mid_normalized_severity": 0.010728627625340246,
+      "median_bidask_normalized_severity": -0.07914366216963492
+    },
+    "2015": {
+      "episode_starts": 20587,
+      "conservative_bidask_starts": 140,
+      "conservative_bidask_share": 0.006800408024481469,
+      "median_mid_normalized_severity": 0.010330757968187113,
+      "median_bidask_normalized_severity": -0.08132654238573242
+    },
+    "2016": {
+      "episode_starts": 64084,
+      "conservative_bidask_starts": 3786,
+      "conservative_bidask_share": 0.059078709194182635,
+      "median_mid_normalized_severity": 0.04026845637583892,
+      "median_bidask_normalized_severity": -0.12121212121212123
+    },
+    "2017": {
+      "episode_starts": 89061,
+      "conservative_bidask_starts": 12284,
+      "conservative_bidask_share": 0.13792793703192194,
+      "median_mid_normalized_severity": 0.0322146352786429,
+      "median_bidask_normalized_severity": -0.08180300500834715
+    },
+    "2018": {
+      "episode_starts": 144522,
+      "conservative_bidask_starts": 5969,
+      "conservative_bidask_share": 0.0413016703339284,
+      "median_mid_normalized_severity": 0.023255813953488393,
+      "median_bidask_normalized_severity": -0.10979004243928003
+    },
+    "2019": {
+      "episode_starts": 96040,
+      "conservative_bidask_starts": 4151,
+      "conservative_bidask_share": 0.04322157434402332,
+      "median_mid_normalized_severity": 0.02079395085066162,
+      "median_bidask_normalized_severity": -0.09090909090909091
+    },
+    "2020": {
+      "episode_starts": 333782,
+      "conservative_bidask_starts": 25717,
+      "conservative_bidask_share": 0.07704729434181591,
+      "median_mid_normalized_severity": 0.01949570630904507,
+      "median_bidask_normalized_severity": -0.05392186875729922
+    },
+    "2021": {
+      "episode_starts": 395785,
+      "conservative_bidask_starts": 20588,
+      "conservative_bidask_share": 0.052018141162499844,
+      "median_mid_normalized_severity": 0.04461538461538466,
+      "median_bidask_normalized_severity": -0.12101910828025483
+    },
+    "2022": {
+      "episode_starts": 161604,
+      "conservative_bidask_starts": 6604,
+      "conservative_bidask_share": 0.04086532511571496,
+      "median_mid_normalized_severity": 0.028571428571428584,
+      "median_bidask_normalized_severity": -0.10000000000000009
+    },
+    "2023": {
+      "episode_starts": 153069,
+      "conservative_bidask_starts": 12731,
+      "conservative_bidask_share": 0.08317164154727606,
+      "median_mid_normalized_severity": 0.025974025974025993,
+      "median_bidask_normalized_severity": -0.07405443765035259
+    },
+    "2024": {
+      "episode_starts": 264115,
+      "conservative_bidask_starts": 34167,
+      "conservative_bidask_share": 0.12936410275826818,
+      "median_mid_normalized_severity": 0.01617805792123372,
+      "median_bidask_normalized_severity": -0.04722293330381637
+    },
+    "2025": {
+      "episode_starts": 223869,
+      "conservative_bidask_starts": 41577,
+      "conservative_bidask_share": 0.18572022030741192,
+      "median_mid_normalized_severity": 0.058139534883720985,
+      "median_bidask_normalized_severity": -0.06451612903225809
+    },
+    "2026": {
+      "episode_starts": 64833,
+      "conservative_bidask_starts": 9335,
+      "conservative_bidask_share": 0.14398531611987722,
+      "median_mid_normalized_severity": 0.04245283018867939,
+      "median_bidask_normalized_severity": -0.062388567937888564
+    }
+  },
+  "filter_rule": "feature_A_ask * feature_B_ask < feature_C_bid * feature_D_bid",
+  "input": "data/labels/archive2_episode_start_labels_2013_2026.parquet",
+  "output": "data/labels/archive2_episode_start_labels_conservative_bidask_2013_2026.parquet",
+  "summary_output": "data/labels/archive2_episode_start_labels_conservative_bidask_summary_2013_2026.json",
+  "years_filter": null,
+  "diagnostic_outputs": {
+    "by_year": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/conservative_bidask_subset/conservative_bidask_subset_by_year.csv",
+    "top_episodes": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/conservative_bidask_subset/top_conservative_bidask_episodes.csv",
+    "end_state_counts": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/conservative_bidask_subset/conservative_bidask_end_state_counts.csv"
+  }
+}

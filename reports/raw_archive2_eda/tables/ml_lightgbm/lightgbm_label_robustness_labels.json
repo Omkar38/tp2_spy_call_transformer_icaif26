@@ -1,0 +1,27 @@
+{
+  "rows": 226577,
+  "net_vs_return_mismatches": 0,
+  "net_vs_capped_mismatches": 12,
+  "return_vs_capped_mismatches": 12,
+  "net_counts": {
+    "skip": 167067,
+    "T2": 21593,
+    "T1": 20013,
+    "K1": 10224,
+    "K2": 7680
+  },
+  "return_counts": {
+    "skip": 167067,
+    "T2": 21593,
+    "T1": 20013,
+    "K1": 10224,
+    "K2": 7680
+  },
+  "capped_counts": {
+    "skip": 167067,
+    "T2": 21593,
+    "T1": 20025,
+    "K1": 10224,
+    "K2": 7668
+  }
+}

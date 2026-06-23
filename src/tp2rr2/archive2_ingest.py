@@ -51,6 +51,10 @@ class Archive2CleanConfig:
     require_positive_open_interest: bool = False
     require_positive_volume: bool = False
     exclude_rate_fallback: bool = False
+    require_call_price_bounds: bool = True
+    call_lower_bound_tolerance: float = 1.0
+    call_upper_bound_multiplier: float = 1.05
+    call_upper_bound_tolerance: float = 1.0
 
 
 def archive2_year_path(root: Path, year: int) -> Path:
@@ -141,31 +145,69 @@ def _fresh_quote_mask(df: pd.DataFrame, config: Archive2CleanConfig) -> pd.Serie
     return minutes >= threshold
 
 
-def apply_research_filters(df: pd.DataFrame, config: Archive2CleanConfig) -> pd.DataFrame:
-    out = df.copy()
-    mask = out["dte"].between(config.min_dte, config.max_dte)
+def _call_price_bounds_mask(df: pd.DataFrame, config: Archive2CleanConfig) -> pd.Series:
+    """Flag call quotes that satisfy broad static no-arbitrage price bounds.
+
+    For a nonnegative-dividend call, price should not be far below intrinsic
+    value and should not exceed the underlying by a large margin. We keep the
+    tolerance deliberately loose because this is a raw-data sanity filter, not a
+    pricing model.
+    """
+    if not config.require_call_price_bounds:
+        return pd.Series(True, index=df.index)
+
+    is_call = df["type"].eq("call")
+    underlying = pd.to_numeric(df["underlying_price"], errors="coerce")
+    strike = pd.to_numeric(df["strike"], errors="coerce")
+    mid = pd.to_numeric(df["mid"], errors="coerce")
+    intrinsic = (underlying - strike).clip(lower=0)
+
+    lower_ok = mid >= intrinsic - config.call_lower_bound_tolerance
+    upper_ok = mid <= (
+        underlying * config.call_upper_bound_multiplier
+        + config.call_upper_bound_tolerance
+    )
+    valid_inputs = underlying.notna() & strike.notna() & mid.notna()
+    return (~is_call) | (valid_inputs & lower_ok & upper_ok)
+
+
+def _research_filter_mask(
+    df: pd.DataFrame,
+    config: Archive2CleanConfig,
+    *,
+    include_call_price_bounds: bool = True,
+) -> pd.Series:
+    mask = df["dte"].between(config.min_dte, config.max_dte)
 
     if config.calls_only:
-        mask &= out["type"].eq("call")
+        mask &= df["type"].eq("call")
     if config.otm_calls_only:
-        mask &= out["strike"] > out["underlying_price"]
+        mask &= df["strike"] > df["underlying_price"]
     if config.require_bid_ask:
-        mask &= out["bid"].notna() & out["ask"].notna() & (out["ask"] > out["bid"]) & (out["mid"] > 0)
+        mask &= df["bid"].notna() & df["ask"].notna() & (df["ask"] > df["bid"]) & (df["mid"] > 0)
+    if include_call_price_bounds:
+        mask &= _call_price_bounds_mask(df, config)
     if config.require_positive_bid:
-        mask &= out["bid"] > 0
+        mask &= df["bid"] > 0
     if config.max_spread_pct is not None:
-        mask &= out["spread_pct"] <= config.max_spread_pct
+        mask &= df["spread_pct"] <= config.max_spread_pct
     if config.require_positive_size:
-        mask &= (out["bid_size"].fillna(0) > 0) & (out["ask_size"].fillna(0) > 0)
+        mask &= (df["bid_size"].fillna(0) > 0) & (df["ask_size"].fillna(0) > 0)
     if config.require_positive_open_interest:
-        mask &= out["open_interest"].fillna(0) > 0
+        mask &= df["open_interest"].fillna(0) > 0
     if config.require_positive_volume:
-        mask &= out["volume"].fillna(0) > 0
+        mask &= df["volume"].fillna(0) > 0
     if config.exclude_rate_fallback:
-        mask &= out["risk_free_rate"] != 0.04
+        mask &= df["risk_free_rate"] != 0.04
 
     if not config.use_last_available_quote:
-        mask &= _fresh_quote_mask(out, config)
+        mask &= _fresh_quote_mask(df, config)
+    return mask
+
+
+def apply_research_filters(df: pd.DataFrame, config: Archive2CleanConfig) -> pd.DataFrame:
+    out = df.copy()
+    mask = _research_filter_mask(out, config, include_call_price_bounds=True)
     return _stabilize_output_dtypes(out.loc[mask].reset_index(drop=True))
 
 
@@ -220,6 +262,8 @@ def clean_archive2_year(root: Path, year: int, config: Archive2CleanConfig) -> t
     raw = load_archive2_year(root, year)
     deduped = deduplicate_archive2(raw)
     normalized = normalize_for_pipeline(deduped)
+    pre_price_bound_mask = _research_filter_mask(normalized, config, include_call_price_bounds=False)
+    call_bounds_mask = _call_price_bounds_mask(normalized, config)
     cleaned = apply_research_filters(normalized, config)
 
     summary = {
@@ -228,6 +272,7 @@ def clean_archive2_year(root: Path, year: int, config: Archive2CleanConfig) -> t
         "deduped_rows": int(len(deduped)),
         "duplicate_rows_removed": int(len(raw) - len(deduped)),
         "clean_rows": int(len(cleaned)),
+        "call_price_bound_fail_rows": int((pre_price_bound_mask & ~call_bounds_mask).sum()),
         "raw_sessions": int(pd.to_datetime(raw["quote_date"]).nunique()),
         "clean_sessions": int(cleaned["date"].nunique()) if not cleaned.empty else 0,
     }

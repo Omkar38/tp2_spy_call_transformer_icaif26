@@ -1,0 +1,81 @@
+{
+  "input": "data/features/archive2_lastquote_forward/tp2_call_forward_features_lastquote_2013_2026.parquet",
+  "daily_violation_rows": 2419378,
+  "episode_rows": 2091823,
+  "clean_calendar_sessions": 3256,
+  "unique_pair_keys": 1787050,
+  "repeated_pair_keys_with_multiple_episodes": 231529,
+  "single_day_episodes": 1855276,
+  "single_day_episode_share": 0.8869182526437466,
+  "episodes_with_exact_rectangle_change": 53890,
+  "episodes_with_exact_rectangle_change_share": 0.02576221793144066,
+  "duration_sessions": {
+    "min": 1,
+    "p25": 1.0,
+    "median": 1.0,
+    "mean": 1.156588296428522,
+    "p75": 1.0,
+    "p95": 2.0,
+    "max": 14
+  },
+  "daily_rows_by_year": {
+    "2013": 73619,
+    "2014": 13510,
+    "2015": 22101,
+    "2016": 90011,
+    "2017": 115256,
+    "2018": 161425,
+    "2019": 107568,
+    "2020": 369138,
+    "2021": 485518,
+    "2022": 174918,
+    "2023": 169882,
+    "2024": 297186,
+    "2025": 265810,
+    "2026": 73436
+  },
+  "episode_starts_by_year": {
+    "2013": 68391,
+    "2014": 12081,
+    "2015": 20587,
+    "2016": 64084,
+    "2017": 89061,
+    "2018": 144522,
+    "2019": 96040,
+    "2020": 333782,
+    "2021": 395785,
+    "2022": 161604,
+    "2023": 153069,
+    "2024": 264115,
+    "2025": 223869,
+    "2026": 64833
+  },
+  "end_reason_counts": {
+    "not_detected_next_session": 2090508,
+    "sample_ended": 1315
+  },
+  "split_overlap_diagnostics": {
+    "train_2013_2022_overlapping_episodes": 1385937,
+    "train_2013_2022_episode_starts": 1385937,
+    "validation_2023_overlapping_episodes": 153069,
+    "validation_2023_episode_starts": 153069,
+    "test_2024_2026_overlapping_episodes": 552820,
+    "test_2024_2026_episode_starts": 552817,
+    "crosses_2022_2023_boundary": 0,
+    "crosses_2023_2024_boundary": 3
+  },
+  "clean_input": "data/processed/archive2_spy_call_allmoneyness_lastquote_clean_2013_2026.parquet",
+  "episodes_output": "data/features/archive2_episodes/tp2_call_pair_episodes_2013_2026.parquet",
+  "members_output": "data/features/archive2_episodes/tp2_call_episode_members_2013_2026.parquet",
+  "summary_output": "data/features/archive2_episodes/tp2_call_episode_summary_2013_2026.json",
+  "years_filter": null,
+  "primary_episode_key": "A_expiration|A_strike|B_expiration|B_strike",
+  "diagnostic_rectangle_key": "A/B/C/D expirations and strikes",
+  "diagnostic_outputs": {
+    "episode_starts_by_year": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/episodes/episode_starts_by_year.csv",
+    "episode_starts_by_month": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/episodes/episode_starts_by_month.csv",
+    "episode_duration_distribution": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/episodes/episode_duration_distribution.csv",
+    "top_longest_episodes": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/episodes/top_longest_episodes.csv",
+    "top_reappearing_pair_keys": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/episodes/top_reappearing_pair_keys.csv"
+  }
+}

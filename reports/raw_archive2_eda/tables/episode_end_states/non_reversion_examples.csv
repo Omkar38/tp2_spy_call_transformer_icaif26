@@ -1,0 +1,501 @@
+episode_id,episode_end_date,next_trading_date,end_state,end_state_detail,pair_key
+pair_ep_000000001,2013-04-11,2013-04-12,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130420|162.500000|20130426|165.000000
+pair_ep_000000002,2013-04-11,2013-04-12,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130420|162.500000|20130503|165.000000
+pair_ep_000000003,2013-05-03,2013-05-06,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130510|164.000000|20130518|167.000000
+pair_ep_000000004,2013-05-03,2013-05-06,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130510|165.000000|20130518|167.000000
+pair_ep_000000005,2013-05-03,2013-05-06,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130510|165.000000|20130524|168.000000
+pair_ep_000000006,2013-05-03,2013-05-06,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130510|165.000000|20130531|168.000000
+pair_ep_000000007,2013-05-03,2013-05-06,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130510|166.000000|20130518|167.000000
+pair_ep_000000008,2013-05-03,2013-05-06,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130510|166.000000|20130524|168.000000
+pair_ep_000000009,2013-05-03,2013-05-06,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130510|166.000000|20130531|168.000000
+pair_ep_000000010,2013-05-03,2013-05-06,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130510|166.000000|20130628|168.000000
+pair_ep_000000011,2013-05-17,2013-05-20,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130518|109.000000|20130720|152.000000
+pair_ep_000000012,2013-05-17,2013-05-20,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130518|110.000000|20130720|152.000000
+pair_ep_000000013,2013-05-17,2013-05-20,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130518|111.000000|20130720|152.000000
+pair_ep_000000014,2013-05-17,2013-05-20,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130518|112.000000|20130720|152.000000
+pair_ep_000000015,2013-05-17,2013-05-20,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130518|113.000000|20130720|152.000000
+pair_ep_000000016,2013-05-17,2013-05-20,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130518|114.000000|20130720|152.000000
+pair_ep_000000017,2013-05-17,2013-05-20,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130518|115.000000|20130720|152.000000
+pair_ep_000000023,2013-04-30,2013-05-01,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|165.000000|20130622|170.000000
+pair_ep_000000024,2013-04-25,2013-04-26,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|165.000000|20130628|170.000000
+pair_ep_000000025,2013-05-10,2013-05-13,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|165.500000|20130524|169.000000
+pair_ep_000000027,2013-04-04,2013-04-05,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130518|166.000000|20130622|169.000000
+pair_ep_000000030,2013-04-25,2013-04-26,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|166.000000|20130622|170.000000
+pair_ep_000000031,2013-04-30,2013-05-01,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|166.000000|20130622|170.000000
+pair_ep_000000032,2013-04-04,2013-04-05,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130518|166.000000|20130628|169.000000
+pair_ep_000000036,2013-04-25,2013-04-26,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|166.000000|20130628|170.000000
+pair_ep_000000037,2013-04-30,2013-05-01,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|166.000000|20130628|170.000000
+pair_ep_000000038,2013-04-25,2013-04-26,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|166.000000|20130720|170.000000
+pair_ep_000000040,2013-05-10,2013-05-13,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|166.500000|20130524|169.000000
+pair_ep_000000041,2013-05-10,2013-05-13,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|166.500000|20130531|169.000000
+pair_ep_000000042,2013-05-08,2013-05-09,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|167.000000|20130524|170.000000
+pair_ep_000000043,2013-05-08,2013-05-09,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130518|167.000000|20130531|171.000000
+pair_ep_000000046,2013-04-17,2013-04-18,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|167.000000|20130622|170.000000
+pair_ep_000000047,2013-04-30,2013-05-01,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|167.000000|20130622|170.000000
+pair_ep_000000048,2013-04-17,2013-04-18,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130518|167.000000|20130628|170.000000
+pair_ep_000000049,2013-04-25,2013-04-26,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|167.000000|20130628|170.000000
+pair_ep_000000050,2013-04-30,2013-05-01,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|167.000000|20130628|170.000000
+pair_ep_000000051,2013-04-30,2013-05-01,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|167.000000|20130720|170.000000
+pair_ep_000000052,2013-05-10,2013-05-13,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|167.500000|20130524|169.000000
+pair_ep_000000053,2013-05-10,2013-05-13,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|167.500000|20130531|169.000000
+pair_ep_000000054,2013-05-10,2013-05-13,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|167.500000|20130622|169.000000
+pair_ep_000000056,2013-05-08,2013-05-09,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130518|169.000000|20130628|170.000000
+pair_ep_000000062,2013-05-31,2013-06-03,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130607|168.000000|20130614|170.000000
+pair_ep_000000194,2013-06-20,2013-06-21,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|162.000000|20130628|163.000000
+pair_ep_000000195,2013-06-20,2013-06-21,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|162.000000|20130628|163.500000
+pair_ep_000000196,2013-06-20,2013-06-21,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|162.500000|20130628|163.000000
+pair_ep_000000197,2013-06-20,2013-06-21,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|162.500000|20130628|163.500000
+pair_ep_000000198,2013-06-20,2013-06-21,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|162.500000|20130705|164.000000
+pair_ep_000000199,2013-06-20,2013-06-21,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|162.500000|20130712|164.000000
+pair_ep_000000200,2013-06-20,2013-06-21,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|163.000000|20130628|163.000000
+pair_ep_000000201,2013-06-20,2013-06-21,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|163.000000|20130628|163.500000
+pair_ep_000000202,2013-06-20,2013-06-21,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|163.500000|20130628|163.500000
+pair_ep_000000205,2013-05-10,2013-05-13,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|171.000000|20130628|176.000000
+pair_ep_000000207,2013-06-04,2013-06-05,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|172.000000|20130705|174.000000
+pair_ep_000000208,2013-06-04,2013-06-05,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|172.000000|20130720|174.000000
+pair_ep_000000210,2013-04-25,2013-04-26,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130622|175.000000|20130720|178.000000
+pair_ep_000000211,2013-04-29,2013-04-30,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130622|175.000000|20130720|178.000000
+pair_ep_000000214,2013-05-20,2013-05-21,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130622|182.000000|20130720|185.000000
+pair_ep_000003568,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|160.500000|20130705|166.000000
+pair_ep_000003569,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|161.000000|20130705|166.000000
+pair_ep_000003570,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|161.500000|20130705|166.000000
+pair_ep_000003571,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|161.500000|20130712|166.000000
+pair_ep_000003572,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|162.000000|20130705|166.000000
+pair_ep_000003573,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|162.000000|20130712|166.000000
+pair_ep_000003574,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|162.500000|20130705|166.000000
+pair_ep_000003575,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|162.500000|20130712|166.000000
+pair_ep_000003576,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|162.500000|20130720|166.000000
+pair_ep_000003577,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|163.000000|20130705|166.000000
+pair_ep_000003578,2013-06-20,2013-06-21,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|163.000000|20130705|168.000000
+pair_ep_000003579,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|163.000000|20130712|166.000000
+pair_ep_000003580,2013-06-24,2013-06-25,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130628|163.500000|20130705|166.000000
+pair_ep_000003581,2013-06-24,2013-06-25,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130628|163.500000|20130712|166.000000
+pair_ep_000003582,2013-06-24,2013-06-25,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130628|163.500000|20130720|166.000000
+pair_ep_000003583,2013-06-24,2013-06-25,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130628|163.500000|20130726|166.000000
+pair_ep_000003584,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|164.000000|20130705|166.000000
+pair_ep_000003585,2013-06-20,2013-06-21,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|164.000000|20130705|168.000000
+pair_ep_000003586,2013-06-20,2013-06-21,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|164.000000|20130705|169.000000
+pair_ep_000003587,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|164.000000|20130712|166.000000
+pair_ep_000003588,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|164.000000|20130720|166.000000
+pair_ep_000003589,2013-06-24,2013-06-25,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|164.000000|20130726|166.000000
+pair_ep_000003590,2013-06-24,2013-06-25,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130628|164.500000|20130705|166.000000
+pair_ep_000003591,2013-06-20,2013-06-21,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|164.500000|20130705|168.000000
+pair_ep_000003592,2013-06-24,2013-06-25,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130628|164.500000|20130712|166.000000
+pair_ep_000003593,2013-06-24,2013-06-25,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130628|164.500000|20130720|166.000000
+pair_ep_000003594,2013-06-24,2013-06-25,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130628|164.500000|20130726|166.000000
+pair_ep_000003595,2013-06-20,2013-06-21,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|165.000000|20130705|168.000000
+pair_ep_000003596,2013-06-20,2013-06-21,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|165.000000|20130705|169.000000
+pair_ep_000003597,2013-06-20,2013-06-21,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|166.000000|20130705|168.000000
+pair_ep_000003598,2013-06-20,2013-06-21,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|166.000000|20130705|169.000000
+pair_ep_000003599,2013-06-07,2013-06-10,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|172.000000|20130720|176.000000
+pair_ep_000003600,2013-06-07,2013-06-10,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|173.000000|20130720|176.000000
+pair_ep_000003601,2013-06-07,2013-06-10,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130628|173.000000|20130817|177.000000
+pair_ep_000003603,2013-07-05,2013-07-08,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130712|167.000000|20130720|169.000000
+pair_ep_000003604,2013-06-27,2013-06-28,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130720|169.000000|20130726|172.000000
+pair_ep_000003605,2013-07-02,2013-07-05,right_leg_missing_or_expired,forward-adjusted rounded C/D strike out of available clean-chain bounds,20130720|170.000000|20130817|172.000000
+pair_ep_000003606,2013-06-19,2013-06-20,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130720|174.000000|20130817|177.000000
+pair_ep_000003607,2013-06-19,2013-06-20,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130720|175.000000|20130817|177.000000
+pair_ep_000003631,2013-07-19,2013-07-22,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130726|173.500000|20130817|175.000000
+pair_ep_000003632,2013-07-19,2013-07-22,liquidity_filter_failure,A/B present in raw next day but missing from clean quote-quality universe,20130726|173.500000|20130823|175.000000
+pair_ep_000004605,2013-08-08,2013-08-09,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130809|140.000000|20130906|154.000000
+pair_ep_000004867,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|123.000000
+pair_ep_000004868,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|124.000000
+pair_ep_000004869,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|125.000000
+pair_ep_000004870,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|126.000000
+pair_ep_000004871,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|127.000000
+pair_ep_000004872,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|128.000000
+pair_ep_000004873,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|129.000000
+pair_ep_000004875,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|130.000000
+pair_ep_000004877,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|131.000000
+pair_ep_000004880,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|132.000000
+pair_ep_000004882,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|133.000000
+pair_ep_000004885,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|134.000000
+pair_ep_000004887,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|135.000000
+pair_ep_000004889,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|136.000000
+pair_ep_000004891,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|137.000000
+pair_ep_000004893,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|138.000000
+pair_ep_000004895,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|139.000000
+pair_ep_000004897,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|140.000000
+pair_ep_000004899,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|141.000000
+pair_ep_000004901,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|142.000000
+pair_ep_000004903,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|143.000000
+pair_ep_000004905,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|144.000000
+pair_ep_000004907,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|145.000000
+pair_ep_000004910,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|146.000000
+pair_ep_000004913,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|147.000000
+pair_ep_000004916,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|148.000000
+pair_ep_000004919,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|149.000000
+pair_ep_000004922,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|150.000000
+pair_ep_000004925,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|151.000000
+pair_ep_000004928,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|152.000000
+pair_ep_000004930,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|153.000000
+pair_ep_000004933,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|154.000000
+pair_ep_000004935,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|155.000000
+pair_ep_000004937,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|156.000000
+pair_ep_000004939,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|157.000000
+pair_ep_000004941,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|109.000000|20130930|158.000000
+pair_ep_000004977,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|123.000000
+pair_ep_000004978,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|124.000000
+pair_ep_000004979,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|125.000000
+pair_ep_000004980,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|126.000000
+pair_ep_000004981,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|127.000000
+pair_ep_000004982,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|128.000000
+pair_ep_000004983,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|129.000000
+pair_ep_000004985,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|130.000000
+pair_ep_000004987,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|131.000000
+pair_ep_000004990,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|132.000000
+pair_ep_000004992,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|133.000000
+pair_ep_000004995,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|134.000000
+pair_ep_000004997,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|135.000000
+pair_ep_000004999,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|136.000000
+pair_ep_000005001,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|137.000000
+pair_ep_000005003,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|138.000000
+pair_ep_000005005,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|139.000000
+pair_ep_000005007,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|140.000000
+pair_ep_000005009,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|141.000000
+pair_ep_000005011,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|142.000000
+pair_ep_000005013,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|143.000000
+pair_ep_000005015,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|144.000000
+pair_ep_000005017,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|145.000000
+pair_ep_000005019,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|146.000000
+pair_ep_000005022,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|147.000000
+pair_ep_000005025,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|148.000000
+pair_ep_000005028,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|149.000000
+pair_ep_000005031,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|150.000000
+pair_ep_000005034,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|151.000000
+pair_ep_000005037,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|152.000000
+pair_ep_000005039,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|153.000000
+pair_ep_000005042,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|154.000000
+pair_ep_000005044,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|155.000000
+pair_ep_000005046,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|156.000000
+pair_ep_000005048,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|157.000000
+pair_ep_000005050,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|110.000000|20130930|158.000000
+pair_ep_000005092,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|123.000000
+pair_ep_000005093,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|124.000000
+pair_ep_000005094,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|125.000000
+pair_ep_000005095,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|126.000000
+pair_ep_000005096,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|127.000000
+pair_ep_000005097,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|128.000000
+pair_ep_000005098,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|129.000000
+pair_ep_000005100,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|130.000000
+pair_ep_000005102,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|131.000000
+pair_ep_000005105,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|132.000000
+pair_ep_000005107,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|133.000000
+pair_ep_000005110,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|134.000000
+pair_ep_000005112,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|135.000000
+pair_ep_000005114,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|136.000000
+pair_ep_000005116,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|137.000000
+pair_ep_000005118,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|138.000000
+pair_ep_000005120,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|139.000000
+pair_ep_000005122,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|140.000000
+pair_ep_000005124,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|141.000000
+pair_ep_000005126,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|142.000000
+pair_ep_000005128,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|143.000000
+pair_ep_000005130,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|144.000000
+pair_ep_000005132,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|145.000000
+pair_ep_000005134,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|146.000000
+pair_ep_000005136,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|147.000000
+pair_ep_000005138,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|148.000000
+pair_ep_000005141,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|149.000000
+pair_ep_000005144,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|150.000000
+pair_ep_000005147,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|151.000000
+pair_ep_000005150,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|152.000000
+pair_ep_000005152,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|153.000000
+pair_ep_000005155,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|154.000000
+pair_ep_000005157,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|155.000000
+pair_ep_000005159,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|156.000000
+pair_ep_000005161,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|157.000000
+pair_ep_000005163,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|111.000000|20130930|158.000000
+pair_ep_000005195,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|123.000000
+pair_ep_000005196,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|124.000000
+pair_ep_000005197,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|125.000000
+pair_ep_000005198,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|126.000000
+pair_ep_000005199,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|127.000000
+pair_ep_000005200,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|128.000000
+pair_ep_000005201,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|129.000000
+pair_ep_000005203,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|130.000000
+pair_ep_000005205,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|131.000000
+pair_ep_000005208,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|132.000000
+pair_ep_000005210,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|133.000000
+pair_ep_000005213,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|134.000000
+pair_ep_000005215,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|135.000000
+pair_ep_000005217,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|136.000000
+pair_ep_000005219,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|137.000000
+pair_ep_000005221,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|138.000000
+pair_ep_000005223,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|139.000000
+pair_ep_000005225,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|140.000000
+pair_ep_000005227,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|141.000000
+pair_ep_000005229,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|142.000000
+pair_ep_000005231,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|143.000000
+pair_ep_000005233,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|144.000000
+pair_ep_000005235,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|145.000000
+pair_ep_000005237,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|146.000000
+pair_ep_000005239,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|147.000000
+pair_ep_000005241,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|148.000000
+pair_ep_000005243,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|149.000000
+pair_ep_000005245,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|150.000000
+pair_ep_000005248,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|151.000000
+pair_ep_000005250,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|152.000000
+pair_ep_000005252,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|153.000000
+pair_ep_000005255,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|154.000000
+pair_ep_000005257,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|155.000000
+pair_ep_000005259,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|156.000000
+pair_ep_000005261,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|157.000000
+pair_ep_000005263,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|112.000000|20130930|158.000000
+pair_ep_000005285,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|123.000000
+pair_ep_000005286,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|124.000000
+pair_ep_000005287,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|125.000000
+pair_ep_000005288,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|126.000000
+pair_ep_000005289,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|127.000000
+pair_ep_000005290,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|128.000000
+pair_ep_000005291,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|129.000000
+pair_ep_000005293,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|130.000000
+pair_ep_000005295,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|131.000000
+pair_ep_000005298,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|132.000000
+pair_ep_000005300,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|133.000000
+pair_ep_000005303,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|134.000000
+pair_ep_000005305,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|135.000000
+pair_ep_000005307,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|136.000000
+pair_ep_000005309,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|137.000000
+pair_ep_000005311,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|138.000000
+pair_ep_000005313,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|139.000000
+pair_ep_000005315,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|140.000000
+pair_ep_000005317,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|141.000000
+pair_ep_000005319,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|142.000000
+pair_ep_000005321,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|143.000000
+pair_ep_000005323,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|144.000000
+pair_ep_000005325,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|145.000000
+pair_ep_000005327,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|146.000000
+pair_ep_000005329,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|147.000000
+pair_ep_000005331,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|148.000000
+pair_ep_000005333,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|149.000000
+pair_ep_000005335,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|150.000000
+pair_ep_000005337,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|151.000000
+pair_ep_000005339,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|152.000000
+pair_ep_000005341,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|153.000000
+pair_ep_000005344,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|154.000000
+pair_ep_000005346,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|155.000000
+pair_ep_000005348,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|156.000000
+pair_ep_000005351,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|113.000000|20130930|158.000000
+pair_ep_000005372,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|123.000000
+pair_ep_000005373,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|124.000000
+pair_ep_000005374,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|125.000000
+pair_ep_000005375,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|126.000000
+pair_ep_000005376,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|127.000000
+pair_ep_000005377,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|128.000000
+pair_ep_000005378,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|129.000000
+pair_ep_000005380,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|130.000000
+pair_ep_000005382,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|131.000000
+pair_ep_000005384,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|132.000000
+pair_ep_000005386,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|133.000000
+pair_ep_000005389,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|134.000000
+pair_ep_000005391,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|135.000000
+pair_ep_000005393,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|136.000000
+pair_ep_000005395,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|137.000000
+pair_ep_000005397,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|138.000000
+pair_ep_000005399,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|139.000000
+pair_ep_000005401,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|140.000000
+pair_ep_000005403,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|141.000000
+pair_ep_000005405,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|142.000000
+pair_ep_000005407,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|143.000000
+pair_ep_000005409,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|144.000000
+pair_ep_000005411,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|145.000000
+pair_ep_000005413,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|146.000000
+pair_ep_000005415,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|147.000000
+pair_ep_000005417,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|148.000000
+pair_ep_000005419,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|149.000000
+pair_ep_000005421,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|150.000000
+pair_ep_000005423,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|151.000000
+pair_ep_000005425,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|152.000000
+pair_ep_000005427,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|153.000000
+pair_ep_000005430,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|154.000000
+pair_ep_000005432,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|155.000000
+pair_ep_000005434,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|156.000000
+pair_ep_000005437,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|114.000000|20130930|158.000000
+pair_ep_000005460,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|123.000000
+pair_ep_000005461,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|124.000000
+pair_ep_000005462,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|125.000000
+pair_ep_000005463,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|126.000000
+pair_ep_000005464,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|127.000000
+pair_ep_000005465,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|128.000000
+pair_ep_000005466,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|129.000000
+pair_ep_000005468,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|130.000000
+pair_ep_000005470,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|131.000000
+pair_ep_000005472,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|132.000000
+pair_ep_000005474,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|133.000000
+pair_ep_000005477,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|134.000000
+pair_ep_000005479,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|135.000000
+pair_ep_000005481,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|136.000000
+pair_ep_000005483,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|137.000000
+pair_ep_000005485,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|138.000000
+pair_ep_000005487,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|139.000000
+pair_ep_000005489,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|140.000000
+pair_ep_000005491,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|141.000000
+pair_ep_000005493,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|142.000000
+pair_ep_000005495,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|143.000000
+pair_ep_000005497,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|144.000000
+pair_ep_000005499,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|145.000000
+pair_ep_000005501,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|146.000000
+pair_ep_000005503,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|147.000000
+pair_ep_000005505,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|148.000000
+pair_ep_000005507,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|149.000000
+pair_ep_000005509,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|150.000000
+pair_ep_000005511,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|151.000000
+pair_ep_000005513,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|152.000000
+pair_ep_000005515,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|153.000000
+pair_ep_000005518,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|154.000000
+pair_ep_000005520,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|155.000000
+pair_ep_000005522,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|156.000000
+pair_ep_000005525,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|115.000000|20130930|158.000000
+pair_ep_000005554,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|123.000000
+pair_ep_000005555,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|124.000000
+pair_ep_000005556,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|125.000000
+pair_ep_000005557,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|126.000000
+pair_ep_000005558,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|127.000000
+pair_ep_000005559,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|128.000000
+pair_ep_000005560,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|129.000000
+pair_ep_000005562,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|130.000000
+pair_ep_000005564,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|131.000000
+pair_ep_000005566,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|132.000000
+pair_ep_000005568,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|133.000000
+pair_ep_000005571,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|134.000000
+pair_ep_000005573,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|135.000000
+pair_ep_000005575,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|136.000000
+pair_ep_000005577,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|137.000000
+pair_ep_000005579,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|138.000000
+pair_ep_000005581,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|139.000000
+pair_ep_000005583,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|140.000000
+pair_ep_000005585,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|141.000000
+pair_ep_000005587,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|142.000000
+pair_ep_000005589,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|143.000000
+pair_ep_000005591,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|144.000000
+pair_ep_000005593,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|145.000000
+pair_ep_000005595,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|146.000000
+pair_ep_000005597,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|147.000000
+pair_ep_000005599,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|148.000000
+pair_ep_000005601,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|149.000000
+pair_ep_000005603,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|150.000000
+pair_ep_000005605,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|151.000000
+pair_ep_000005607,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|152.000000
+pair_ep_000005609,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|153.000000
+pair_ep_000005612,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|154.000000
+pair_ep_000005614,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|155.000000
+pair_ep_000005616,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|156.000000
+pair_ep_000005619,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|116.000000|20130930|158.000000
+pair_ep_000005646,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|123.000000
+pair_ep_000005647,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|124.000000
+pair_ep_000005648,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|125.000000
+pair_ep_000005649,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|126.000000
+pair_ep_000005650,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|127.000000
+pair_ep_000005651,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|128.000000
+pair_ep_000005652,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|129.000000
+pair_ep_000005654,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|130.000000
+pair_ep_000005656,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|131.000000
+pair_ep_000005658,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|132.000000
+pair_ep_000005660,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|133.000000
+pair_ep_000005663,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|134.000000
+pair_ep_000005665,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|135.000000
+pair_ep_000005667,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|136.000000
+pair_ep_000005669,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|137.000000
+pair_ep_000005671,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|138.000000
+pair_ep_000005673,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|139.000000
+pair_ep_000005675,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|140.000000
+pair_ep_000005677,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|141.000000
+pair_ep_000005679,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|142.000000
+pair_ep_000005681,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|143.000000
+pair_ep_000005683,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|144.000000
+pair_ep_000005685,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|145.000000
+pair_ep_000005687,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|146.000000
+pair_ep_000005689,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|147.000000
+pair_ep_000005691,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|148.000000
+pair_ep_000005693,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|149.000000
+pair_ep_000005695,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|150.000000
+pair_ep_000005697,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|151.000000
+pair_ep_000005699,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|152.000000
+pair_ep_000005701,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|153.000000
+pair_ep_000005704,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|154.000000
+pair_ep_000005706,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|155.000000
+pair_ep_000005708,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|156.000000
+pair_ep_000005711,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|117.000000|20130930|158.000000
+pair_ep_000005738,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|123.000000
+pair_ep_000005739,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|124.000000
+pair_ep_000005740,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|125.000000
+pair_ep_000005741,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|126.000000
+pair_ep_000005742,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|127.000000
+pair_ep_000005743,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|128.000000
+pair_ep_000005744,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|129.000000
+pair_ep_000005746,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|130.000000
+pair_ep_000005748,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|131.000000
+pair_ep_000005750,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|132.000000
+pair_ep_000005752,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|133.000000
+pair_ep_000005755,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|134.000000
+pair_ep_000005757,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|135.000000
+pair_ep_000005759,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|136.000000
+pair_ep_000005761,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|137.000000
+pair_ep_000005763,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|138.000000
+pair_ep_000005765,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|139.000000
+pair_ep_000005767,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|140.000000
+pair_ep_000005769,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|141.000000
+pair_ep_000005771,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|142.000000
+pair_ep_000005773,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|143.000000
+pair_ep_000005775,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|144.000000
+pair_ep_000005777,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|145.000000
+pair_ep_000005779,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|146.000000
+pair_ep_000005782,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|147.000000
+pair_ep_000005785,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|148.000000
+pair_ep_000005788,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|149.000000
+pair_ep_000005791,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|150.000000
+pair_ep_000005794,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|151.000000
+pair_ep_000005797,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|152.000000
+pair_ep_000005800,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|153.000000
+pair_ep_000005803,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|154.000000
+pair_ep_000005806,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|155.000000
+pair_ep_000005809,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|156.000000
+pair_ep_000005814,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|118.000000|20130930|158.000000
+pair_ep_000005844,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|123.000000
+pair_ep_000005845,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|124.000000
+pair_ep_000005846,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|125.000000
+pair_ep_000005847,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|126.000000
+pair_ep_000005848,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|127.000000
+pair_ep_000005849,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|128.000000
+pair_ep_000005850,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|129.000000
+pair_ep_000005852,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|130.000000
+pair_ep_000005854,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|131.000000
+pair_ep_000005856,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|132.000000
+pair_ep_000005858,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|133.000000
+pair_ep_000005861,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|134.000000
+pair_ep_000005863,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|135.000000
+pair_ep_000005865,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|136.000000
+pair_ep_000005867,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|137.000000
+pair_ep_000005869,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|138.000000
+pair_ep_000005871,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|139.000000
+pair_ep_000005873,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|140.000000
+pair_ep_000005875,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|141.000000
+pair_ep_000005877,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|142.000000
+pair_ep_000005879,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|143.000000
+pair_ep_000005881,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|144.000000
+pair_ep_000005883,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|145.000000
+pair_ep_000005885,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|146.000000
+pair_ep_000005888,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|147.000000
+pair_ep_000005891,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|148.000000
+pair_ep_000005894,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|149.000000
+pair_ep_000005897,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|150.000000
+pair_ep_000005900,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|151.000000
+pair_ep_000005903,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|152.000000
+pair_ep_000005906,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|153.000000
+pair_ep_000005909,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|154.000000
+pair_ep_000005912,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|155.000000
+pair_ep_000005915,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|156.000000
+pair_ep_000005920,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|119.000000|20130930|158.000000
+pair_ep_000005950,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|126.000000
+pair_ep_000005951,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|127.000000
+pair_ep_000005952,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|128.000000
+pair_ep_000005953,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|129.000000
+pair_ep_000005955,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|130.000000
+pair_ep_000005957,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|131.000000
+pair_ep_000005959,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|132.000000
+pair_ep_000005961,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|133.000000
+pair_ep_000005963,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|134.000000
+pair_ep_000005965,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|135.000000
+pair_ep_000005967,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|136.000000
+pair_ep_000005969,2013-08-16,2013-08-19,left_leg_expired_or_missing,A or B expiration reached before next-state check,20130817|120.000000|20130930|137.000000

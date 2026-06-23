@@ -1,0 +1,34 @@
+{
+  "rows": 5437848,
+  "episodes": 226577,
+  "policies": [
+    "exit_at_reversion_day",
+    "exit_first_liquid_on_or_after_reversion",
+    "exit_reversion_plus_1_session",
+    "exit_reversion_plus_3_sessions",
+    "exit_reversion_plus_5_sessions",
+    "exit_selected_leg_expiration_payoff"
+  ],
+  "first_liquid_net_pnl": {
+    "T1": -49090515.481,
+    "T2": -3343329.0755000003,
+    "K1": -19399319.726499993,
+    "K2": -24418971.097000003
+  },
+  "expiration_net_pnl": {
+    "T1": -32162457.08103345,
+    "T2": 194351782.46878996,
+    "K1": -118555648.18219312,
+    "K2": 173835761.60299376
+  },
+  "positive_policy_strategy_cells": 2,
+  "total_policy_strategy_cells": 24,
+  "best_by_policy": {
+    "exit_at_reversion_day": "T2",
+    "exit_first_liquid_on_or_after_reversion": "T2",
+    "exit_reversion_plus_1_session": "K2",
+    "exit_reversion_plus_3_sessions": "T2",
+    "exit_reversion_plus_5_sessions": "K2",
+    "exit_selected_leg_expiration_payoff": "T2"
+  }
+}

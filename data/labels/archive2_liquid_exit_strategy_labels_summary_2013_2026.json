@@ -1,0 +1,300 @@
+{
+  "rows": 5437848,
+  "episodes": 226577,
+  "strategies": [
+    "K1",
+    "K2",
+    "T1",
+    "T2"
+  ],
+  "exit_policies": [
+    "exit_at_reversion_day",
+    "exit_first_liquid_on_or_after_reversion",
+    "exit_reversion_plus_1_session",
+    "exit_reversion_plus_3_sessions",
+    "exit_reversion_plus_5_sessions",
+    "exit_selected_leg_expiration_payoff"
+  ],
+  "valid_rows": 2364690,
+  "valid_net_pnl": -144011604.52644286,
+  "by_policy_strategy": [
+    {
+      "exit_policy": "exit_at_reversion_day",
+      "strategy": "K1",
+      "selected": 226577,
+      "valid": 105591,
+      "profitable": 27304,
+      "net_pnl": -19348534.915999994,
+      "median_return": -0.024611908305418886,
+      "mean_holding_days": 2.6184523302175373,
+      "hit_rate": 0.25858264435415895
+    },
+    {
+      "exit_policy": "exit_at_reversion_day",
+      "strategy": "K2",
+      "selected": 226577,
+      "valid": 79965,
+      "profitable": 24697,
+      "net_pnl": -24576311.352500003,
+      "median_return": -0.017811500882579635,
+      "mean_holding_days": 2.5692365409866817,
+      "hit_rate": 0.30884762083411493
+    },
+    {
+      "exit_policy": "exit_at_reversion_day",
+      "strategy": "T1",
+      "selected": 226577,
+      "valid": 80226,
+      "profitable": 30363,
+      "net_pnl": -49163385.54049999,
+      "median_return": -0.021182094525248357,
+      "mean_holding_days": 2.575100341535163,
+      "hit_rate": 0.37846832697629196
+    },
+    {
+      "exit_policy": "exit_at_reversion_day",
+      "strategy": "T2",
+      "selected": 226577,
+      "valid": 100685,
+      "profitable": 32057,
+      "net_pnl": -3258086.2805000003,
+      "median_return": -0.030781095415589176,
+      "mean_holding_days": 2.6904305507275166,
+      "hit_rate": 0.31838903510949995
+    },
+    {
+      "exit_policy": "exit_first_liquid_on_or_after_reversion",
+      "strategy": "K1",
+      "selected": 226577,
+      "valid": 106232,
+      "profitable": 27451,
+      "net_pnl": -19399319.726499993,
+      "median_return": -0.024841205691214015,
+      "mean_holding_days": 2.628520596430454,
+      "hit_rate": 0.25840612997966717
+    },
+    {
+      "exit_policy": "exit_first_liquid_on_or_after_reversion",
+      "strategy": "K2",
+      "selected": 226577,
+      "valid": 83703,
+      "profitable": 25523,
+      "net_pnl": -24418971.097000003,
+      "median_return": -0.019258457785890987,
+      "mean_holding_days": 2.7289583408002103,
+      "hit_rate": 0.30492335997515024
+    },
+    {
+      "exit_policy": "exit_first_liquid_on_or_after_reversion",
+      "strategy": "T1",
+      "selected": 226577,
+      "valid": 83846,
+      "profitable": 31507,
+      "net_pnl": -49090515.481,
+      "median_return": -0.022663381273989015,
+      "mean_holding_days": 2.7298141831452902,
+      "hit_rate": 0.3757722491233929
+    },
+    {
+      "exit_policy": "exit_first_liquid_on_or_after_reversion",
+      "strategy": "T2",
+      "selected": 226577,
+      "valid": 101337,
+      "profitable": 32265,
+      "net_pnl": -3343329.0755000003,
+      "median_return": -0.03088783325389879,
+      "mean_holding_days": 2.701954863475335,
+      "hit_rate": 0.31839308446075965
+    },
+    {
+      "exit_policy": "exit_reversion_plus_1_session",
+      "strategy": "K1",
+      "selected": 226577,
+      "valid": 93864,
+      "profitable": 26557,
+      "net_pnl": -21766933.766,
+      "median_return": -0.0146592208344743,
+      "mean_holding_days": 3.9278850251427597,
+      "hit_rate": 0.2829306230290633
+    },
+    {
+      "exit_policy": "exit_reversion_plus_1_session",
+      "strategy": "K2",
+      "selected": 226577,
+      "valid": 71366,
+      "profitable": 31638,
+      "net_pnl": -2149996.6300000027,
+      "median_return": -0.00845985547778702,
+      "mean_holding_days": 3.816271053442816,
+      "hit_rate": 0.4433203486253958
+    },
+    {
+      "exit_policy": "exit_reversion_plus_1_session",
+      "strategy": "T1",
+      "selected": 226577,
+      "valid": 71746,
+      "profitable": 40223,
+      "net_pnl": -5407124.3845,
+      "median_return": 0.010022819427887167,
+      "mean_holding_days": 3.825816073369944,
+      "hit_rate": 0.5606305578011318
+    },
+    {
+      "exit_policy": "exit_reversion_plus_1_session",
+      "strategy": "T2",
+      "selected": 226577,
+      "valid": 98279,
+      "profitable": 28889,
+      "net_pnl": -25672529.083,
+      "median_return": -0.038690860607070617,
+      "mean_holding_days": 3.9793953947435363,
+      "hit_rate": 0.29394885987850916
+    },
+    {
+      "exit_policy": "exit_reversion_plus_3_sessions",
+      "strategy": "K1",
+      "selected": 226577,
+      "valid": 75827,
+      "profitable": 22051,
+      "net_pnl": -13851334.199999988,
+      "median_return": -0.015967059330943126,
+      "mean_holding_days": 6.661228849881968,
+      "hit_rate": 0.29080670473578013
+    },
+    {
+      "exit_policy": "exit_reversion_plus_3_sessions",
+      "strategy": "K2",
+      "selected": 226577,
+      "valid": 60789,
+      "profitable": 28388,
+      "net_pnl": -7383723.412999995,
+      "median_return": -0.00539979311235482,
+      "mean_holding_days": 6.501077497573574,
+      "hit_rate": 0.46699238349043415
+    },
+    {
+      "exit_policy": "exit_reversion_plus_3_sessions",
+      "strategy": "T1",
+      "selected": 226577,
+      "valid": 60986,
+      "profitable": 31964,
+      "net_pnl": -22543113.726499993,
+      "median_return": 0.005181569096406451,
+      "mean_holding_days": 6.505853802512052,
+      "hit_rate": 0.5241202899026006
+    },
+    {
+      "exit_policy": "exit_reversion_plus_3_sessions",
+      "strategy": "T2",
+      "selected": 226577,
+      "valid": 91832,
+      "profitable": 34518,
+      "net_pnl": -4169063.8504999955,
+      "median_return": -0.024606170496933026,
+      "mean_holding_days": 6.850781862531579,
+      "hit_rate": 0.37588204547434445
+    },
+    {
+      "exit_policy": "exit_reversion_plus_5_sessions",
+      "strategy": "K1",
+      "selected": 226577,
+      "valid": 57898,
+      "profitable": 19617,
+      "net_pnl": -10745963.963499999,
+      "median_return": -0.009822909365845576,
+      "mean_holding_days": 9.654858544336593,
+      "hit_rate": 0.33881999378216865
+    },
+    {
+      "exit_policy": "exit_reversion_plus_5_sessions",
+      "strategy": "K2",
+      "selected": 226577,
+      "valid": 48488,
+      "profitable": 23541,
+      "net_pnl": -10643200.781,
+      "median_return": -0.0018279820941610524,
+      "mean_holding_days": 9.537349447285926,
+      "hit_rate": 0.4855015673981191
+    },
+    {
+      "exit_policy": "exit_reversion_plus_5_sessions",
+      "strategy": "T1",
+      "selected": 226577,
+      "valid": 48826,
+      "profitable": 29960,
+      "net_pnl": -17295017.804500002,
+      "median_return": 0.024256703132333288,
+      "mean_holding_days": 9.554909269651414,
+      "hit_rate": 0.6136075041985827
+    },
+    {
+      "exit_policy": "exit_reversion_plus_5_sessions",
+      "strategy": "T2",
+      "selected": 226577,
+      "valid": 83312,
+      "profitable": 28800,
+      "net_pnl": -27254588.263000004,
+      "median_return": -0.03519370313985663,
+      "mean_holding_days": 9.9182830804686,
+      "hit_rate": 0.3456884962550413
+    },
+    {
+      "exit_policy": "exit_selected_leg_expiration_payoff",
+      "strategy": "K1",
+      "selected": 226577,
+      "valid": 177943,
+      "profitable": 122390,
+      "net_pnl": -118555648.18219312,
+      "median_return": 0.06580086580086589,
+      "mean_holding_days": 26.417768611296875,
+      "hit_rate": 0.6878045216726705
+    },
+    {
+      "exit_policy": "exit_selected_leg_expiration_payoff",
+      "strategy": "K2",
+      "selected": 226577,
+      "valid": 177943,
+      "profitable": 49740,
+      "net_pnl": 173835761.60299376,
+      "median_return": -0.17894986932763135,
+      "mean_holding_days": 26.417768611296875,
+      "hit_rate": 0.2795277139308655
+    },
+    {
+      "exit_policy": "exit_selected_leg_expiration_payoff",
+      "strategy": "T1",
+      "selected": 226577,
+      "valid": 188077,
+      "profitable": 51108,
+      "net_pnl": -32162457.08103345,
+      "median_return": -0.17548409891389896,
+      "mean_holding_days": 12.52728935489188,
+      "hit_rate": 0.2717397661596048
+    },
+    {
+      "exit_policy": "exit_selected_leg_expiration_payoff",
+      "strategy": "T2",
+      "selected": 226577,
+      "valid": 215929,
+      "profitable": 153028,
+      "net_pnl": 194351782.46878996,
+      "median_return": 0.06847736625514397,
+      "mean_holding_days": 28.591773221753446,
+      "hit_rate": 0.708695913934673
+    }
+  ],
+  "exit_reason_counts": {
+    "no_reversion_before_T1": 2336620,
+    "valid_exit": 1604798,
+    "valid_expiration_payoff": 759892,
+    "invalid_entry_or_exit_quote": 281861,
+    "exit_on_or_after_selected_expiration": 251812,
+    "missing_expiration_underlying_or_bad_entry": 146416,
+    "no_liquid_exit_after_reversion": 56449
+  },
+  "labels_input": "data/labels/archive2_episode_start_labels_conservative_bidask_2013_2026.parquet",
+  "lifecycle_input": "data/features/archive2_lifecycle/tp2_conservative_episode_lifecycle_2013_2026.parquet",
+  "quote_input": "data/processed/archive2_spy_call_quote_availability_nospread_2013_2026.parquet",
+  "output": "data/labels/archive2_liquid_exit_strategy_labels_2013_2026.parquet",
+  "max_spread_pct": 0.5
+}

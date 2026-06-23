@@ -1,0 +1,59 @@
+{
+  "output": "data/labels/archive2_episode_strategy_mini_backtest_2013_2026.parquet",
+  "labels_input": "data/labels/archive2_episode_start_labels_2013_2026.parquet",
+  "clean_input": "data/processed/archive2_spy_call_allmoneyness_lastquote_clean_2013_2026.parquet",
+  "strategy_rows": 8392852,
+  "strategies": [
+    "T1",
+    "T2",
+    "K1",
+    "K2"
+  ],
+  "strategies_per_episode": 4,
+  "unique_episodes_expected": 2098213,
+  "valid_backtest_rows": 4202430,
+  "valid_backtest_share": 0.5007153706511207,
+  "exit_reason_counts": {
+    "true_reversion_exit": 4202430,
+    "left_leg_expired_or_missing": 611116,
+    "right_leg_missing_or_expired": 2146396,
+    "liquidity_filter_failure": 1255124,
+    "invalid_entry_or_exit_quote": 58014,
+    "still_violation_or_reappeared": 114496,
+    "sample_ended": 5276
+  },
+  "by_strategy": {
+    "K1": {
+      "candidate_rows": 2098213,
+      "valid_rows": 1062589,
+      "net_pnl": -1290316789.8760002,
+      "transaction_cost": 26995792.226000004
+    },
+    "K2": {
+      "candidate_rows": 2098213,
+      "valid_rows": 1038626,
+      "net_pnl": -1508973915.1834998,
+      "transaction_cost": 48973807.7335
+    },
+    "T1": {
+      "candidate_rows": 2098213,
+      "valid_rows": 1038626,
+      "net_pnl": -1093795647.543,
+      "transaction_cost": 38275208.47800001
+    },
+    "T2": {
+      "candidate_rows": 2098213,
+      "valid_rows": 1062589,
+      "net_pnl": -1708548484.3415,
+      "transaction_cost": 37787799.471499994
+    }
+  },
+  "policy_note": "Conservative first baseline: enter at episode start and exit only at clean true-reversion next-state using the same opened contracts.",
+  "diagnostic_outputs": {
+    "exit_reason_counts": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/episode_mini_backtest/episode_mini_backtest_exit_reason_counts.csv",
+    "by_strategy": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/episode_mini_backtest/episode_mini_backtest_by_strategy.csv",
+    "by_year_strategy": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/episode_mini_backtest/episode_mini_backtest_by_year_strategy.csv",
+    "top_valid_pnl": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/episode_mini_backtest/episode_mini_backtest_top_valid_pnl.csv",
+    "bottom_valid_pnl": "/Users/jyotirpatel/Downloads/FinalQuant copy 2/reports/raw_archive2_eda/tables/episode_mini_backtest/episode_mini_backtest_bottom_valid_pnl.csv"
+  }
+}

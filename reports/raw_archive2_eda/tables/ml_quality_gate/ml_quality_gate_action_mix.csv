@@ -1,0 +1,16 @@
+predicted_action,Rows,Gate
+K1,3297,Base
+K2,1763,Base
+T1,998,Base
+T2,8816,Base
+skip,110128,Base
+K1,718,Volume + Delta
+K2,216,Volume + Delta
+T1,660,Volume + Delta
+T2,271,Volume + Delta
+skip,1565,Volume + Delta
+K1,577,Strict Quality
+K2,406,Strict Quality
+T1,358,Strict Quality
+T2,309,Strict Quality
+skip,530,Strict Quality

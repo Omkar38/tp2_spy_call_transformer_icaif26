@@ -1,0 +1,7 @@
+end_state,episode_count,episode_share
+true_reversion,1059366,0.5064319495483126
+right_leg_missing_or_expired,536657,0.2565499088594016
+liquidity_filter_failure,315233,0.15069774067882416
+left_leg_expired_or_missing,151072,0.07222025955350907
+still_violation_or_reappeared,28180,0.013471503086064165
+sample_ended,1315,0.0006286382738883739

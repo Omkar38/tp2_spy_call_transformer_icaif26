@@ -15,7 +15,11 @@
     "require_positive_size": false,
     "require_positive_open_interest": false,
     "require_positive_volume": false,
-    "exclude_rate_fallback": false
+    "exclude_rate_fallback": false,
+    "require_call_price_bounds": true,
+    "call_lower_bound_tolerance": 1.0,
+    "call_upper_bound_multiplier": 1.05,
+    "call_upper_bound_tolerance": 1.0
   },
   "years": [
     {
@@ -24,6 +28,7 @@
       "deduped_rows": 529719,
       "duplicate_rows_removed": 560299,
       "clean_rows": 99129,
+      "call_price_bound_fail_rows": 0,
       "raw_sessions": 189,
       "clean_sessions": 189
     },
@@ -32,7 +37,8 @@
       "raw_rows": 1741109,
       "deduped_rows": 830554,
       "duplicate_rows_removed": 910555,
-      "clean_rows": 156479,
+      "clean_rows": 156422,
+      "call_price_bound_fail_rows": 57,
       "raw_sessions": 249,
       "clean_sessions": 249
     },
@@ -42,6 +48,7 @@
       "deduped_rows": 977614,
       "duplicate_rows_removed": 1106161,
       "clean_rows": 181555,
+      "call_price_bound_fail_rows": 0,
       "raw_sessions": 250,
       "clean_sessions": 250
     },
@@ -51,6 +58,7 @@
       "deduped_rows": 1099012,
       "duplicate_rows_removed": 1307740,
       "clean_rows": 225307,
+      "call_price_bound_fail_rows": 0,
       "raw_sessions": 251,
       "clean_sessions": 251
     },
@@ -59,7 +67,8 @@
       "raw_rows": 2441126,
       "deduped_rows": 1214680,
       "duplicate_rows_removed": 1226446,
-      "clean_rows": 242041,
+      "clean_rows": 242021,
+      "call_price_bound_fail_rows": 20,
       "raw_sessions": 249,
       "clean_sessions": 249
     },
@@ -68,7 +77,8 @@
       "raw_rows": 3332563,
       "deduped_rows": 1490252,
       "duplicate_rows_removed": 1842311,
-      "clean_rows": 340904,
+      "clean_rows": 340878,
+      "call_price_bound_fail_rows": 26,
       "raw_sessions": 248,
       "clean_sessions": 248
     },
@@ -78,6 +88,7 @@
       "deduped_rows": 1673672,
       "duplicate_rows_removed": 2162567,
       "clean_rows": 355517,
+      "call_price_bound_fail_rows": 0,
       "raw_sessions": 249,
       "clean_sessions": 249
     },
@@ -86,7 +97,8 @@
       "raw_rows": 6143825,
       "deduped_rows": 2338708,
       "duplicate_rows_removed": 3805117,
-      "clean_rows": 528083,
+      "clean_rows": 527851,
+      "call_price_bound_fail_rows": 232,
       "raw_sessions": 251,
       "clean_sessions": 251
     },
@@ -95,7 +107,8 @@
       "raw_rows": 6107956,
       "deduped_rows": 2535312,
       "duplicate_rows_removed": 3572644,
-      "clean_rows": 567934,
+      "clean_rows": 567866,
+      "call_price_bound_fail_rows": 68,
       "raw_sessions": 250,
       "clean_sessions": 250
     },
@@ -104,7 +117,8 @@
       "raw_rows": 7062256,
       "deduped_rows": 2252560,
       "duplicate_rows_removed": 4809696,
-      "clean_rows": 539482,
+      "clean_rows": 539279,
+      "call_price_bound_fail_rows": 203,
       "raw_sessions": 251,
       "clean_sessions": 251
     },
@@ -113,7 +127,8 @@
       "raw_rows": 5746810,
       "deduped_rows": 1928686,
       "duplicate_rows_removed": 3818124,
-      "clean_rows": 410310,
+      "clean_rows": 410307,
+      "call_price_bound_fail_rows": 3,
       "raw_sessions": 248,
       "clean_sessions": 248
     },
@@ -122,7 +137,8 @@
       "raw_rows": 6044559,
       "deduped_rows": 2147976,
       "duplicate_rows_removed": 3896583,
-      "clean_rows": 483658,
+      "clean_rows": 483637,
+      "call_price_bound_fail_rows": 21,
       "raw_sessions": 236,
       "clean_sessions": 236
     },
@@ -131,7 +147,8 @@
       "raw_rows": 7119099,
       "deduped_rows": 2256872,
       "duplicate_rows_removed": 4862227,
-      "clean_rows": 523904,
+      "clean_rows": 522372,
+      "call_price_bound_fail_rows": 1532,
       "raw_sessions": 232,
       "clean_sessions": 232
     },
@@ -140,12 +157,13 @@
       "raw_rows": 3677988,
       "deduped_rows": 1314233,
       "duplicate_rows_removed": 2363755,
-      "clean_rows": 258588,
+      "clean_rows": 258565,
+      "call_price_bound_fail_rows": 23,
       "raw_sessions": 103,
       "clean_sessions": 103
     }
   ],
-  "total_clean_rows": 4912891,
+  "total_clean_rows": 4910706,
   "total_raw_rows": 58834075,
   "total_deduped_rows": 22589850,
   "total_duplicate_rows_removed": 36244225
