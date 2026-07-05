@@ -1,0 +1,15 @@
+{
+  "method": "MLP baseline on selected F_star features",
+  "feature_count": 48,
+  "total_selected": 14885,
+  "total_norm_pnl": 1220528.9366063916,
+  "positive_years": 6,
+  "total_years": 6,
+  "combined_daily_sharpe": 2.2310767732038785,
+  "combined_win_rate": 0.5627813234800134,
+  "notes": [
+    "This is the first ablation before transformer attention.",
+    "Thresholds are tuned on validation years only.",
+    "Test years are evaluated once."
+  ]
+}

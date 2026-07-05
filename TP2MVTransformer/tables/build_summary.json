@@ -1,0 +1,115 @@
+{
+  "strategy_universe": [
+    "T1",
+    "K2"
+  ],
+  "label_policy": "exit_selected_leg_expiration_payoff",
+  "token_rows": 354974,
+  "unique_episodes": 177487,
+  "date_min": "2014-02-03",
+  "date_max": "2026-06-04",
+  "candidate_features": 149,
+  "selected_features": 48,
+  "selected_feature_blocks": {
+    "market": 12,
+    "short_d_leg": 10,
+    "option_risk": 10,
+    "surface_location": 6,
+    "liquidity": 5,
+    "tp2_geometry": 3,
+    "strategy_calendar": 1,
+    "lifecycle_pressure": 1
+  },
+  "folds": [
+    {
+      "fold": "2017_2019__val2020__test2021",
+      "train": [
+        2017,
+        2018,
+        2019
+      ],
+      "val": [
+        2020
+      ],
+      "test": [
+        2021
+      ]
+    },
+    {
+      "fold": "2018_2020__val2021__test2022",
+      "train": [
+        2018,
+        2019,
+        2020
+      ],
+      "val": [
+        2021
+      ],
+      "test": [
+        2022
+      ]
+    },
+    {
+      "fold": "2019_2021__val2022__test2023",
+      "train": [
+        2019,
+        2020,
+        2021
+      ],
+      "val": [
+        2022
+      ],
+      "test": [
+        2023
+      ]
+    },
+    {
+      "fold": "2020_2022__val2023__test2024",
+      "train": [
+        2020,
+        2021,
+        2022
+      ],
+      "val": [
+        2023
+      ],
+      "test": [
+        2024
+      ]
+    },
+    {
+      "fold": "2021_2023__val2024__test2025",
+      "train": [
+        2021,
+        2022,
+        2023
+      ],
+      "val": [
+        2024
+      ],
+      "test": [
+        2025
+      ]
+    },
+    {
+      "fold": "2022_2024__val2025__test2026",
+      "train": [
+        2022,
+        2023,
+        2024
+      ],
+      "val": [
+        2025
+      ],
+      "test": [
+        2026
+      ]
+    }
+  ],
+  "notes": [
+    "Boosting is used only for feature discovery.",
+    "Booster predictions, leaves, SHAP vectors, and scores are not transformer inputs.",
+    "signal_year and all label/future columns are excluded from candidate features.",
+    "SHAP is not computed in this environment because shap is not installed; permutation importance is used instead."
+  ]
+}

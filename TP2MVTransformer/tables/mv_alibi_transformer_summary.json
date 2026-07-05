@@ -1,0 +1,18 @@
+{
+  "method": "TP2-MV-ALiBi cross-attention transformer",
+  "feature_count": 48,
+  "max_history_tokens": 32,
+  "total_selected": 35354,
+  "total_norm_pnl": 3839180.332824968,
+  "positive_years": 5,
+  "total_years": 6,
+  "combined_daily_sharpe": 1.6091840378111821,
+  "combined_win_rate": 0.34861684675001414,
+  "device": "cpu",
+  "notes": [
+    "Historical context uses prior tokens only.",
+    "Validation thresholds are tuned only on validation-year outcomes.",
+    "Test years are evaluated once.",
+    "This is the first full multivariate ALiBi implementation, not the final tuned transformer."
+  ]
+}

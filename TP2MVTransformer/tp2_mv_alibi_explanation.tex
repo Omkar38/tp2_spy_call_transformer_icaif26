@@ -1,0 +1,543 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts,mathtools}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{tabularx}
+
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\softmax}{\operatorname{softmax}}
+\newcommand{\softplus}{\operatorname{softplus}}
+
+\title{\textbf{TP2-MV-ALiBi Transformer}\\[4pt]
+\large Architecture Explanation with Formulas}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+%%────────────────────────────────────────────────────────────────
+\section{What Problem the Transformer Solves}
+
+For each TP2 episode on a given day, we want to answer:
+
+\begin{center}
+\textit{``Will trading strategy T1 (or K2) on this violation make money by expiry?''}
+\end{center}
+
+A standard model (MLP, LightGBM) looks at the current episode's 48 features and
+gives a probability. The transformer does something extra: it asks
+
+\begin{center}
+\textit{``What happened historically in episodes that looked similar to this one?''}
+\end{center}
+
+and uses that historical context to improve the prediction.
+
+The key structural insight used throughout: both viable strategies T1 and K2
+\textbf{short the shorter-dated D-leg}. T2 and K1 short the longer-dated C-leg
+and are structural losers. The strategy universe is therefore restricted to
+$r \in \{T1, K2\}$ as a theoretical prior.
+
+%%────────────────────────────────────────────────────────────────
+\section{Token Construction}
+
+Each (episode $i$, strategy $r$) pair becomes one \textbf{token} --- a vector
+of numbers the transformer reads.
+
+\[
+  u_{i,r}
+  =
+  \bigl[\,
+    x_{i,r};\;
+    \mathrm{emb}(r);\;
+    \mathrm{emb}(\mathrm{month}_i);\;
+    \mathrm{emb}(\mathrm{dayofweek}_i)
+  \,\bigr]
+\]
+
+where:
+\begin{itemize}[leftmargin=*]
+  \item $x_{i,r} \in \R^{48}$ --- the 48 features selected from $\mathcal{F}^\star$
+        (option surface, short-D-leg risk, liquidity, lifecycle pressure).
+  \item $\mathrm{emb}(r)$ --- a learned embedding for whether the strategy is T1 or K2.
+  \item Month and day-of-week --- seasonality signals.
+  \item \texttt{signal\_year} is \textbf{explicitly excluded} to prevent fold leakage.
+\end{itemize}
+
+The token is projected to a hidden dimension $d = 64$:
+\[
+  h_{i,r}^{(0)}
+  =
+  \mathrm{MLP}_{\mathrm{emb}}\!\bigl(\mathrm{LayerNorm}(u_{i,r})\bigr)
+  \;\in\; \R^{64}.
+\]
+
+The MLP embedding uses the structure:
+\[
+  \mathrm{Linear}(48 \to 64) \;\to\; \mathrm{LayerNorm} \;\to\; \mathrm{GELU}
+  \;\to\; \mathrm{Dropout}(0.10) \;\to\; \mathrm{Linear}(64 \to 64).
+\]
+
+%%────────────────────────────────────────────────────────────────
+\section{Standard Self-Attention (Baseline)}
+
+In standard attention with $H = 4$ heads, each of dimension
+$d_h = 64 / 4 = 16$, the attention score between episode $i$ (query)
+and historical episode $j$ (key) in head $h$ is:
+
+\[
+  a_{ij}^{(h)}
+  =
+  \frac{(Q_i^{(h)})^\top K_j^{(h)}}{\sqrt{d_h}}
+\]
+
+Attention weights:
+\[
+  \alpha_{ij}^{(h)}
+  =
+  \frac{\exp(a_{ij}^{(h)})}{\displaystyle\sum_{k} \exp(a_{ik}^{(h)})}
+\]
+
+Context vector (weighted sum of value vectors):
+\[
+  \tilde{h}_i^{(h)}
+  =
+  \sum_j \alpha_{ij}^{(h)} V_j^{(h)}
+\]
+
+\textbf{Problem with standard attention for TP2:} All historical episodes
+are treated as equally relevant regardless of when they happened, what the
+option surface looked like, or how liquid the market was. A violation from
+3 years ago in a completely different volatility regime gets the same
+consideration as one from last week in an identical setup.
+
+%%────────────────────────────────────────────────────────────────
+\section{Original ALiBi --- Scalar Distance Penalty}
+
+ALiBi (Press, Smith \& Lewis, ICLR 2022) adds a \textbf{penalty proportional
+to time distance} to the attention score, replacing positional embeddings:
+
+\[
+  a_{ij}^{(h)}
+  =
+  \frac{(Q_i^{(h)})^\top K_j^{(h)}}{\sqrt{d_h}}
+  - m_h \cdot (t_i - t_j)
+\]
+
+where $m_h > 0$ is a fixed head-specific slope. Larger slope = stronger
+preference for recent episodes. The penalty grows linearly with how far back
+you look.
+
+\textbf{Limitation for TP2:} Scalar time distance alone does not capture what
+actually matters. A violation from 5 years ago with an identical option surface
+configuration and the same short-D-leg moneyness is more relevant than a
+violation from last month with a completely different setup.
+
+%%────────────────────────────────────────────────────────────────
+\section{TP2-MV-ALiBi --- Multivariate Distance Penalty}
+
+\subsection{Core Idea}
+
+We replace the scalar time distance with a \textbf{vector of 5 TP2-domain
+distances}:
+
+\[
+  d_{ij}
+  =
+  \bigl[\,
+    D_{\mathrm{time}}(i,j),\;
+    D_{\mathrm{surface}}(i,j),\;
+    D_{\mathrm{short\text{-}D}}(i,j),\;
+    D_{\mathrm{liq}}(i,j),\;
+    D_{\mathrm{life}}(i,j)
+  \,\bigr]^\top
+  \;\in\; \R^5
+\]
+
+Each attention head gets a \textbf{slope vector} $m_h \in \R^5$:
+
+\[
+  b_{ij}^{(h)} = -m_h^\top d_{ij}
+\]
+
+\subsection{Full Attention Logit}
+
+\[
+  \boxed{
+  a_{ij}^{(h)}
+  =
+  \underbrace{\frac{(Q_i^{(h)})^\top K_j^{(h)}}{\sqrt{d_h}}}_{\text{feature similarity}}
+  -\;
+  \underbrace{m_h^\top d_{ij}}_{\text{MV-ALiBi penalty}}
+  +\;
+  \underbrace{\rho_h^{\mathrm{same}} \cdot \1\{r_i = r_j\}}_{\text{same-strategy bonus}}
+  +\;
+  \underbrace{\rho_h^{\mathrm{cross}} \cdot \1\{r_i \neq r_j\}}_{\text{cross-strategy bonus}}
+  }
+\]
+
+where:
+\begin{itemize}[leftmargin=*]
+  \item $\rho_h^{\mathrm{same}}$ --- learned bonus when both tokens are the same
+        strategy (T1$\leftrightarrow$T1 or K2$\leftrightarrow$K2).
+  \item $\rho_h^{\mathrm{cross}}$ --- learned bonus for cross-strategy comparison
+        (T1$\leftrightarrow$K2).
+\end{itemize}
+
+\subsection{Slopes are Guaranteed Positive (Softplus Parameterization)}
+
+The slopes $m_h$ are parameterized as:
+\[
+  m_h = \softplus(\tilde{m}_h),
+  \qquad
+  \softplus(x) = \log(1 + e^x)
+\]
+where $\tilde{m}_h$ is the learned parameter. This guarantees $m_h \geq 0$,
+which preserves the ALiBi property: \textbf{larger distances always reduce
+attention weight}.
+
+\subsection{Attention Weights and Context}
+
+\[
+  \alpha_{ij}^{(h)}
+  =
+  \frac{\exp(a_{ij}^{(h)})}{\sum_{k < i} \exp(a_{ik}^{(h)})}
+\]
+
+Padding positions (empty history) are masked with $-10^9$ before softmax.
+
+\[
+  c_i
+  =
+  \sum_{j < i} \alpha_{ij} V_j
+  \;\in\; \R^{64}
+\]
+
+%%────────────────────────────────────────────────────────────────
+\section{The Five Distance Functions}
+
+\subsection{D1 --- Time Distance}
+How old is the historical episode?
+\[
+  D_{\mathrm{time}}(i,j)
+  =
+  \log(1 + \Delta t_{ij}),
+  \qquad
+  \Delta t_{ij} = t_i - t_j \;\text{(in days)}
+\]
+Log-scaled so the penalty does not explode for very old episodes.
+
+\subsection{D2 --- Option Surface Distance}
+Where on the moneyness--maturity surface does the violation occur?
+\[
+  D_{\mathrm{surface}}(i,j)
+  =
+  \bigl\|W_s(s_i - s_j)\bigr\|_1
+\]
+\[
+  s_i
+  =
+  \bigl[
+    \log(K_A/S_i),\;
+    \log(K_B/S_i),\;
+    \log(K_C/S_i),\;
+    \log(K_D/S_i),\;
+    \log(1 + \mathrm{DTE}_{T1,i}),\;
+    \log(1 + \mathrm{DTE}_{T2,i})
+  \bigr]
+\]
+
+\subsection{D3 --- Short-D-Leg Distance}
+Risk profile of the leg that \textbf{both T1 and K2 short}:
+\[
+  D_{\mathrm{short\text{-}D}}(i,j)
+  =
+  \bigl\|W_D(z_{D,i} - z_{D,j})\bigr\|_1
+\]
+\[
+  z_{D,i}
+  =
+  \bigl[
+    \log(K_D/S_i),\;
+    \Delta_{D,i},\;
+    \Gamma_{D,i},\;
+    \Theta_{D,i},\;
+    \sigma_{D,i},\;
+    \mathrm{DTE}_{D,i},\;
+    \mathrm{spread}_{D,i}
+  \bigr]
+\]
+This distance is the structural heart of the model: T1 and K2 are both
+profitable because they short the same short-dated D-leg. Historically similar
+short-D-leg configurations should predict similar outcomes.
+
+\subsection{D4 --- Liquidity Distance}
+How tradeable is the episode?
+\[
+  D_{\mathrm{liq}}(i,j)
+  =
+  \bigl\|W_\ell(\ell_{i,r} - \ell_{j,r})\bigr\|_1
+\]
+\[
+  \ell_{i,r}
+  =
+  \bigl[
+    \mathrm{max\ spread\ pct}_{i,r},\;
+    \mathrm{mean\ spread\ pct}_{i,r},\;
+    \mathrm{min\ volume}_{i,r},\;
+    \mathrm{roundtrip\ cost}_{i,r}
+  \bigr]
+\]
+
+\subsection{D5 --- Lifecycle Distance}
+Trajectory and persistence of the TP2 violation before signal date:
+\[
+  D_{\mathrm{life}}(i,j)
+  =
+  \bigl\|W_c(c_i - c_j)\bigr\|_1
+\]
+\[
+  c_i
+  =
+  \bigl[
+    \mathrm{lc\_pressure}_i,\;
+    \mathrm{lc\_pressure\_slope}_i,\;
+    \mathrm{lc\_observable\_share}_i
+  \bigr]
+\]
+
+In the implementation, $W_s, W_D, W_\ell, W_c$ are computed as
+\textbf{mean absolute difference} across that feature block --- simple,
+interpretable, and parameter-free.
+
+%%────────────────────────────────────────────────────────────────
+\section{Prediction Heads}
+
+Combined representation after attention:
+\[
+  z_i = \bigl[h_i^{(0)};\; c_i\bigr] \;\in\; \R^{128}
+\]
+
+\subsection{Binary Classification Head (Main --- Used for Trading)}
+\[
+  \hat{p}_{i,r}
+  =
+  \sigma\!\left(
+    \mathrm{MLP}_{\mathrm{cls}}\!\left(
+      \mathrm{LayerNorm}(z_i)
+    \right)
+  \right)
+\]
+$\sigma$ is the sigmoid function. $\hat{p}_{i,r}$ is the probability that
+strategy $r$ on episode $i$ is profitable at expiry.
+
+\subsection{Return Auxiliary Head (Diagnostics Only)}
+\[
+  \hat{\mu}_{i,r}
+  =
+  \mathrm{MLP}_{\mathrm{ret}}\!\left(
+    \mathrm{LayerNorm}(z_i)
+  \right)
+\]
+Predicts the normalized realized return. Used for diagnostics and error
+analysis. \textbf{Not used for trading decisions.}
+
+\subsection{Trading Decision Rule}
+\[
+  r_i^\star
+  =
+  \arg\max_{r \in \{T1, K2\}} \hat{p}_{i,r},
+  \qquad
+  \text{trade only if } \max_{r} \hat{p}_{i,r} > \theta
+\]
+The threshold $\theta$ is tuned on the validation year only. Test year is
+evaluated once.
+
+%%────────────────────────────────────────────────────────────────
+\section{Training Loss}
+
+\[
+  \mathcal{L}
+  =
+  \mathcal{L}_{\mathrm{BCE}}
+  +
+  \lambda_R \cdot \mathcal{L}_{\mathrm{Huber}}
+\]
+
+\subsection{Binary Cross-Entropy (Main Loss)}
+With class-weight $w^+ = (1-\bar{y})/\bar{y}$ to handle class imbalance
+($\bar{y}$ is the training positive rate):
+
+\[
+  \mathcal{L}_{\mathrm{BCE}}
+  =
+  -\sum_i
+  \Bigl[
+    w^+ y_i \log \hat{p}_i
+    +
+    (1 - y_i) \log(1 - \hat{p}_i)
+  \Bigr]
+\]
+
+\subsection{Huber Return Loss (Auxiliary, $\lambda_R = 0.02$)}
+\[
+  \mathcal{L}_{\mathrm{Huber}}
+  =
+  \sum_i \mathrm{Huber}_{0.5}\!\left(R_i^{\mathrm{expiry}} - \hat{\mu}_i\right)
+\]
+
+\[
+  \mathrm{Huber}_\delta(r)
+  =
+  \begin{cases}
+    \tfrac{1}{2}r^2 & |r| \leq \delta \\
+    \delta\bigl(|r| - \tfrac{1}{2}\delta\bigr) & |r| > \delta
+  \end{cases}
+\]
+
+The Huber loss is less sensitive to the large loss outliers that characterize
+failing T2/K1-style episodes (which are excluded by the mechanical gate but
+can occur in borderline cases). $\lambda_R = 0.02$ keeps it strictly
+auxiliary.
+
+\textbf{Pairwise ranking loss is intentionally excluded.} Cross-episode
+ranking is not conceptually clean for this trading problem: two episodes on
+different days with different market conditions are not comparable by a
+ranking objective.
+
+%%────────────────────────────────────────────────────────────────
+\section{Isotonic Probability Calibration}
+
+After training, raw probabilities are passed through an isotonic regression
+fitted on the validation year:
+
+\[
+  \hat{p}^{\mathrm{cal}} = \mathrm{IsotonicRegression}(\hat{p}^{\mathrm{raw}})
+\]
+
+\begin{itemize}[leftmargin=*]
+  \item Isotonic regression is monotone: it re-maps probabilities without
+        changing their rank order.
+  \item Fitted on validation predictions and labels, applied to test
+        predictions. No test leakage.
+  \item Since the mapping is monotone, the threshold grid search on validation
+        yields the same selected episodes before and after calibration --- the
+        calibration improves interpretability of the probabilities without
+        affecting the trading decision.
+\end{itemize}
+
+%%────────────────────────────────────────────────────────────────
+\section{Rolling Evaluation Protocol}
+
+\begin{table}[h]
+\centering
+\caption{Rolling train/validation/test folds}
+\begin{tabular}{cccc}
+\toprule
+Fold & Train & Validation & Test \\
+\midrule
+1 & 2017--2019 & 2020 & 2021 \\
+2 & 2018--2020 & 2021 & 2022 \\
+3 & 2019--2021 & 2022 & 2023 \\
+4 & 2020--2022 & 2023 & 2024 \\
+5 & 2021--2023 & 2024 & 2025 \\
+6 & 2022--2024 & 2025 & 2026 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For each fold:
+\begin{enumerate}[leftmargin=*]
+  \item Scale features using \texttt{StandardScaler} fitted on training years only.
+  \item Build history arrays: for each token in val/test, look back up to
+        MAX\_HISTORY = 64 prior tokens from the training window.
+  \item Train for up to 25 epochs with early stopping (patience = 5) on
+        validation AUC. LR scheduler halves learning rate when AUC plateaus.
+  \item Restore best checkpoint (highest validation AUC).
+  \item Calibrate probabilities with isotonic regression on validation year.
+  \item Tune threshold $\theta$ by grid search on calibrated validation P\&L.
+  \item Evaluate once on test year using the validation-tuned threshold.
+\end{enumerate}
+
+%%────────────────────────────────────────────────────────────────
+\section{Head Specialization}
+
+Different heads can learn different notions of historical relevance. With 4
+heads and 5 distance dimensions, different slope vectors naturally specialize:
+
+\begin{table}[h]
+\centering
+\caption{Expected head specialization after training}
+\begin{tabular}{lcccccc}
+\toprule
+Head type & $D_{\mathrm{time}}$ & $D_{\mathrm{surface}}$ &
+$D_{\mathrm{short\text{-}D}}$ & $D_{\mathrm{liq}}$ & $D_{\mathrm{life}}$ \\
+\midrule
+Time-local   & large  & small  & small  & small  & small \\
+Surface-local & small & large  & medium & small  & small \\
+Short-D-local & medium & medium & large & small  & medium \\
+Liquidity-local & small & small & small & large  & medium \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This specialization happens through gradient descent on the learned slope
+parameters $\tilde{m}_h$.
+
+%%────────────────────────────────────────────────────────────────
+\section{Architecture Summary}
+
+\begin{table}[h]
+\centering
+\caption{TP2-MV-ALiBi model configuration}
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+Input features ($|\mathcal{F}^\star|$) & 48 \\
+Hidden dimension & 64 \\
+Attention heads & 4 \\
+Head dimension & 16 \\
+History window & 64 tokens \\
+Distance dimensions & 5 \\
+Strategy universe & T1, K2 \\
+Main loss & BCE with class-weight \\
+Auxiliary loss & Huber ($\lambda_R = 0.02$) \\
+Calibration & Isotonic regression (val) \\
+Optimizer & AdamW \\
+Learning rate & $5 \times 10^{-4}$ \\
+LR schedule & ReduceLROnPlateau (factor 0.5) \\
+Epochs (max) & 25 \\
+Early stopping patience & 5 \\
+Batch size & 512 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%%────────────────────────────────────────────────────────────────
+\section{One-Line Summary}
+
+\begin{center}
+\fbox{
+\begin{minipage}{0.88\textwidth}
+Standard attention asks \textit{``which historical episode has similar
+features?''} TP2-MV-ALiBi asks \textit{``which historical episode had a
+similar option surface, similar short-D-leg risk, similar liquidity, and
+similar violation lifecycle --- and also happened recently?''} The
+multivariate ALiBi bias encodes all five notions of proximity directly into
+the attention weights, without adding positional embeddings.
+\end{minipage}
+}
+\end{center}
+
+\end{document}

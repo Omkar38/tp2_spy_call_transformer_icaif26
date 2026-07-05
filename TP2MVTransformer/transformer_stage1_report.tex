@@ -1,0 +1,155 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+\renewcommand{\arraystretch}{1.12}
+
+\title{TP2-MV-ALiBi Transformer Build: Stage 1}
+\author{FinalQuant TP2 Research Pipeline}
+\date{July 3, 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Purpose}
+
+This report documents the first implementation stage of the professor-proposed
+TP2-MV-ALiBi transformer. The goal of this stage is not to train the transformer
+yet. The goal is to produce the leakage-safe T1/K2 token dataset and the stable
+feature dictionary \( \mathcal F^\star \) that the transformer will consume.
+
+\section*{Implemented}
+
+\begin{itemize}
+  \item Created \texttt{TP2MVTransformer/01\_build\_feature\_dictionary.py}.
+  \item Built one token row per \((\mathrm{episode}, \mathrm{strategy})\) for \(T1\) and \(K2\).
+  \item Used corrected expiry-payoff labels only: \texttt{exit\_selected\_leg\_expiration\_payoff}.
+  \item Excluded \texttt{signal\_year}, all \texttt{label\_*} columns, realized P\&L columns, future exit fields, and validity/result columns from candidate inputs.
+  \item Trained rolling LightGBM models only for feature discovery.
+  \item Saved a frozen feature dictionary for downstream transformer training.
+\end{itemize}
+
+\section*{Dataset Summary}
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+Item & Value \\
+\midrule
+Token rows & 354,974 \\
+Unique TP2 episodes & 177,487 \\
+Strategies & T1, K2 \\
+Date range & 2014-02-03 to 2026-06-04 \\
+Candidate point-in-time features & 149 \\
+Selected transformer features & 48 \\
+Normalized exposure convention & \$1,000 per trade \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Rolling Feature-Discovery Folds}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+Fold & Train & Validation & Test \\
+\midrule
+1 & 2017--2019 & 2020 & 2021 \\
+2 & 2018--2020 & 2021 & 2022 \\
+3 & 2019--2021 & 2022 & 2023 \\
+4 & 2020--2022 & 2023 & 2024 \\
+5 & 2021--2023 & 2024 & 2025 \\
+6 & 2022--2024 & 2025 & 2026 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Selected Feature Blocks}
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+Feature block & Selected features \\
+\midrule
+Market / forward / price level & 12 \\
+Short-D-leg features & 10 \\
+Option risk / Greeks / IV & 10 \\
+Surface location & 6 \\
+Liquidity & 5 \\
+TP2 geometry & 3 \\
+Strategy/calendar & 1 \\
+Lifecycle pressure & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Top Stable Features}
+
+\begin{center}
+\small
+\begin{tabular}{rllrr}
+\toprule
+Rank & Feature & Block & Stability & Mean score \\
+\midrule
+1 & \texttt{feature\_D\_theta} & short-D-leg & 1.00 & 0.0339 \\
+2 & \texttt{feature\_F\_T1} & market & 1.00 & 0.0281 \\
+3 & \texttt{strategy\_selected\_mid\_sum} & market & 0.92 & 0.0635 \\
+4 & \texttt{feature\_bidask\_executable\_ratio} & liquidity & 0.92 & 0.0500 \\
+5 & \texttt{feature\_D\_ask} & short-D-leg & 0.92 & 0.0415 \\
+6 & \texttt{feature\_D\_vega} & short-D-leg & 0.92 & 0.0349 \\
+7 & \texttt{signal\_month} & strategy/calendar & 0.92 & 0.0303 \\
+8 & \texttt{feature\_T1\_DTE} & surface location & 0.92 & 0.0260 \\
+9 & \texttt{feature\_F\_T2} & market & 0.92 & 0.0208 \\
+10 & \texttt{feature\_severity} & TP2 geometry & 0.83 & 0.0920 \\
+\bottomrule
+\end{tabular}
+\normalsize
+\end{center}
+
+\section*{Interpretation}
+
+The selected dictionary is consistent with the professor's design. Many stable
+features describe the short \(D\)-leg, liquidity, option-surface location, and
+TP2 severity. That means the data-driven feature discovery is aligned with the
+proposed multivariate ALiBi distances:
+
+\[
+D_{\mathrm{time}},\quad
+D_{\mathrm{surface}},\quad
+D_D,\quad
+D_{\mathrm{liq}},\quad
+D_{\mathrm{life}}.
+\]
+
+The lifecycle block selected fewer features than expected in this first pass.
+This does not mean lifecycle is unimportant; it means the current LightGBM
+feature-discovery pass ranked short-D-leg and liquidity variables more strongly.
+Lifecycle features can still be included in the transformer distance vector as a
+pre-specified structural block.
+
+\section*{Generated Files}
+
+\begin{itemize}
+  \item \texttt{TP2MVTransformer/data/tp2\_t1k2\_token\_dataset.parquet}
+  \item \texttt{TP2MVTransformer/tables/feature\_dictionary.csv}
+  \item \texttt{TP2MVTransformer/tables/fold\_feature\_importance.csv}
+  \item \texttt{TP2MVTransformer/tables/build\_summary.json}
+\end{itemize}
+
+\section*{Next Step}
+
+Install/enable \texttt{torch}, then implement:
+
+\begin{enumerate}
+  \item MLP on \( \mathcal F^\star \).
+  \item Transformer without ALiBi.
+  \item Time-only ALiBi.
+  \item Full TP2-MV-ALiBi using time, surface, short-D, liquidity, and lifecycle distances.
+\end{enumerate}
+
+\end{document}
