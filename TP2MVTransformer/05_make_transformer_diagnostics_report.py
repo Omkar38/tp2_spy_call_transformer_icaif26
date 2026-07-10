@@ -88,14 +88,29 @@ def save_training_plot(hist: pd.DataFrame) -> bool:
 def save_distance_plot(dist: pd.DataFrame) -> bool:
     if dist.empty:
         return False
+    dist = dist.copy()
+    dist.columns = [str(c).strip() for c in dist.columns]
+    required = {"split", "distance", "mean", "p99"}
+    if not required.issubset(dist.columns):
+        missing = ", ".join(sorted(required - set(dist.columns)))
+        print(f"Skipping distance plot; missing columns: {missing}")
+        return False
+    dist["mean"] = pd.to_numeric(dist["mean"], errors="coerce")
+    dist["p99"] = pd.to_numeric(dist["p99"], errors="coerce")
     test = dist[dist["split"].eq("test")].copy()
     if test.empty:
         test = dist.copy()
-    pivot = test.pivot_table(index="distance", values=["mean", "p99"], aggfunc="mean")
+    pivot = (
+        test.groupby("distance", as_index=True)
+        .agg(mean_value=("mean", "mean"), p99_value=("p99", "mean"))
+        .dropna(how="all")
+    )
+    if pivot.empty:
+        return False
     fig, ax = plt.subplots(figsize=(8.5, 4.8))
     x = np.arange(len(pivot.index))
-    ax.bar(x - 0.18, pivot["mean"], width=0.36, label="Mean")
-    ax.bar(x + 0.18, pivot["p99"], width=0.36, label="P99")
+    ax.bar(x - 0.18, pivot["mean_value"], width=0.36, label="Mean")
+    ax.bar(x + 0.18, pivot["p99_value"], width=0.36, label="P99")
     ax.set_xticks(x)
     ax.set_xticklabels(pivot.index, rotation=20, ha="right")
     ax.set_ylabel("Distance scale")
