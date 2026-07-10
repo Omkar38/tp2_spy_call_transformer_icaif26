@@ -275,6 +275,65 @@ def make_arrays(
     )
 
 
+DISTANCE_NAMES = ["time", "surface", "short_d", "liquidity", "lifecycle"]
+
+
+def distance_summary(arrays: FoldArrays, fold_name: str, split: str) -> list[dict]:
+    rows = []
+    if arrays.distances.size == 0:
+        return rows
+    valid = arrays.hist_mask
+    if not valid.any():
+        for idx, name in enumerate(DISTANCE_NAMES):
+            rows.append({
+                "fold": fold_name,
+                "split": split,
+                "distance": name,
+                "n": 0,
+                "mean": float("nan"),
+                "std": float("nan"),
+                "p01": float("nan"),
+                "p50": float("nan"),
+                "p99": float("nan"),
+                "max": float("nan"),
+            })
+        return rows
+    for idx, name in enumerate(DISTANCE_NAMES):
+        vals = arrays.distances[:, :, idx][valid]
+        rows.append({
+            "fold": fold_name,
+            "split": split,
+            "distance": name,
+            "n": int(len(vals)),
+            "mean": float(np.mean(vals)),
+            "std": float(np.std(vals)),
+            "p01": float(np.quantile(vals, 0.01)),
+            "p50": float(np.quantile(vals, 0.50)),
+            "p99": float(np.quantile(vals, 0.99)),
+            "max": float(np.max(vals)),
+        })
+    return rows
+
+
+def attention_parameter_rows(model: MVAlibiClassifier, fold_name: str, test_year: int) -> list[dict]:
+    slopes = torch.nn.functional.softplus(model.raw_slopes).detach().cpu().numpy()
+    same = model.same_strategy_bonus.detach().cpu().numpy()
+    cross = model.cross_strategy_bonus.detach().cpu().numpy()
+    rows = []
+    for head in range(slopes.shape[0]):
+        row = {
+            "fold": fold_name,
+            "test_year": test_year,
+            "head": int(head),
+            "same_strategy_bonus": float(same[head]),
+            "cross_strategy_bonus": float(cross[head]),
+        }
+        for idx, name in enumerate(DISTANCE_NAMES):
+            row[f"slope_{name}"] = float(slopes[head, idx])
+        rows.append(row)
+    return rows
+
+
 # ── training ───────────────────────────────────────────────────────────────────
 
 def train_epoch(
@@ -285,9 +344,10 @@ def train_epoch(
     huber_criterion: nn.Module,
     device: torch.device,
     lambda_return: float,
-) -> float:
+) -> tuple[float, float]:
     model.train()
     losses = []
+    grad_norms = []
     for batch in loader:
         optimizer.zero_grad(set_to_none=True)
         cls_logit, ret_pred = model(
@@ -300,10 +360,36 @@ def train_epoch(
         if lambda_return > 0 and ret_pred is not None:
             loss = loss + lambda_return * huber_criterion(ret_pred, batch["ret"].to(device))
         loss.backward()
-        nn.utils.clip_grad_norm_(model.parameters(), 2.0)
+        grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 2.0)
         optimizer.step()
         losses.append(float(loss.detach().cpu()))
-    return float(np.mean(losses))
+        grad_norms.append(float(grad_norm.detach().cpu() if torch.is_tensor(grad_norm) else grad_norm))
+    return float(np.mean(losses)), float(np.mean(grad_norms))
+
+
+@torch.no_grad()
+def evaluate_loss(
+    model: nn.Module,
+    loader: DataLoader,
+    bce_criterion: nn.Module,
+    huber_criterion: nn.Module,
+    device: torch.device,
+    lambda_return: float,
+) -> float:
+    model.eval()
+    losses = []
+    for batch in loader:
+        cls_logit, ret_pred = model(
+            batch["x"].to(device),
+            batch["hist_x"].to(device),
+            batch["hist_mask"].to(device),
+            batch["distances"].to(device),
+        )
+        loss = bce_criterion(cls_logit, batch["y"].to(device))
+        if lambda_return > 0 and ret_pred is not None:
+            loss = loss + lambda_return * huber_criterion(ret_pred, batch["ret"].to(device))
+        losses.append(float(loss.detach().cpu()))
+    return float(np.mean(losses)) if losses else float("nan")
 
 
 @torch.no_grad()
@@ -374,6 +460,30 @@ def daily_sharpe(selected: pd.DataFrame) -> float:
     return float(daily.mean() / std * np.sqrt(252))
 
 
+def daily_sortino(selected: pd.DataFrame) -> float:
+    if selected.empty:
+        return float("nan")
+    daily = selected.groupby("signal_date")["target_norm_pnl"].sum()
+    if len(daily) < 2:
+        return float("nan")
+    downside = daily[daily < 0.0]
+    if downside.empty:
+        return float("inf") if daily.mean() > 0 else float("nan")
+    downside_std = downside.std()
+    if downside_std == 0 or pd.isna(downside_std):
+        return float("nan")
+    return float(daily.mean() / downside_std * np.sqrt(252))
+
+
+def daily_drawdown(selected: pd.DataFrame) -> float:
+    if selected.empty:
+        return float("nan")
+    daily = selected.groupby("signal_date")["target_norm_pnl"].sum().sort_index()
+    equity = daily.cumsum()
+    drawdown = equity - equity.cummax()
+    return float(drawdown.min()) if len(drawdown) else float("nan")
+
+
 def summarize(selected: pd.DataFrame, threshold: float) -> dict:
     if selected.empty:
         return {
@@ -382,6 +492,8 @@ def summarize(selected: pd.DataFrame, threshold: float) -> dict:
             "norm_total_pnl": 0.0,
             "win_rate": float("nan"),
             "daily_sharpe": float("nan"),
+            "daily_sortino": float("nan"),
+            "max_drawdown": float("nan"),
             "t1_selected": 0,
             "k2_selected": 0,
         }
@@ -392,6 +504,8 @@ def summarize(selected: pd.DataFrame, threshold: float) -> dict:
         "norm_total_pnl": float(selected["target_norm_pnl"].sum()),
         "win_rate": float((selected["target_norm_pnl"] > 0).mean()),
         "daily_sharpe": daily_sharpe(selected),
+        "daily_sortino": daily_sortino(selected),
+        "max_drawdown": daily_drawdown(selected),
         "t1_selected": int(dist.get("T1", 0)),
         "k2_selected": int(dist.get("K2", 0)),
     }
@@ -480,6 +594,10 @@ def main() -> None:
 
     fold_rows = []
     prediction_rows = []
+    val_prediction_rows = []
+    training_history_rows = []
+    distance_rows = []
+    attention_rows = []
 
     for fold in FOLDS:
         fold_name = fold["fold"]
@@ -499,6 +617,9 @@ def main() -> None:
         val_arrays = make_arrays(val, val_history, feature_cols, scaler, block_indices)
         test_history = data[data["signal_year"].isin(fold["train"] + fold["val"])].copy()
         test_arrays = make_arrays(test, test_history, feature_cols, scaler, block_indices)
+        distance_rows.extend(distance_summary(train_arrays, fold_name, "train"))
+        distance_rows.extend(distance_summary(val_arrays, fold_name, "validation"))
+        distance_rows.extend(distance_summary(test_arrays, fold_name, "test"))
 
         pos_rate = float(train["target_profitable"].mean())
         pos_weight = torch.tensor([(1.0 - pos_rate) / max(pos_rate, 1e-6)], dtype=torch.float32, device=device)
@@ -522,19 +643,39 @@ def main() -> None:
 
         best_auc = -np.inf
         best_state = None
+        best_epoch = 0
+        best_val_loss = float("nan")
         stale = 0
         for epoch in range(1, EPOCHS + 1):
-            loss = train_epoch(model, train_loader, optimizer, bce_criterion, huber_criterion, device, LAMBDA_RETURN)
+            train_loss, grad_norm = train_epoch(model, train_loader, optimizer, bce_criterion, huber_criterion, device, LAMBDA_RETURN)
+            val_loss = evaluate_loss(model, val_loader, bce_criterion, huber_criterion, device, LAMBDA_RETURN)
             val_prob, _ = predict(model, val_loader, device)
             try:
                 val_auc = float(roc_auc_score(val_arrays.y, val_prob))
             except ValueError:
                 val_auc = float("nan")
-            print(f"  epoch={epoch:02d} loss={loss:.4f} val_auc={val_auc:.4f} lr={optimizer.param_groups[0]['lr']:.2e}", flush=True)
+            training_history_rows.append({
+                "fold": fold_name,
+                "test_year": test_year,
+                "epoch": epoch,
+                "train_loss": train_loss,
+                "val_loss": val_loss,
+                "val_auc": val_auc,
+                "mean_grad_norm_pre_clip": grad_norm,
+                "learning_rate": float(optimizer.param_groups[0]["lr"]),
+            })
+            print(
+                f"  epoch={epoch:02d} train_loss={train_loss:.4f} "
+                f"val_loss={val_loss:.4f} val_auc={val_auc:.4f} "
+                f"grad_norm={grad_norm:.3f} lr={optimizer.param_groups[0]['lr']:.2e}",
+                flush=True,
+            )
             if np.isfinite(val_auc):
                 scheduler.step(val_auc)
             if np.isfinite(val_auc) and val_auc > best_auc:
                 best_auc = val_auc
+                best_epoch = epoch
+                best_val_loss = val_loss
                 best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
                 stale = 0
             else:
@@ -545,6 +686,7 @@ def main() -> None:
 
         if best_state is not None:
             model.load_state_dict(best_state)
+        attention_rows.extend(attention_parameter_rows(model, fold_name, test_year))
 
         # raw predictions
         val_prob_raw, val_ret_pred = predict(model, val_loader, device)
@@ -583,6 +725,8 @@ def main() -> None:
             "feature_count": len(feature_cols),
             "max_history_tokens": MAX_HISTORY,
             "val_auc": best_auc,
+            "best_epoch": best_epoch,
+            "best_val_loss": best_val_loss,
             "test_auc": test_auc,
             **{f"val_{k}": v for k, v in val_metrics.items()},
             **{f"test_{k}": v for k, v in test_metrics.items()},
@@ -598,6 +742,9 @@ def main() -> None:
             )
         )
         prediction_rows.append(test_tokens)
+
+        val_tokens["fold"] = fold_name
+        val_prediction_rows.append(val_tokens)
 
         # diagnostics for 2022 and any negative year
         if test_year == 2022 or test_metrics["norm_total_pnl"] < 0:
@@ -615,10 +762,40 @@ def main() -> None:
     results = pd.DataFrame(fold_rows)
     predictions = pd.concat(prediction_rows, ignore_index=True)
     selected = predictions[predictions["selected"]].copy()
+    training_history = pd.DataFrame(training_history_rows)
+    distance_diagnostics = pd.DataFrame(distance_rows)
+    attention_diagnostics = pd.DataFrame(attention_rows)
+
+    selected_daily = (
+        selected.groupby("signal_date", as_index=False)["target_norm_pnl"].sum()
+        if len(selected)
+        else pd.DataFrame(columns=["signal_date", "target_norm_pnl"])
+    )
+    if len(selected_daily):
+        selected_daily["signal_year"] = pd.to_datetime(selected_daily["signal_date"]).dt.year
 
     # year-wise diagnostics table
-    yearly = results[["test_year", "test_threshold", "test_n_selected", "test_norm_total_pnl", "test_win_rate", "test_daily_sharpe", "test_t1_selected", "test_k2_selected", "val_auc", "test_auc"]].copy()
+    yearly = results[[
+        "test_year",
+        "test_threshold",
+        "test_n_selected",
+        "test_norm_total_pnl",
+        "test_win_rate",
+        "test_daily_sharpe",
+        "test_daily_sortino",
+        "test_max_drawdown",
+        "test_t1_selected",
+        "test_k2_selected",
+        "val_auc",
+        "test_auc",
+    ]].copy()
     yearly.to_csv(TABLE_DIR / "mv_alibi_v2_yearly_diagnostics.csv", index=False)
+    training_history.to_csv(TABLE_DIR / "mv_alibi_v2_training_history.csv", index=False)
+    distance_diagnostics.to_csv(TABLE_DIR / "mv_alibi_v2_distance_diagnostics.csv", index=False)
+    attention_diagnostics.to_csv(TABLE_DIR / "mv_alibi_v2_attention_parameters.csv", index=False)
+    selected.to_parquet(DATA_DIR / "mv_alibi_transformer_v2_selected_trades.parquet", index=False)
+    selected.to_csv(TABLE_DIR / "mv_alibi_transformer_v2_selected_trades.csv", index=False)
+    selected_daily.to_csv(TABLE_DIR / "mv_alibi_transformer_v2_selected_daily_pnl.csv", index=False)
 
     summary = {
         "method": "TP2-MV-ALiBi cross-attention transformer v2",
@@ -628,23 +805,38 @@ def main() -> None:
         "epochs_max": EPOCHS,
         "lambda_return": LAMBDA_RETURN,
         "calibration": "isotonic on val probs",
+        "diagnostics": {
+            "training_history_csv": str(TABLE_DIR / "mv_alibi_v2_training_history.csv"),
+            "distance_diagnostics_csv": str(TABLE_DIR / "mv_alibi_v2_distance_diagnostics.csv"),
+            "attention_parameters_csv": str(TABLE_DIR / "mv_alibi_v2_attention_parameters.csv"),
+            "selected_daily_pnl_csv": str(TABLE_DIR / "mv_alibi_transformer_v2_selected_daily_pnl.csv"),
+        },
         "total_selected": int(len(selected)),
         "total_norm_pnl": float(selected["target_norm_pnl"].sum()),
         "positive_years": int((results["test_norm_total_pnl"] > 0).sum()),
         "total_years": int(len(results)),
         "combined_daily_sharpe": daily_sharpe(selected),
+        "combined_daily_sortino": daily_sortino(selected),
+        "combined_max_drawdown": daily_drawdown(selected),
         "combined_win_rate": float((selected["target_norm_pnl"] > 0).mean()) if len(selected) else float("nan"),
         "device": str(device),
         "notes": [
             "Pairwise ranking loss excluded: cross-episode ranking not clean for this trading problem.",
             "Return head is auxiliary and diagnostic only; trading decisions use binary probability.",
             "Thresholds tuned on calibrated val probs; test evaluated once.",
+            "Sortino is annualized from selected daily normalized P&L with zero risk-free rate.",
+            "Training history includes train loss, validation loss, validation AUC, learning rate, and pre-clip gradient norm.",
+            "Distance diagnostics report scale statistics for time, surface, short-D-leg, liquidity, and lifecycle distances.",
+            "Attention diagnostics report learned softplus slopes and same/cross strategy bonuses by attention head.",
             "2022 fold diagnostics saved to fold_2022_diagnostics.csv and fold_2022_worst_losses.csv.",
         ],
     }
 
+    val_predictions = pd.concat(val_prediction_rows, ignore_index=True)
+
     results.to_csv(TABLE_DIR / "mv_alibi_transformer_v2_results.csv", index=False)
     predictions.to_parquet(DATA_DIR / "mv_alibi_transformer_v2_test_predictions.parquet", index=False)
+    val_predictions.to_parquet(DATA_DIR / "mv_alibi_transformer_v2_val_predictions.parquet", index=False)
     with open(TABLE_DIR / "mv_alibi_transformer_v2_summary.json", "w", encoding="utf-8") as fh:
         json.dump(summary, fh, indent=2)
 
@@ -654,7 +846,13 @@ def main() -> None:
     print(f"\nYearly diagnostics:")
     print(yearly.to_string(index=False))
     print(f"\nWrote {TABLE_DIR / 'mv_alibi_transformer_v2_results.csv'}")
+    print(f"Wrote {TABLE_DIR / 'mv_alibi_v2_training_history.csv'}")
+    print(f"Wrote {TABLE_DIR / 'mv_alibi_v2_distance_diagnostics.csv'}")
+    print(f"Wrote {TABLE_DIR / 'mv_alibi_v2_attention_parameters.csv'}")
     print(f"Wrote {DATA_DIR / 'mv_alibi_transformer_v2_test_predictions.parquet'}")
+    print(f"Wrote {DATA_DIR / 'mv_alibi_transformer_v2_val_predictions.parquet'}")
+    print(f"Wrote {DATA_DIR / 'mv_alibi_transformer_v2_selected_trades.parquet'}")
+    print(f"Wrote {TABLE_DIR / 'mv_alibi_transformer_v2_selected_daily_pnl.csv'}")
 
 
 if __name__ == "__main__":

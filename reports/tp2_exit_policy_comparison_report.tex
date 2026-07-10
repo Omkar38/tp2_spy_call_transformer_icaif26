@@ -1,0 +1,167 @@
+
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+\title{TP2 Exit Policy Comparison: First-Liquid vs Expiration Payoff}
+\author{SPY American Call TP2 Project}
+\date{\today}
+\begin{document}
+\maketitle
+
+\section{Purpose}
+This report separates two distinct TP2 backtests. The entry episode is the same in both cases: a conservative bid/ask TP2 violation in SPY calls. The difference is the post-entry exit accounting.
+
+\textbf{First-liquid exit} closes the selected legs at the first liquid quote date on or after TP2 reversion. It is more execution-realistic because it uses future tradable bid/ask quotes, liquidity checks, and bid/ask costs. It is not guaranteed to be more profitable.
+
+\textbf{Expiration payoff} holds selected legs to their selected expiration payoff and uses intrinsic call payoff, \(\max(S_T-K,0)\). It is less quote-dependent and cleaner theoretically, but it is not a full assignment-aware live trading simulator for American calls.
+
+All P\&L below uses the \(\$1{,}000\) normalized exposure convention: \(\mathrm{target\_norm\_pnl}=\mathrm{realized\_return}\times1000\).
+
+\textbf{Sharpe and Sortino definitions.} Sharpe is annualized from daily selected normalized P\&L. Sortino uses the same daily series but replaces total daily volatility with downside-only volatility, so it penalizes negative daily P\&L variation rather than large positive jumps. The risk-free rate is set to zero for these diagnostic ratios.
+
+\section{All-Trade Baselines}
+These tables trade every valid T1 or K2 episode without ML selection. They show why the ML problem is needed.
+
+\subsection{Expiration Payoff: All T1 and K2}
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\scriptsize
+\begin{tabular}{rrrrrrrrr}
+\toprule
+Year & T1 trades & T1 P\&L & T1 win & T1 Sortino & K2 trades & K2 P\&L & K2 win & K2 Sortino \\
+\midrule
+2017 & 12,282 & \$2,004,529 & 58.1\% & 13.07 & 12,282 & \$914,078 & 33.5\% & 3.08 \\
+2018 & 5,530 & -\$981,203 & 19.0\% & -4.48 & 5,419 & -\$308,973 & 34.4\% & -3.20 \\
+2019 & 4,112 & \$626,887 & 41.7\% & 6.69 & 4,095 & -\$123,793 & 41.5\% & -2.01 \\
+2020 & 25,373 & \$804,218 & 74.6\% & 5.11 & 25,139 & \$1,767,283 & 70.4\% & 18.98 \\
+2021 & 20,299 & -\$629,380 & 14.4\% & -1.05 & 19,836 & \$3,865,097 & 17.2\% & 8.21 \\
+2022 & 6,604 & -\$1,242,135 & 16.9\% & -4.43 & 6,604 & -\$1,341,724 & 15.1\% & -4.44 \\
+2023 & 12,651 & -\$1,689,826 & 11.7\% & -3.93 & 12,388 & \$13,578 & 17.5\% & 0.03 \\
+2024 & 31,419 & -\$2,188,453 & 17.1\% & -3.49 & 29,757 & -\$3,743,690 & 14.6\% & -4.77 \\
+2025 & 39,420 & -\$6,928,483 & 9.9\% & -7.97 & 38,310 & -\$3,566,744 & 12.2\% & -4.99 \\
+2026 & 9,082 & \$1,918,450 & 11.6\% & 10.42 & 8,515 & \$3,011,879 & 10.5\% & 26.07 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{First-Liquid Exit: All T1 and K2}
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\scriptsize
+\begin{tabular}{rrrrrrrrr}
+\toprule
+Year & T1 trades & T1 P\&L & T1 win & T1 Sortino & K2 trades & K2 P\&L & K2 win & K2 Sortino \\
+\midrule
+2017 & 9,337 & -\$471,741 & 24.5\% & -1.93 & 9,301 & -\$775,417 & 10.1\% & -4.85 \\
+2018 & 3,105 & \$137,869 & 84.1\% & 19.30 & 3,100 & \$12,455 & 80.0\% & 0.88 \\
+2019 & 3,055 & \$166,731 & 71.1\% & 5.81 & 3,055 & -\$213,078 & 62.7\% & -2.49 \\
+2020 & 22,533 & -\$1,138,666 & 48.2\% & -1.21 & 22,526 & -\$629,860 & 45.6\% & -2.16 \\
+2021 & 7,695 & -\$900,424 & 22.4\% & -7.10 & 7,694 & -\$1,138,350 & 21.1\% & -8.51 \\
+2022 & 2,338 & -\$93,361 & 56.9\% & -1.89 & 2,334 & -\$190,492 & 53.5\% & -2.79 \\
+2023 & 2,785 & -\$708,497 & 20.8\% & -4.14 & 2,784 & -\$781,770 & 25.8\% & -5.13 \\
+2024 & 6,559 & -\$33,980 & 44.7\% & -0.26 & 6,551 & -\$916,870 & 41.5\% & -7.00 \\
+2025 & 7,339 & -\$1,281,815 & 37.8\% & -3.92 & 7,354 & -\$1,594,695 & 32.2\% & -5.74 \\
+2026 & 1,019 & -\$277,004 & 15.6\% & -4.43 & 1,020 & -\$287,051 & 14.2\% & -5.43 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\section{Model Summary, Test Years 2021--2026}
+\subsection{Expiration Payoff Models}
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\small
+\begin{tabular}{lrrrrrrr}
+\toprule
+Model & Total P\&L & Trades & Win rate & Mean yearly Sharpe & Mean yearly Sortino & Combined Sortino & Positive years \\
+\midrule
+LightGBM & \$1,672,567 & 16,979 & 62.9\% & 4.26 & 64.74 & 5.23 & 6/6 \\
+MLP & \$1,220,529 & 14,885 & 56.3\% & 3.34 & 38.88 & 2.45 & 6/6 \\
+Transformer V1 & \$3,839,180 & 35,354 & 34.9\% & 2.73 & 49.93 & 4.57 & 5/6 \\
+Transformer V2 GPU & \$7,721,980 & 65,080 & 25.0\% & 1.16 & -- & -- & 5/6 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{First-Liquid Exit Models}
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\small
+\begin{tabular}{lrrrrrrr}
+\toprule
+Model & Total P\&L & Trades & Win rate & Mean yearly Sharpe & Mean yearly Sortino & Combined Sortino & Positive years \\
+\midrule
+LightGBM & -\$89,206 & 9,595 & 35.2\% & 0.72 & -1.24 & -0.98 & 2/6 \\
+MLP & -\$231,094 & 6,364 & 23.6\% & -0.82 & 3.21 & -2.22 & 2/6 \\
+Transformer & pending & -- & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\section{Year-Wise Model P\&L}
+\subsection{Expiration Payoff}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Year & LightGBM & MLP & Transformer V1 & Transformer V2 GPU \\
+\midrule
+2021 & \$187,760 & \$140,077 & \$2,591,486 & \$4,527,492 \\
+2022 & \$39,181 & \$82,746 & -\$640,596 & -\$896,653 \\
+2023 & \$361,033 & \$683,111 & \$79,309 & \$72,353 \\
+2024 & \$171,464 & \$135,139 & \$695,137 & \$339,645 \\
+2025 & \$688,958 & \$86,127 & \$282,237 & \$1,967,735 \\
+2026 & \$224,172 & \$93,328 & \$831,608 & \$1,711,409 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{First-Liquid Exit}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lrr}
+\toprule
+Year & LightGBM & MLP \\
+\midrule
+2021 & -\$81,772 & -\$39,451 \\
+2022 & \$3,912 & \$6,566 \\
+2023 & -\$8,931 & -\$200,260 \\
+2024 & \$343 & \$3,277 \\
+2025 & -\$1,039 & -\$1 \\
+2026 & -\$1,720 & -\$1,224 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Interpretation}
+The first-liquid exit is more execution-realistic, but it is much harder in this dataset. The all-trade first-liquid T1/K2 portfolio is negative in every test year from 2021 to 2026. LightGBM and MLP also remain negative overall, although they reduce the unconditional loss substantially.
+
+The expiration-payoff target is materially stronger. Blindly trading T1 and K2 from 2017 to 2026 is still negative in aggregate because T1 loses heavily, but K2 contains strong positive payoff-skew years. The ML and transformer models convert the noisy unconditional opportunity into selected portfolios with positive out-of-sample P\&L.
+
+The first-liquid transformer has not yet been trained on GPU. Its row is marked pending. The correct next experiment is to run \texttt{TP2MVTransformerFirstLiquid/03\_train\_mv\_alibi\_transformer\_first\_liquid.py} on Colab/GPU and then regenerate this report.
+
+The Transformer V2 GPU expiration row is loaded from Colab year-level diagnostics. Because the local Colab artifact does not include the selected episode-level prediction parquet, its Sortino cannot be independently recomputed from daily selected P\&L in this report and is shown as unavailable. Once the selected V2 prediction file is exported from Colab, the same generator can compute its Sortino directly.
+
+\section{Caveats}
+\begin{itemize}
+  \item Normalized P\&L is return-based. It controls exposure per trade, but rare high-return option outcomes can dominate total P\&L.
+  \item Expiration payoff is terminal-payoff accounting. For SPY American calls, assignment and dividend risk are not fully modeled.
+  \item First-liquid exits depend on future option quote availability and bid/ask quality, so they are execution-realistic but quote-noise-sensitive.
+  \item Model threshold choices are validation-year choices only; test years are evaluated once.
+\end{itemize}
+
+\end{document}

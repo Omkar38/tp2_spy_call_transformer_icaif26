@@ -1,0 +1,451 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{tabularx}
+
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+
+\newcommand{\softmax}{\operatorname{softmax}}
+\newcommand{\softplus}{\operatorname{softplus}}
+\newcommand{\1}{\mathbf{1}}
+
+\title{\textbf{Intuition Behind the TP2-MV-ALiBi Transformer}\\
+\large A readable explanation for the SPY call TP2 project}
+\author{SPY American Call TP2 Project}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Purpose of This Note}
+
+This note explains the transformer used in the TP2 project in plain language.
+The goal is not only to state the equation, but to explain what the model is
+trying to learn and why the architecture was chosen.
+
+The key point is:
+
+\begin{center}
+\textbf{The transformer is not detecting TP2 violations. The detector already
+finds the violations. The transformer decides whether a detected violation is
+worth trading.}
+\end{center}
+
+For each TP2 violation episode, the model asks:
+
+\begin{center}
+\textit{Given what this violation looks like today, and given what happened
+to similar violations in the past, should we trade T1, trade K2, or skip?}
+\end{center}
+
+This distinction matters. A TP2 violation is a mathematical signal, but not
+every mathematical violation is economically useful after bid/ask spreads,
+liquidity, market regime changes, and payoff asymmetry. The machine learning
+problem is therefore a conditional selection problem.
+
+\section{Where the Transformer Sits in the Pipeline}
+
+The pipeline before the transformer is:
+
+\begin{enumerate}[leftmargin=*]
+  \item Clean the SPY call option data.
+  \item Construct option-price rectangles across two strikes and two maturities.
+  \item Detect conservative bid/ask TP2 violations.
+  \item Track each violation as an episode.
+  \item Build strategy labels for T1 and K2 under the corrected payoff rule.
+  \item Build point-in-time features available on the violation date.
+\end{enumerate}
+
+Only after these steps do we train the transformer. The model never sees future
+P\&L, future exit date, test-year labels, or the year as a direct feature.
+
+\section{What Is a Token?}
+
+The transformer reads \textbf{tokens}. In our project, one token is one
+episode-strategy candidate:
+
+\begin{center}
+\textbf{one TP2 episode + one candidate strategy, either T1 or K2.}
+\end{center}
+
+So if a TP2 violation episode is found on a certain date, we create two model
+rows:
+
+\[
+  (\text{episode } i, \text{T1}), \qquad
+  (\text{episode } i, \text{K2}).
+\]
+
+Each token contains only entry-time information, such as:
+
+\begin{itemize}[leftmargin=*]
+  \item TP2 severity: how strong the inequality violation is.
+  \item Moneyness and distance from the forward/underlying.
+  \item Time to expiration for the short and long maturity legs.
+  \item Bid/ask spread, volume, and open interest.
+  \item Short-D-leg information, because both T1 and K2 short the shorter-dated
+        D leg.
+  \item Lifecycle pressure, such as whether the violation is fresh or persistent.
+  \item Strategy identity: whether the token represents T1 or K2.
+\end{itemize}
+
+The model output for each token is a probability:
+
+\[
+  p_{i,r} =
+  \Pr(\text{strategy } r \text{ is profitable for episode } i
+  \mid \text{entry-time information}).
+\]
+
+Then a validation-tuned rule chooses:
+
+\[
+  \text{trade T1, trade K2, or skip.}
+\]
+
+\section{Why Not Just Use a Normal MLP or LightGBM?}
+
+An MLP or LightGBM can look at today's violation features. That is useful, but
+it does not naturally ask:
+
+\begin{center}
+\textit{Have we seen similar TP2 episodes before, and what happened after them?}
+\end{center}
+
+The transformer is useful because it can compare today's episode with a short
+history of past TP2 episodes. This is important because option-market behavior
+is not independent day by day. Some periods have persistent liquidity stress,
+some have strong trend regimes, and some have unusually profitable or
+unprofitable payoff behavior.
+
+The transformer is therefore a memory-based model:
+
+\begin{center}
+\textbf{current TP2 episode} + \textbf{similar historical TP2 episodes}
+\(\rightarrow\) \textbf{trade probability}.
+\end{center}
+
+\section{The Attention Equation in Plain Language}
+
+The core attention score is:
+
+\[
+  a_{ij}^{(h)}
+  =
+  \frac{(Q_i^{(h)})^\top K_j^{(h)}}{\sqrt{d_h}}
+  -
+  m_h^\top d_{ij}
+  +
+  \rho_h^{\mathrm{same}}\1\{r_i=r_j\}
+  +
+  \rho_h^{\mathrm{cross}}\1\{r_i\neq r_j\}.
+\]
+
+This equation decides how much current episode \(i\) should pay attention to
+past episode \(j\), in attention head \(h\).
+
+\subsection{Part 1: Feature Similarity}
+
+\[
+  \frac{(Q_i^{(h)})^\top K_j^{(h)}}{\sqrt{d_h}}
+\]
+
+This is the standard transformer similarity term.
+
+Intuition:
+
+\begin{itemize}[leftmargin=*]
+  \item \(Q_i\) means: what the current episode is looking for.
+  \item \(K_j\) means: what the past episode represents.
+  \item Their dot product is large when the current and past episodes look
+        similar in the learned feature space.
+\end{itemize}
+
+If today's violation resembles a past violation that was profitable, the model
+can use that historical information. If it resembles a past violation that
+lost money, the model can also learn caution.
+
+\subsection{Part 2: Multivariate ALiBi Penalty}
+
+\[
+  -m_h^\top d_{ij}
+\]
+
+This is the main TP2-specific modification.
+
+Standard attention only learns similarity. But in financial data, two episodes
+can look similar numerically while still being meaningfully different. For
+example:
+
+\begin{itemize}[leftmargin=*]
+  \item one happened yesterday, another happened five years ago;
+  \item one was near-the-money, another was deep in-the-money;
+  \item one was liquid, another had wide spreads;
+  \item one was a fresh violation, another was an old persistent violation.
+\end{itemize}
+
+The distance vector \(d_{ij}\) measures these differences. In our model it
+contains five domain distances:
+
+\[
+  d_{ij}
+  =
+  [
+  \text{time distance},
+  \text{surface distance},
+  \text{short-D-leg distance},
+  \text{liquidity distance},
+  \text{lifecycle distance}
+  ].
+\]
+
+The learned vector \(m_h\) says how much each attention head cares about each
+kind of distance. If a head learns that liquidity mismatch is dangerous, it
+will put a larger penalty on liquidity distance. If another head cares more
+about maturity structure, it can penalize surface or short-D-leg distance more.
+
+The negative sign is important:
+
+\[
+  \text{larger distance} \Rightarrow \text{lower attention}.
+\]
+
+So the model is encouraged to use past episodes that are not only similar in
+features, but similar in financially meaningful ways.
+
+\subsection{Part 3: Same-Strategy and Cross-Strategy Bonuses}
+
+\[
+  \rho_h^{\mathrm{same}}\1\{r_i=r_j\}
+  +
+  \rho_h^{\mathrm{cross}}\1\{r_i\neq r_j\}
+\]
+
+This tells the transformer whether it should compare T1 mostly with past T1
+examples, or whether past K2 examples are also informative.
+
+For example:
+
+\begin{itemize}[leftmargin=*]
+  \item Some heads may learn that T1 should mostly attend to T1 history.
+  \item Other heads may learn that K2 history helps explain T1 outcomes because
+        both strategies share the short D leg.
+\end{itemize}
+
+This is useful because the two viable strategies are related but not identical.
+
+\section{From Attention Scores to a Decision}
+
+After computing scores \(a_{ij}^{(h)}\), the model applies softmax:
+
+\[
+  \alpha_{ij}^{(h)}
+  =
+  \softmax_j(a_{ij}^{(h)}).
+\]
+
+The values \(\alpha_{ij}^{(h)}\) are attention weights. They sum to one across
+the historical episodes. A high weight means:
+
+\begin{center}
+\textit{this past episode is important for understanding the current episode.}
+\end{center}
+
+The transformer then forms a historical context vector:
+
+\[
+  c_i^{(h)} = \sum_j \alpha_{ij}^{(h)} V_j^{(h)}.
+\]
+
+In plain language:
+
+\begin{center}
+\textbf{The model builds a weighted memory of the most relevant past TP2
+episodes.}
+\end{center}
+
+Finally, the current episode representation and the historical memory are
+combined and passed through a classifier:
+
+\[
+  \Pr(y_{i,r}=1)
+  =
+  \sigma(\mathrm{MLP}([h_i,c_i])).
+\]
+
+Here \(y_{i,r}=1\) means strategy \(r\) was profitable for episode \(i\) under
+the chosen payoff label.
+
+\section{Why This Architecture Makes Sense for TP2}
+
+The TP2 opportunity is not just a static row-wise pattern. It is a market
+structure pattern. The same violation severity can mean different things under
+different conditions:
+
+\begin{itemize}[leftmargin=*]
+  \item In a liquid, stable market, a violation may revert or produce clean
+        payoff value.
+  \item In a stressed market, wide spreads and regime movement may dominate
+        the theoretical signal.
+  \item A fresh violation may be more informative than a violation that has
+        persisted for many days.
+  \item A near-expiration short-D-leg setup behaves differently from a longer
+        maturity setup.
+\end{itemize}
+
+The transformer is designed to learn these conditional patterns from historical
+episodes.
+
+\section{What the Model Is Not Doing}
+
+It is important to be precise:
+
+\begin{itemize}[leftmargin=*]
+  \item It is not proving arbitrage.
+  \item It is not guaranteeing executable live trading profits.
+  \item It is not using future information at entry time.
+  \item It is not using LightGBM predictions as transformer inputs.
+  \item It is not selecting the best strategy after seeing the test year.
+\end{itemize}
+
+The model is a conditional selector trained under rolling out-of-sample splits.
+It tests whether TP2 violations contain learnable structure that can improve
+trade selection.
+
+\section{Why 2022 Is Difficult}
+
+The 2022 issue is not simply that the transformer equation is wrong. The deeper
+issue is that the model became too permissive after validation.
+
+The chain is:
+
+\begin{enumerate}[leftmargin=*]
+  \item The validation year before 2022 was unusually favorable for broad K2
+        exposure.
+  \item Because many K2 trades made money in validation, a low threshold looked
+        attractive.
+  \item That low threshold allowed many trades in 2022.
+  \item In 2022, the unconditional T1/K2 environment was poor, so broad
+        selection created losses.
+\end{enumerate}
+
+This is a risk-control and validation-objective problem as much as a model
+architecture problem.
+
+\section{Can Changing the Attention Equation Reduce 2022 Risk?}
+
+Changing the equation can help only if the change gives the model information
+that separates dangerous regimes from safe regimes. For example, useful
+extensions could include:
+
+\begin{itemize}[leftmargin=*]
+  \item market volatility regime distance;
+  \item SPY trend or drawdown regime distance;
+  \item daily option-liquidity stress distance;
+  \item concentration controls by day or expiration;
+  \item downside-aware training or threshold selection.
+\end{itemize}
+
+But simply making the transformer larger, deeper, or more complex may not solve
+the problem. If threshold selection is based only on validation total P\&L, a
+single strong validation year can still cause the model to trade too broadly.
+
+For this reason, the next robust version should evaluate and possibly tune
+using:
+
+\begin{itemize}[leftmargin=*]
+  \item total normalized P\&L;
+  \item Sharpe ratio;
+  \item Sortino ratio;
+  \item maximum drawdown;
+  \item worst-year P\&L;
+  \item number of selected trades;
+  \item maximum trades per day.
+\end{itemize}
+
+\section{Sharpe vs Sortino in This Project}
+
+Sharpe ratio is:
+
+\[
+  \text{Sharpe}
+  =
+  \frac{\text{average daily P\&L}}{\text{standard deviation of daily P\&L}}
+  \sqrt{252}.
+\]
+
+Sortino ratio is:
+
+\[
+  \text{Sortino}
+  =
+  \frac{\text{average daily P\&L}}{\text{standard deviation of negative daily P\&L}}
+  \sqrt{252}.
+\]
+
+The difference is important. TP2 option strategies can have low win rate but
+large positive payoff skew. Sharpe penalizes both upside and downside
+volatility. Sortino focuses only on downside volatility.
+
+For this project, Sortino answers:
+
+\begin{center}
+\textit{Is the strategy making money while controlling bad downside days, or is
+it just relying on a few large winners?}
+\end{center}
+
+\section{Simple Example}
+
+Suppose today's TP2 episode is a K2 candidate with:
+
+\begin{itemize}[leftmargin=*]
+  \item high TP2 severity;
+  \item short D leg near expiration;
+  \item acceptable spread;
+  \item similar moneyness to several past profitable K2 episodes.
+\end{itemize}
+
+The transformer compares it with the previous 64 historical TP2 tokens.
+
+Past episode A is recent, same strategy, similar moneyness, similar liquidity.
+It receives high attention.
+
+Past episode B is old, illiquid, and far away in moneyness. Even if its raw
+features have some similarity, the multivariate distance penalty lowers its
+attention.
+
+Past episode C is T1, not K2, but has the same short-D-leg structure. A
+cross-strategy head may still attend to it if that information has historically
+helped prediction.
+
+The model then combines these historical memories and outputs:
+
+\[
+  \Pr(\text{K2 profitable}) = 0.62.
+\]
+
+If the validation-tuned threshold is below 0.62 and T1 is less attractive, the
+selector chooses K2. If both T1 and K2 fall below threshold, the episode is
+skipped.
+
+\section{Main Takeaways}
+
+\begin{enumerate}[leftmargin=*]
+  \item The transformer is a TP2 episode selector, not a TP2 detector.
+  \item Each token is an episode-strategy candidate: T1 or K2.
+  \item Attention lets the model use similar past TP2 episodes as memory.
+  \item MV-ALiBi makes attention financially meaningful by penalizing distance
+        in time, option surface, short-D-leg structure, liquidity, and lifecycle.
+  \item The 2022 weakness is likely driven more by aggressive validation-time
+        selection than by the attention equation alone.
+  \item The next research step is not only better architecture, but better
+        downside-aware selection using Sortino, drawdown, exposure limits, and
+        concentration controls.
+\end{enumerate}
+
+\end{document}

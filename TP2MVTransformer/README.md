@@ -31,6 +31,10 @@ Current scope:
 - `TP2MVTransformer/data/mv_alibi_transformer_test_predictions.parquet`
 - `TP2MVTransformer/tables/mv_alibi_transformer_v2_results.csv`
 - `TP2MVTransformer/data/mv_alibi_transformer_v2_test_predictions.parquet`
+- `TP2MVTransformer/data/mv_alibi_transformer_v2_val_predictions.parquet`
+- `TP2MVTransformer/data/mv_alibi_transformer_v2_selected_trades.parquet`
+- `TP2MVTransformer/tables/mv_alibi_transformer_v2_selected_trades.csv`
+- `TP2MVTransformer/tables/mv_alibi_transformer_v2_selected_daily_pnl.csv`
 - `TP2MVTransformer/transformer_implementation_report.pdf`
 
 ## Run Order
@@ -40,14 +44,27 @@ python TP2MVTransformer/01_build_feature_dictionary.py
 python TP2MVTransformer/02_train_mlp_baseline.py
 python TP2MVTransformer/03_train_mv_alibi_transformer.py
 python TP2MVTransformer/04_make_transformer_report.py
+python TP2MVTransformer/05_make_transformer_diagnostics_report.py
 cd TP2MVTransformer
 pdflatex -interaction=nonstopmode -halt-on-error transformer_implementation_report.tex
 pdflatex -interaction=nonstopmode -halt-on-error transformer_implementation_report.tex
+pdflatex -interaction=nonstopmode -halt-on-error transformer_diagnostics_report.tex
+pdflatex -interaction=nonstopmode -halt-on-error transformer_diagnostics_report.tex
 ```
 
 The v2 transformer script uses CUDA, then Apple MPS, then CPU in priority order.
 On CPU-only machines it can take several hours. The v2 run writes separate
 `*_v2_*` outputs so the earlier transformer result files are preserved.
+For Sortino reporting, bring back at least
+`TP2MVTransformer/data/mv_alibi_transformer_v2_selected_trades.parquet` from
+Colab/GPU. The comparison report can then recompute V2 daily Sortino directly.
+For professor-facing transformer diagnostics, also bring back:
+
+- `TP2MVTransformer/tables/mv_alibi_v2_training_history.csv`
+- `TP2MVTransformer/tables/mv_alibi_v2_distance_diagnostics.csv`
+- `TP2MVTransformer/tables/mv_alibi_v2_attention_parameters.csv`
+- `TP2MVTransformer/tables/mv_alibi_v2_yearly_diagnostics.csv`
+- `TP2MVTransformer/tables/mv_alibi_transformer_v2_summary.json`
 
 ## Design Rules
 

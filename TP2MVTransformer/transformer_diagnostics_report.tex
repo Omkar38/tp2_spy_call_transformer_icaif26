@@ -1,0 +1,94 @@
+
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+
+\title{TP2-MV-ALiBi Transformer Diagnostics Report}
+\author{SPY American Call TP2 Project}
+\date{\today}
+
+\begin{document}
+\sloppy
+\maketitle
+
+\section{Purpose}
+This report addresses the transformer diagnostics requested in the latest project meeting: training/validation loss, gradient norms, learned MV-ALiBi distance weights, distance scale checks, Sortino ratio, and drawdown. It is generated from saved run artifacts, so after a GPU run the PDF can be regenerated without manual number entry.
+
+\section{Run Status}
+\begin{table}[H]
+\centering
+\begin{tabular}{lr}
+\toprule
+Field & Value \\
+\midrule
+Diagnostic status & pending GPU rerun \\
+Total selected trades & -- \\
+Total normalized P\&L & -- \\
+Combined Sharpe & -- \\
+Combined Sortino & -- \\
+Combined max drawdown & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Yearly Test Diagnostics}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{rrrrrrr}
+\toprule
+Year & Trades & P\&L & Win rate & Sharpe & Sortino & Max drawdown \\
+\midrule
+Pending GPU run & -- & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Training Stability}
+The training diagnostics check whether the model is learning smoothly. We want training loss and validation loss to decrease or stabilize, gradient norms to remain controlled, and early stopping to occur before validation behavior deteriorates.
+
+\textbf{Pending:} training-history artifacts are not available yet. Rerun the V2 transformer trainer on GPU to populate this section.
+
+\section{Distance Scale Diagnostics}
+The MV-ALiBi bias combines five distances: time, surface, short-D-leg, liquidity, and lifecycle. If one distance has a much larger numerical scale than the others, it may dominate the attention penalty unless the learned slope compensates. This section checks whether normalization or clipping may be needed.
+
+\textbf{Pending:} distance diagnostics are not available yet.
+
+\section{Learned Attention Bias Parameters}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Scope & Time & Surface & Short-D & Liquidity & Lifecycle & Same/Cross bonus \\
+\midrule
+Pending GPU run & -- & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Pending:} learned attention parameters are not available yet.
+
+\section{Interpretation and Next Checks}
+\begin{itemize}
+  \item If validation loss rises while training loss falls, the transformer is overfitting and needs stronger regularization, lower capacity, or earlier stopping.
+  \item If gradient norms are unstable or frequently clipped, learning rate should be reduced and the optimizer schedule should be checked.
+  \item If one distance channel is orders of magnitude larger than the others, run a distance-normalized transformer variant before claiming the MV-ALiBi weights are economically interpretable.
+  \item If the learned liquidity or lifecycle slopes are near zero, the model is not using those distances strongly; this is useful evidence for architecture simplification or feature redesign.
+  \item If Sortino is much weaker than Sharpe, the model has downside-tail risk even if total P\&L is positive.
+\end{itemize}
+
+\section{GPU Run Command}
+Run the trainer on Colab/GPU:
+\begin{verbatim}
+python TP2MVTransformer/03_train_mv_alibi_transformer.py
+python TP2MVTransformer/05_make_transformer_diagnostics_report.py
+\end{verbatim}
+
+Bring back the generated \texttt{tables/} CSVs and \texttt{data/} parquet files before regenerating project-level comparison reports.
+
+\end{document}
