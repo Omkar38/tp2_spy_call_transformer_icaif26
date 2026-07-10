@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""Conservative transformer selection with a fixed probability floor.
+"""Conservative transformer selection with fixed probability-floor robustness.
 
 This is the practical risk-control layer for the corrected-history transformer:
 validation may tune the threshold, but it is not allowed to choose a threshold
-below CONSERVATIVE_FLOOR. This prevents the low-confidence over-selection that
+below a fixed floor. This prevents the low-confidence over-selection that
 caused the raw transformer failures in 2022 and 2025.
 
 Important publication note:
-This should be treated as a pre-specified risk-control rule going forward, not
-as a test-year optimized threshold. The script itself does not use test P&L to
-choose thresholds; each fold tunes only on validation data subject to the fixed
-floor.
+To avoid a single "magic" floor, this script reports a small fixed family:
+0.10, 0.20, and 0.30. The 0.20 floor is marked as the primary moderate rule,
+while 0.10 and 0.30 are robustness checks. The script itself does not use test
+P&L to choose thresholds; each fold tunes only on validation data subject to the
+fixed floor being evaluated.
 """
 from __future__ import annotations
 
@@ -40,8 +41,9 @@ import matplotlib.pyplot as plt
 TEST_PATH = DATA_DIR / "mv_alibi_transformer_v2_test_predictions.parquet"
 VAL_PATH = DATA_DIR / "mv_alibi_transformer_v2_val_predictions.parquet"
 
-CONSERVATIVE_FLOOR = 0.20
-THRESHOLD_GRID = np.round(np.arange(CONSERVATIVE_FLOOR, 0.951, 0.025), 3)
+FLOORS = [0.10, 0.20, 0.30]
+PRIMARY_FLOOR = 0.20
+THRESHOLD_STEP = 0.025
 MIN_TRADES = 30
 
 FOLDS = [
@@ -127,14 +129,15 @@ def summarize(selected: pd.DataFrame) -> dict:
     }
 
 
-def tune_threshold_on_validation(val_tokens: pd.DataFrame) -> tuple[float, pd.DataFrame]:
+def tune_threshold_on_validation(val_tokens: pd.DataFrame, floor: float) -> tuple[float, pd.DataFrame]:
     rows = []
-    best_threshold = CONSERVATIVE_FLOOR
+    best_threshold = floor
     best_pnl = -np.inf
-    for threshold in THRESHOLD_GRID:
+    threshold_grid = np.round(np.arange(floor, 0.951, THRESHOLD_STEP), 3)
+    for threshold in threshold_grid:
         selected = select_actions(val_tokens, float(threshold))
         stats = summarize(selected)
-        rows.append({"threshold": float(threshold), **stats})
+        rows.append({"floor": floor, "threshold": float(threshold), **stats})
         if stats["n"] < MIN_TRADES:
             continue
         if stats["pnl"] > best_pnl:
@@ -143,10 +146,22 @@ def tune_threshold_on_validation(val_tokens: pd.DataFrame) -> tuple[float, pd.Da
     return best_threshold, pd.DataFrame(rows)
 
 
-def save_plots(yearly: pd.DataFrame) -> None:
+def save_plots(yearly: pd.DataFrame, summary_by_floor: pd.DataFrame, primary_yearly: pd.DataFrame) -> None:
+    fig, ax = plt.subplots(figsize=(8.5, 4.5))
+    labels = [f"{x:.2f}" for x in summary_by_floor["floor"]]
+    ax.bar(labels, summary_by_floor["total_pnl"] / 1_000_000, color="#355070")
+    ax.axhline(0, color="#222", linewidth=0.8)
+    ax.set_title("Conservative transformer floors: total normalized P&L")
+    ax.set_xlabel("Probability floor")
+    ax.set_ylabel("Total P&L ($M)")
+    ax.grid(axis="y", alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "conservative_transformer_floor_summary_pnl.pdf")
+    plt.close(fig)
+
     fig, ax = plt.subplots(figsize=(9, 4.5))
-    years = yearly["test_year"].astype(str)
-    ax.bar(years, yearly["test_pnl"] / 1_000_000, color="#355070")
+    years = primary_yearly["test_year"].astype(str)
+    ax.bar(years, primary_yearly["test_pnl"] / 1_000_000, color="#355070")
     ax.axhline(0, color="#222", linewidth=0.8)
     ax.set_title("Conservative transformer floor: yearly normalized P&L")
     ax.set_ylabel("P&L ($M)")
@@ -156,7 +171,7 @@ def save_plots(yearly: pd.DataFrame) -> None:
     plt.close(fig)
 
     fig, ax = plt.subplots(figsize=(9, 4.5))
-    ax.bar(years, yearly["test_n"], color="#6d597a")
+    ax.bar(years, primary_yearly["test_n"], color="#6d597a")
     ax.set_title("Conservative transformer floor: selected trades")
     ax.set_ylabel("Trades")
     ax.grid(axis="y", alpha=0.25)
@@ -165,7 +180,7 @@ def save_plots(yearly: pd.DataFrame) -> None:
     plt.close(fig)
 
 
-def write_report(yearly: pd.DataFrame, summary: dict) -> None:
+def write_report(yearly: pd.DataFrame, summary_by_floor: pd.DataFrame, primary_summary: dict) -> None:
     def money(x: float) -> str:
         if pd.isna(x):
             return "--"
@@ -179,9 +194,18 @@ def write_report(yearly: pd.DataFrame, summary: dict) -> None:
             return "$\\infty$"
         return f"{x:.2f}"
 
-    rows = []
-    for _, r in yearly.iterrows():
-        rows.append(
+    summary_rows = []
+    for _, r in summary_by_floor.iterrows():
+        summary_rows.append(
+            f"{f2(r['floor'])} & {int(r['total_selected']):,} & {money(r['total_pnl'])} & "
+            f"{int(r['positive_years'])}/{int(r['total_years'])} & {f2(r['combined_sharpe'])} & "
+            f"{f2(r['combined_sortino'])} & {money(r['combined_max_drawdown'])} \\\\"
+        )
+
+    primary_yearly = yearly[np.isclose(yearly["floor"], PRIMARY_FLOOR)].copy()
+    yearly_rows = []
+    for _, r in primary_yearly.iterrows():
+        yearly_rows.append(
             f"{int(r['test_year'])} & {f2(r['threshold'])} & {int(r['test_n'])} & "
             f"{money(r['test_pnl'])} & {f2(r['test_sharpe'])} & "
             f"{f2(r['test_sortino'])} & {money(r['test_max_drawdown'])} \\\\"
@@ -202,29 +226,33 @@ def write_report(yearly: pd.DataFrame, summary: dict) -> None:
 \maketitle
 
 \section{{Purpose}}
-This report evaluates the corrected-history TP2-MV-ALiBi transformer with a fixed conservative probability floor. The transformer still tunes its threshold on validation P\&L, but the threshold cannot fall below {CONSERVATIVE_FLOOR:.2f}. This directly addresses the observed over-selection failure from low-confidence thresholds.
+This report evaluates the corrected-history TP2-MV-ALiBi transformer with conservative probability-floor risk controls. The transformer still tunes its exact threshold on validation P\&L, but the threshold cannot fall below a fixed floor. To avoid relying on one hand-picked value, we report floors 0.10, 0.20, and 0.30 side by side. The 0.20 floor is treated as the primary moderate rule; 0.10 and 0.30 are robustness checks.
 
 \section{{Leakage Control}}
-The fixed floor is treated as a risk-control design choice. Within each rolling fold, the exact threshold is selected using the validation year only. The test year is evaluated once. No test-year P\&L enters threshold tuning.
+The floor family is treated as a risk-control design choice. Within each rolling fold and each fixed floor, the exact threshold is selected using the validation year only. The test year is evaluated once. No test-year P\&L enters threshold tuning.
 
-\section{{Aggregate Result}}
+\section{{Aggregate Results Across Fixed Floors}}
 \begin{{table}}[H]
 \centering
-\begin{{tabular}}{{lr}}
+\small
+\begin{{tabular}}{{rrrrrrr}}
 \toprule
-Metric & Value \\
+Floor & Trades & P\&L & Positive years & Sharpe & Sortino & Max DD \\
 \midrule
-Total selected trades & {summary['total_selected']:,} \\
-Total normalized P\&L & {money(summary['total_pnl'])} \\
-Positive years & {summary['positive_years']} / {summary['total_years']} \\
-Combined Sharpe & {f2(summary['combined_sharpe'])} \\
-Combined Sortino & {f2(summary['combined_sortino'])} \\
-Combined max drawdown & {money(summary['combined_max_drawdown'])} \\
+{chr(10).join(summary_rows)}
 \bottomrule
 \end{{tabular}}
 \end{{table}}
 
-\section{{Yearly Results}}
+\begin{{figure}}[H]
+\centering
+\includegraphics[width=0.82\linewidth]{{figures/conservative_transformer_floor_summary_pnl.pdf}}
+\caption{{Total normalized P\&L for the fixed confidence-floor family.}}
+\end{{figure}}
+
+\section{{Primary Floor Yearly Results}}
+The table below reports the primary moderate floor, \(p \geq {PRIMARY_FLOOR:.2f}\). The adjacent floors are retained in the aggregate robustness table above.
+
 \begin{{table}}[H]
 \centering
 \small
@@ -232,7 +260,7 @@ Combined max drawdown & {money(summary['combined_max_drawdown'])} \\
 \toprule
 Year & Threshold & Trades & P\&L & Sharpe & Sortino & Max DD \\
 \midrule
-{chr(10).join(rows)}
+{chr(10).join(yearly_rows)}
 \bottomrule
 \end{{tabular}}
 \end{{table}}
@@ -269,63 +297,86 @@ def main() -> None:
 
     yearly_rows = []
     grid_rows = []
-    selected_rows = []
-    for fold in FOLDS:
-        val_fold = val[val["signal_year"].eq(fold["val_year"])].copy()
-        test_fold = test[test["signal_year"].eq(fold["test_year"])].copy()
-        threshold, grid = tune_threshold_on_validation(val_fold)
-        grid["fold"] = fold["fold"]
-        grid["val_year"] = fold["val_year"]
-        grid["test_year"] = fold["test_year"]
-        grid_rows.append(grid)
+    selected_by_floor: dict[float, list[pd.DataFrame]] = {floor: [] for floor in FLOORS}
+    for floor in FLOORS:
+        for fold in FOLDS:
+            val_fold = val[val["signal_year"].eq(fold["val_year"])].copy()
+            test_fold = test[test["signal_year"].eq(fold["test_year"])].copy()
+            threshold, grid = tune_threshold_on_validation(val_fold, floor)
+            grid["fold"] = fold["fold"]
+            grid["val_year"] = fold["val_year"]
+            grid["test_year"] = fold["test_year"]
+            grid_rows.append(grid)
 
-        val_selected = select_actions(val_fold, threshold)
-        test_selected = select_actions(test_fold, threshold)
-        test_selected = test_selected.copy()
-        test_selected["fold"] = fold["fold"]
-        test_selected["threshold"] = threshold
-        selected_rows.append(test_selected)
+            val_selected = select_actions(val_fold, threshold)
+            test_selected = select_actions(test_fold, threshold)
+            test_selected = test_selected.copy()
+            test_selected["floor"] = floor
+            test_selected["fold"] = fold["fold"]
+            test_selected["threshold"] = threshold
+            selected_by_floor[floor].append(test_selected)
 
-        val_stats = summarize(val_selected)
-        test_stats = summarize(test_selected)
-        yearly_rows.append({
-            "fold": fold["fold"],
-            "val_year": fold["val_year"],
-            "test_year": fold["test_year"],
-            "threshold": threshold,
-            **{f"val_{k}": v for k, v in val_stats.items()},
-            **{f"test_{k}": v for k, v in test_stats.items()},
-        })
+            val_stats = summarize(val_selected)
+            test_stats = summarize(test_selected)
+            yearly_rows.append({
+                "floor": floor,
+                "is_primary_floor": bool(np.isclose(floor, PRIMARY_FLOOR)),
+                "fold": fold["fold"],
+                "val_year": fold["val_year"],
+                "test_year": fold["test_year"],
+                "threshold": threshold,
+                **{f"val_{k}": v for k, v in val_stats.items()},
+                **{f"test_{k}": v for k, v in test_stats.items()},
+            })
 
     yearly = pd.DataFrame(yearly_rows)
-    selected_all = pd.concat(selected_rows, ignore_index=True) if selected_rows else pd.DataFrame()
+    summary_rows = []
+    selected_primary = pd.DataFrame()
+    for floor in FLOORS:
+        selected_all = pd.concat(selected_by_floor[floor], ignore_index=True) if selected_by_floor[floor] else pd.DataFrame()
+        floor_yearly = yearly[np.isclose(yearly["floor"], floor)].copy()
+        if np.isclose(floor, PRIMARY_FLOOR):
+            selected_primary = selected_all.copy()
+        summary_rows.append({
+            "floor": floor,
+            "is_primary_floor": bool(np.isclose(floor, PRIMARY_FLOOR)),
+            "total_selected": int(len(selected_all)),
+            "total_pnl": float(selected_all["target_norm_pnl"].sum()) if not selected_all.empty else 0.0,
+            "positive_years": int((floor_yearly["test_pnl"] > 0).sum()),
+            "total_years": int(len(floor_yearly)),
+            "combined_sharpe": sharpe(selected_all),
+            "combined_sortino": sortino(selected_all),
+            "combined_max_drawdown": max_drawdown(selected_all),
+        })
+    summary_by_floor = pd.DataFrame(summary_rows)
+    primary_summary = summary_by_floor[summary_by_floor["is_primary_floor"]].iloc[0].to_dict()
     summary = {
-        "method": "corrected_history_transformer_conservative_probability_floor",
-        "conservative_floor": CONSERVATIVE_FLOOR,
-        "threshold_rule": "maximize validation P&L subject to threshold >= conservative_floor",
-        "total_selected": int(len(selected_all)),
-        "total_pnl": float(selected_all["target_norm_pnl"].sum()) if not selected_all.empty else 0.0,
-        "positive_years": int((yearly["test_pnl"] > 0).sum()),
-        "total_years": int(len(yearly)),
-        "combined_sharpe": sharpe(selected_all),
-        "combined_sortino": sortino(selected_all),
-        "combined_max_drawdown": max_drawdown(selected_all),
+        "method": "corrected_history_transformer_conservative_probability_floor_family",
+        "floors": FLOORS,
+        "primary_floor": PRIMARY_FLOOR,
+        "threshold_rule": "for each fixed floor, maximize validation P&L subject to threshold >= floor",
+        "primary_summary": primary_summary,
+        "all_floor_summary": summary_rows,
     }
 
     pd.concat(grid_rows, ignore_index=True).to_csv(TABLE_DIR / "conservative_transformer_floor_validation_grid.csv", index=False)
     yearly.to_csv(TABLE_DIR / "conservative_transformer_floor_yearly.csv", index=False)
-    selected_all.to_parquet(DATA_DIR / "conservative_transformer_floor_selected_trades.parquet", index=False)
-    selected_all.groupby("signal_date", as_index=False)["target_norm_pnl"].sum().to_csv(
+    summary_by_floor.to_csv(TABLE_DIR / "conservative_transformer_floor_summary_by_floor.csv", index=False)
+    selected_primary.to_parquet(DATA_DIR / "conservative_transformer_floor_selected_trades.parquet", index=False)
+    selected_primary.groupby("signal_date", as_index=False)["target_norm_pnl"].sum().to_csv(
         TABLE_DIR / "conservative_transformer_floor_daily_pnl.csv", index=False
     )
     with open(TABLE_DIR / "conservative_transformer_floor_summary.json", "w", encoding="utf-8") as fh:
         json.dump(summary, fh, indent=2)
 
-    save_plots(yearly)
-    write_report(yearly, summary)
+    primary_yearly = yearly[yearly["is_primary_floor"]].copy()
+    save_plots(yearly, summary_by_floor, primary_yearly)
+    write_report(yearly, summary_by_floor, primary_summary)
 
-    print("\nConservative transformer floor yearly results:")
-    print(yearly[[
+    print("\nConservative transformer floor summary by floor:")
+    print(summary_by_floor.to_string(index=False))
+    print(f"\nPrimary floor ({PRIMARY_FLOOR:.2f}) yearly results:")
+    print(primary_yearly[[
         "test_year", "threshold", "test_n", "test_pnl", "test_win_rate",
         "test_sharpe", "test_sortino", "test_max_drawdown",
     ]].to_string(index=False))

@@ -1,12 +1,56 @@
 {
-  "method": "corrected_history_transformer_conservative_probability_floor",
-  "conservative_floor": 0.2,
-  "threshold_rule": "maximize validation P&L subject to threshold >= conservative_floor",
-  "total_selected": 43123,
-  "total_pnl": 6413690.418002142,
-  "positive_years": 6,
-  "total_years": 6,
-  "combined_sharpe": 1.7569972108946381,
-  "combined_sortino": 8.143065836794838,
-  "combined_max_drawdown": -735990.4752768099
+  "method": "corrected_history_transformer_conservative_probability_floor_family",
+  "floors": [
+    0.1,
+    0.2,
+    0.3
+  ],
+  "primary_floor": 0.2,
+  "threshold_rule": "for each fixed floor, maximize validation P&L subject to threshold >= floor",
+  "primary_summary": {
+    "floor": 0.2,
+    "is_primary_floor": true,
+    "total_selected": 43123,
+    "total_pnl": 6413690.418002142,
+    "positive_years": 6,
+    "total_years": 6,
+    "combined_sharpe": 1.7569972108946381,
+    "combined_sortino": 8.143065836794838,
+    "combined_max_drawdown": -735990.4752768099
+  },
+  "all_floor_summary": [
+    {
+      "floor": 0.1,
+      "is_primary_floor": false,
+      "total_selected": 69679,
+      "total_pnl": 5818060.756886159,
+      "positive_years": 5,
+      "total_years": 6,
+      "combined_sharpe": 1.2103672391121314,
+      "combined_sortino": 5.214288222891055,
+      "combined_max_drawdown": -1863540.3208058877
+    },
+    {
+      "floor": 0.2,
+      "is_primary_floor": true,
+      "total_selected": 43123,
+      "total_pnl": 6413690.418002142,
+      "positive_years": 6,
+      "total_years": 6,
+      "combined_sharpe": 1.7569972108946381,
+      "combined_sortino": 8.143065836794838,
+      "combined_max_drawdown": -735990.4752768099
+    },
+    {
+      "floor": 0.3,
+      "is_primary_floor": false,
+      "total_selected": 26497,
+      "total_pnl": 3283188.658853385,
+      "positive_years": 6,
+      "total_years": 6,
+      "combined_sharpe": 1.8465642735348011,
+      "combined_sortino": 6.4403417705137525,
+      "combined_max_drawdown": -286855.31178853987
+    }
+  ]
 }
