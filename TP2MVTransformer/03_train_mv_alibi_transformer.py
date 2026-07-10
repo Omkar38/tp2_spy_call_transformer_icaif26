@@ -97,6 +97,11 @@ def choose_device() -> torch.device:
     return torch.device("cpu")
 
 
+def date_to_day_number(values: pd.Series) -> np.ndarray:
+    """Convert datetimes to integer calendar-day numbers independent of unit."""
+    return pd.to_datetime(values).to_numpy(dtype="datetime64[D]").astype("int64")
+
+
 # ── data structures ────────────────────────────────────────────────────────────
 
 @dataclass
@@ -221,8 +226,8 @@ def build_history_arrays(
     feature_cols: list[str],
     block_indices: dict[str, np.ndarray],
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    hist_dates = pd.to_datetime(history["signal_date"]).astype("int64").to_numpy() // 86_400_000_000_000
-    cur_dates = pd.to_datetime(current["signal_date"]).astype("int64").to_numpy() // 86_400_000_000_000
+    hist_dates = date_to_day_number(history["signal_date"])
+    cur_dates = date_to_day_number(current["signal_date"])
     hist_strategy = history["strategy_id"].to_numpy(dtype=np.float32)
     cur_strategy = current["strategy_id"].to_numpy(dtype=np.float32)
 
@@ -620,6 +625,14 @@ def main() -> None:
         distance_rows.extend(distance_summary(train_arrays, fold_name, "train"))
         distance_rows.extend(distance_summary(val_arrays, fold_name, "validation"))
         distance_rows.extend(distance_summary(test_arrays, fold_name, "test"))
+        print(
+            f"  history coverage: train={train_arrays.hist_mask.mean():.3f} "
+            f"val={val_arrays.hist_mask.mean():.3f} "
+            f"test={test_arrays.hist_mask.mean():.3f}",
+            flush=True,
+        )
+        if train_arrays.hist_mask.sum() == 0 or val_arrays.hist_mask.sum() == 0 or test_arrays.hist_mask.sum() == 0:
+            print("  WARNING: at least one split has no historical attention tokens.", flush=True)
 
         pos_rate = float(train["target_profitable"].mean())
         pos_weight = torch.tensor([(1.0 - pos_rate) / max(pos_rate, 1e-6)], dtype=torch.float32, device=device)
