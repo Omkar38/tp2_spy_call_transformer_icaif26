@@ -55,6 +55,29 @@ pdflatex -interaction=nonstopmode -halt-on-error transformer_diagnostics_report.
 The v2 transformer script uses CUDA, then Apple MPS, then CPU in priority order.
 On CPU-only machines it can take several hours. The v2 run writes separate
 `*_v2_*` outputs so the earlier transformer result files are preserved.
+
+## Corrected vs Legacy Transformer
+
+Use this as the main transformer:
+
+```bash
+python TP2MVTransformer/03_train_mv_alibi_transformer.py
+```
+
+This corrected runner converts dates with calendar-day units and actually fills
+the historical-attention memory. The console should show nonzero history
+coverage.
+
+For comparison only, the previous behavior is preserved here:
+
+```bash
+python TP2MVTransformer/03_train_mv_alibi_transformer_legacy_no_history.py
+```
+
+The legacy runner intentionally reproduces the earlier datetime conversion
+behavior that led to empty historical attention. Keep it only for ablation or
+sanity comparison; it should not be treated as the main publishable model.
+
 For Sortino reporting, bring back at least
 `TP2MVTransformer/data/mv_alibi_transformer_v2_selected_trades.parquet` from
 Colab/GPU. The comparison report can then recompute V2 daily Sortino directly.
