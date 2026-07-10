@@ -45,11 +45,15 @@ python TP2MVTransformer/02_train_mlp_baseline.py
 python TP2MVTransformer/03_train_mv_alibi_transformer.py
 python TP2MVTransformer/04_make_transformer_report.py
 python TP2MVTransformer/05_make_transformer_diagnostics_report.py
+python TP2MVTransformer/06_risk_gated_transformer_selection.py
+python TP2MVTransformer/07_conservative_transformer_floor_selection.py
 cd TP2MVTransformer
 pdflatex -interaction=nonstopmode -halt-on-error transformer_implementation_report.tex
 pdflatex -interaction=nonstopmode -halt-on-error transformer_implementation_report.tex
 pdflatex -interaction=nonstopmode -halt-on-error transformer_diagnostics_report.tex
 pdflatex -interaction=nonstopmode -halt-on-error transformer_diagnostics_report.tex
+pdflatex -interaction=nonstopmode -halt-on-error conservative_transformer_floor_report.tex
+pdflatex -interaction=nonstopmode -halt-on-error conservative_transformer_floor_report.tex
 ```
 
 The v2 transformer script uses CUDA, then Apple MPS, then CPU in priority order.
@@ -77,6 +81,19 @@ python TP2MVTransformer/03_train_mv_alibi_transformer_legacy_no_history.py
 The legacy runner intentionally reproduces the earlier datetime conversion
 behavior that led to empty historical attention. Keep it only for ablation or
 sanity comparison; it should not be treated as the main publishable model.
+
+## Current Risk-Control Candidate
+
+The raw corrected transformer is diagnostic. The practical candidate is:
+
+```bash
+python TP2MVTransformer/07_conservative_transformer_floor_selection.py
+```
+
+It uses a fixed probability floor of `0.20` and then tunes the exact threshold
+on the validation year only. This is intended to control low-confidence
+over-selection in adverse years. Treat the floor as a pre-specified risk-control
+rule for future runs, not a test-year optimized arbitrage condition.
 
 For Sortino reporting, bring back at least
 `TP2MVTransformer/data/mv_alibi_transformer_v2_selected_trades.parquet` from

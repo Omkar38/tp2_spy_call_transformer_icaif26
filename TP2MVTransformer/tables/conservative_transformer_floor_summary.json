@@ -1,0 +1,12 @@
+{
+  "method": "corrected_history_transformer_conservative_probability_floor",
+  "conservative_floor": 0.2,
+  "threshold_rule": "maximize validation P&L subject to threshold >= conservative_floor",
+  "total_selected": 43123,
+  "total_pnl": 6413690.418002142,
+  "positive_years": 6,
+  "total_years": 6,
+  "combined_sharpe": 1.7569972108946381,
+  "combined_sortino": 8.143065836794838,
+  "combined_max_drawdown": -735990.4752768099
+}

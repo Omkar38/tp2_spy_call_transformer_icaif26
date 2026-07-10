@@ -1,0 +1,71 @@
+
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+\title{Conservative Transformer Floor Selection Report}
+\author{SPY American Call TP2 Project}
+\date{\today}
+\begin{document}
+\maketitle
+
+\section{Purpose}
+This report evaluates the corrected-history TP2-MV-ALiBi transformer with a fixed conservative probability floor. The transformer still tunes its threshold on validation P\&L, but the threshold cannot fall below 0.20. This directly addresses the observed over-selection failure from low-confidence thresholds.
+
+\section{Leakage Control}
+The fixed floor is treated as a risk-control design choice. Within each rolling fold, the exact threshold is selected using the validation year only. The test year is evaluated once. No test-year P\&L enters threshold tuning.
+
+\section{Aggregate Result}
+\begin{table}[H]
+\centering
+\begin{tabular}{lr}
+\toprule
+Metric & Value \\
+\midrule
+Total selected trades & 43,123 \\
+Total normalized P\&L & \$6,413,690 \\
+Positive years & 6 / 6 \\
+Combined Sharpe & 1.76 \\
+Combined Sortino & 8.14 \\
+Combined max drawdown & -\$735,990 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Yearly Results}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{rrrrrrr}
+\toprule
+Year & Threshold & Trades & P\&L & Sharpe & Sortino & Max DD \\
+\midrule
+2021 & 0.20 & 15382 & \$3,339,496 & 2.12 & 9.74 & -\$735,990 \\
+2022 & 0.53 & 717 & \$23,338 & 1.16 & 0.80 & -\$26,372 \\
+2023 & 0.42 & 2106 & \$12,829 & 0.80 & 0.99 & -\$34,941 \\
+2024 & 0.20 & 11629 & \$304,278 & 1.27 & 2.22 & -\$470,283 \\
+2025 & 0.20 & 12212 & \$2,127,171 & 2.16 & 23.38 & -\$163,421 \\
+2026 & 0.20 & 1077 & \$606,577 & 2.88 & 231.14 & -\$12,613 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\linewidth]{figures/conservative_transformer_floor_yearly_pnl.pdf}
+\caption{Yearly normalized P\&L under the conservative transformer floor rule.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\linewidth]{figures/conservative_transformer_floor_trades.pdf}
+\caption{Selected trade counts under the conservative transformer floor rule.}
+\end{figure}
+
+\section{Interpretation}
+The raw transformer selected too many low-confidence trades in adverse years. The conservative floor reduces over-selection by requiring a minimum model confidence before any trade can enter. This should be presented as a risk-control layer, not as a new arbitrage condition.
+
+\end{document}

@@ -1,0 +1,80 @@
+{
+  "method": "risk_gated_transformer_validation_only_policy_selection",
+  "policy_family": [
+    {
+      "policy": "floor05_pnl",
+      "objective": "pnl",
+      "floor": 0.05,
+      "max_trades_per_day": null,
+      "min_win_rate": 0.0
+    },
+    {
+      "policy": "floor10_pnl",
+      "objective": "pnl",
+      "floor": 0.1,
+      "max_trades_per_day": null,
+      "min_win_rate": 0.0
+    },
+    {
+      "policy": "floor20_pnl",
+      "objective": "pnl",
+      "floor": 0.2,
+      "max_trades_per_day": null,
+      "min_win_rate": 0.0
+    },
+    {
+      "policy": "floor30_pnl",
+      "objective": "pnl",
+      "floor": 0.3,
+      "max_trades_per_day": null,
+      "min_win_rate": 0.0
+    },
+    {
+      "policy": "floor20_sharpe",
+      "objective": "sharpe",
+      "floor": 0.2,
+      "max_trades_per_day": null,
+      "min_win_rate": 0.0
+    },
+    {
+      "policy": "floor20_sortino",
+      "objective": "sortino",
+      "floor": 0.2,
+      "max_trades_per_day": null,
+      "min_win_rate": 0.0
+    },
+    {
+      "policy": "floor20_pnl_tpd50",
+      "objective": "pnl",
+      "floor": 0.2,
+      "max_trades_per_day": 50,
+      "min_win_rate": 0.0
+    },
+    {
+      "policy": "floor20_pnl_tpd20",
+      "objective": "pnl",
+      "floor": 0.2,
+      "max_trades_per_day": 20,
+      "min_win_rate": 0.0
+    },
+    {
+      "policy": "floor30_pnl_tpd50",
+      "objective": "pnl",
+      "floor": 0.3,
+      "max_trades_per_day": 50,
+      "min_win_rate": 0.0
+    }
+  ],
+  "total_selected": 86921,
+  "total_pnl": 3853837.8309634076,
+  "positive_years": 4,
+  "total_years": 6,
+  "combined_sharpe": 0.690284407587722,
+  "combined_sortino": 2.3217105379050262,
+  "combined_max_drawdown": -3681550.3639537822,
+  "notes": [
+    "Policy and threshold are selected using validation-year predictions only.",
+    "Test-year results are evaluated once after validation selection.",
+    "This stage is intended as the official risk-gated transformer selection candidate."
+  ]
+}
