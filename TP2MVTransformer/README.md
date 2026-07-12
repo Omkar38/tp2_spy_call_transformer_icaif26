@@ -47,6 +47,7 @@ python TP2MVTransformer/04_make_transformer_report.py
 python TP2MVTransformer/05_make_transformer_diagnostics_report.py
 python TP2MVTransformer/06_risk_gated_transformer_selection.py
 python TP2MVTransformer/07_conservative_transformer_floor_selection.py
+python TP2MVTransformer/10_transformer_drift_calibration_audit.py
 cd TP2MVTransformer
 pdflatex -interaction=nonstopmode -halt-on-error transformer_implementation_report.tex
 pdflatex -interaction=nonstopmode -halt-on-error transformer_implementation_report.tex
@@ -59,6 +60,59 @@ pdflatex -interaction=nonstopmode -halt-on-error conservative_transformer_floor_
 The v2 transformer script uses CUDA, then Apple MPS, then CPU in priority order.
 On CPU-only machines it can take several hours. The v2 run writes separate
 `*_v2_*` outputs so the earlier transformer result files are preserved.
+
+## Professor Training-Audit Ablations
+
+Professor's transformer-training feedback is implemented as a separate
+experiment layer so the main `03_train_mv_alibi_transformer.py` result remains
+reproducible.
+
+Use this configurable runner for GPU ablations:
+
+```bash
+python TP2MVTransformer/09_train_mv_alibi_transformer_ablation.py \
+  --tag best_loss_lr3e4 \
+  --checkpoint-metric val_loss \
+  --scheduler warmup_cosine \
+  --lr 3e-4 \
+  --clip-norm 1.0
+```
+
+Each run writes to:
+
+```text
+TP2MVTransformer/ablation_runs/<tag>/
+```
+
+The runner supports:
+
+- best validation-loss versus best validation-AUC checkpointing;
+- learning-rate sweep;
+- AdamW weight-decay sweep;
+- warm-up plus cosine schedule or plateau schedule;
+- gradient clipping;
+- hidden dimension / attention-head / history-length ablations;
+- dropout and random-seed ablations;
+- distance-bias and strategy-bonus ablations;
+- Brier score and expected calibration error.
+
+Use this audit script for target drift, feature drift, and calibration tables:
+
+```bash
+python TP2MVTransformer/10_transformer_drift_calibration_audit.py
+```
+
+After several ablations finish, summarize them with:
+
+```bash
+python TP2MVTransformer/11_summarize_transformer_ablation_runs.py
+```
+
+For Colab copy/paste commands, use:
+
+```text
+TP2MVTransformer/transformer_ablation_colab_commands.md
+```
 
 ## Corrected vs Legacy Transformer
 
