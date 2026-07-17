@@ -1,0 +1,27 @@
+{
+  "method": "TP2-MV-ALiBi transformer, final (val-loss checkpoint + warm-up + causal p>=0.5 selection)",
+  "feature_count": 48,
+  "max_history_tokens": 64,
+  "hidden_dim": 64,
+  "epochs_max": 25,
+  "warmup_fraction": 0.08,
+  "grad_clip_norm": 1.0,
+  "checkpoint_metric": "val_loss (min)",
+  "selection_rule": "fixed p>=0.5, zero tuning, fully causal",
+  "lambda_return": 0.02,
+  "calibration": "isotonic on val probs",
+  "total_selected": 15015,
+  "total_norm_pnl": 570127.9633989141,
+  "positive_years": 6,
+  "total_years": 6,
+  "combined_daily_sharpe": 1.5125026076474164,
+  "combined_daily_sortino": 1.2411721757619332,
+  "combined_max_drawdown": -267839.5805803448,
+  "combined_win_rate": 0.6099234099234099,
+  "device": "mps",
+  "notes": [
+    "Selection rule is a fixed constant (p>=0.5) compared per-trade against that trade's own calibrated probability -- no validation-year tuning, no reference to any other trade's prediction, no quantile computed over any period. Fully causal and live-deployable as-is.",
+    "Training protocol (LR=3e-5, warm-up, grad clip 1.0, checkpoint on val_loss) is unchanged from v3.",
+    "This script writes only *_v3final_* outputs; no v2/v3/v4 artifact is modified."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "method": "TP2-MV-ALiBi transformer, final (5-seed ensemble, causal p>=0.5 selection)",
+  "seeds": [
+    42,
+    101,
+    202,
+    303,
+    404
+  ],
+  "base_protocol": "v3 (val-loss checkpoint, warm-up, grad clip 1.0, LR=3e-5)",
+  "selection_rule": "fixed p>=0.5, zero tuning, fully causal",
+  "total_selected": 14648,
+  "total_norm_pnl": 703705.154582378,
+  "positive_years": 6,
+  "total_years": 6,
+  "combined_daily_sharpe": 2.359584529269594,
+  "combined_daily_sortino": 3.7211763238805124,
+  "combined_max_drawdown": -90990.57130829847,
+  "combined_win_rate": 0.6014472965592572,
+  "device": "mps",
+  "notes": [
+    "Selection rule is a fixed constant (p>=0.5) compared per-trade against that trade's own seed-averaged calibrated probability -- no validation-year tuning, no reference to any other trade's prediction. Fully causal and live-deployable as-is.",
+    "Training: 5 independently-seeded models per fold, v3's exact protocol, raw probabilities averaged before one isotonic calibration per fold.",
+    "This script writes only *_v4final_* outputs; no v2/v3/v4/v3final artifact is modified."
+  ]
+}

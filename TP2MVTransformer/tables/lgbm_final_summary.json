@@ -1,0 +1,32 @@
+{
+  "method": "LightGBM parallel binary classifiers (T1/T2/K1/K2), final: isotonic calibration + causal p>=0.5 selection",
+  "selection_rule": "fixed p>=0.5, zero tuning, fully causal",
+  "feature_count": 136,
+  "all4_strategies": {
+    "n_selected": 124467,
+    "norm_total_pnl": -37232222.23769484,
+    "win_rate": 0.7646123068765215,
+    "daily_sharpe": -1.7592009129190127,
+    "daily_sortino": -0.891809142385222,
+    "max_drawdown": -39426174.58566984,
+    "positive_years": 1,
+    "total_years": 6
+  },
+  "t1_k2_only": {
+    "n_selected": 19636,
+    "norm_total_pnl": 682411.4099733665,
+    "win_rate": 0.5056019555917702,
+    "daily_sharpe": 1.2516782996590332,
+    "daily_sortino": 1.1215698428345038,
+    "max_drawdown": -254256.3202080741,
+    "positive_years": 5,
+    "total_years": 6
+  },
+  "notes": [
+    "Trained fresh -- does not reuse ExpiryMLCorrection/02_parallel_binary_lgbm.py's saved predictions.",
+    "Isotonic calibration fit on validation predictions only, then applied unchanged to test -- the original script had no calibration step.",
+    "Selection is a fixed p>=0.5 cutoff, matching the transformer's shipped rule -- the original script used a validation-P&L-maximizing threshold search (tune_threshold), already retired from the transformer pipeline for producing unstable results.",
+    "Sharpe/Sortino/drawdown are computed from daily-grouped P&L, matching the transformer's methodology -- the original script's Sharpe was computed from trade-level (not daily) returns, a different and incorrect statistic; Sortino and max drawdown were not computed at all.",
+    "t1_k2_only restricts to the T1+K2 structural short-D-leg prior, matching the transformer's scope."
+  ]
+}

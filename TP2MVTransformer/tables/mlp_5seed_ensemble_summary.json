@@ -1,0 +1,31 @@
+{
+  "method": "MLP on selected F_star features, 5-seed ensemble average + causal p>=0.5 selection",
+  "seeds": [
+    42,
+    101,
+    202,
+    303,
+    404
+  ],
+  "selection_rule": "fixed p>=0.5, zero tuning, fully causal",
+  "n_selected": 24977,
+  "norm_total_pnl": 3433936.251873806,
+  "win_rate": 0.3295431797253473,
+  "daily_sharpe": 1.6617555804076938,
+  "daily_sortino": 6.119653213427375,
+  "max_drawdown": -1207037.8771429441,
+  "positive_years": 4,
+  "total_years": 6,
+  "single_seed_comparison": {
+    "single_seed_daily_sharpe": 2.598686307737242,
+    "single_seed_daily_sortino": 6.891264110702389,
+    "single_seed_norm_total_pnl": 1411595.9672699657,
+    "ensemble_daily_sharpe": 1.6617555804076938,
+    "ensemble_daily_sortino": 6.119653213427375,
+    "ensemble_norm_total_pnl": 3433936.251873806
+  },
+  "notes": [
+    "Same ensembling methodology as 03_train_mv_alibi_transformer_v4_multiseed.py: raw probabilities averaged across 5 seeds before ONE isotonic calibration.",
+    "Built to close a gap surfaced by the professor's own comment (meeting transcript, [12:23]): the existing MLP-vs-transformer comparison compared single-seed MLP against 5-seed-ensembled transformer (v4-final) -- apples-to-oranges on the ensembling axis."
+  ]
+}

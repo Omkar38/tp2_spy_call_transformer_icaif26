@@ -1,0 +1,24 @@
+{
+  "method": "TP2-MV-ALiBi transformer, final (10-seed ensemble, causal p>=0.5 selection)",
+  "seeds": [
+    42,
+    101,
+    202,
+    303,
+    404,
+    505,
+    606,
+    707,
+    808,
+    909
+  ],
+  "selection_rule": "fixed p>=0.5, zero tuning, fully causal",
+  "total_selected": 12772,
+  "total_norm_pnl": 746544.1057520749,
+  "positive_years": 6,
+  "total_years": 6,
+  "combined_daily_sharpe": 1.8130411977207899,
+  "combined_daily_sortino": 1.5858227891385017,
+  "combined_max_drawdown": -297707.13660519687,
+  "combined_win_rate": 0.6479799561540871
+}
