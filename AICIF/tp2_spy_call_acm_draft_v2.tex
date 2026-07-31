@@ -1,7 +1,11 @@
 \documentclass[sigconf,review,anonymous]{acmart}
 
 \usepackage{tikz}
-\usetikzlibrary{positioning,arrows.meta,fit}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
+\definecolor{cData}{RGB}{219,234,254}\definecolor{cDataB}{RGB}{37,99,235}
+\definecolor{cFeat}{RGB}{220,252,231}\definecolor{cFeatB}{RGB}{22,163,74}
+\definecolor{cModel}{RGB}{255,237,213}\definecolor{cModelB}{RGB}{234,88,12}
+\definecolor{cEval}{RGB}{237,233,254}\definecolor{cEvalB}{RGB}{124,58,237}
 
 \setlength{\textfloatsep}{7pt plus 2pt minus 2pt}
 \setlength{\floatsep}{5pt plus 2pt minus 2pt}
@@ -37,9 +41,7 @@
 \renewcommand{\shortauthors}{Anonymous et al.}
 
 \begin{abstract}
-We study whether machine learning can identify economically meaningful total-positivity-inspired (TP2) violations in the SPY American call option surface. From conservative bid/ask TP2 violation episodes, we construct strategy-level labels for the two structurally viable call strategies, T1 and K2, using leakage-safe rolling train, validation, and test splits over 2014--2026 (2013 excluded as a data-vendor anomaly). The prediction task is not to detect TP2 violations, but to decide which episode-strategy pairs are worth trading.
-
-Trading every T1/K2 episode unconditionally over 2021--2026 loses \$12.52M under a \$1,000 normalized exposure convention (Sharpe $-1.01$, 2 of 6 years profitable); three independent learned selectors -- LightGBM, an MLP, and a transformer attending to historical episodes over five domain-relevant distances -- each convert this into a positive portfolio under an identical, causal selection rule (trade whenever calibrated probability $\ge 0.5$, no other tuning). This economic setting is our testbed for a methodological problem we argue is general and easy to miss: \textbf{naively comparing a single model fit for one architecture against a multi-seed ensemble for another is not a controlled comparison, and correcting for it can reverse which model looks superior.} We demonstrate this concretely, not just in principle: single-model Sharpe ranges from 1.25 (LightGBM) to 2.60 (MLP) to 1.73 (transformer), but at matched five-seed ensembles the MLP-versus-transformer ranking flips, and the same reversal recurs one level down when testing an ALiBi-style distance-bias extension to the transformer's attention -- in neither case is the underlying single-model gap statistically significant, a conclusion we confirm under two independent tests (a year-level paired bootstrap and a trade-dependence-aware block bootstrap by trading date). A capital-scaled backtest (\$1M capital, 1\% daily position cap~\cite{glasserman2025tp2}) sharpens the caution further: LightGBM and the MLP remain robustly profitable (Sharpe 1.09/1.03) while both transformer variants fall far behind (Sharpe 0.32/0.51) under realistic position sizing, traced to an asymmetric payoff shape rather than weaker ranking. Our central contribution is not a claim that any one architecture wins, but a demonstration of exactly how, and why, such rankings can mislead.
+We study whether machine learning can identify economically meaningful total-positivity-inspired (TP2) violations in the SPY American call option surface. From conservative bid/ask TP2 episodes we construct strategy-level labels for the two structurally viable call strategies, T1 and K2, and evaluate on leakage-safe rolling train/validation/test splits over 2014--2026. The task is not to detect violations but to decide which episode-strategy pairs are worth trading: trading every one over 2021--2026 loses \$12.52M (Sharpe $-1.01$, 2 of 6 years profitable), yet three independent selectors -- LightGBM, an MLP, and a transformer attending to historical episodes over five domain-relevant distances -- each convert this into a positive portfolio under one fixed, causal rule (trade when calibrated probability $\ge 0.5$, no other tuning). This setting is our testbed for a methodological problem we argue is general and easy to miss: \textbf{comparing a single-seed model of one architecture against a multi-seed ensemble of another is uncontrolled, and correcting for it can reverse which model looks superior.} We show this concretely -- the MLP-versus-transformer ranking flips between single- and five-seed comparison, and the same reversal recurs for an ALiBi-style attention extension -- with neither single-model gap separable at six test years (sign-test power $\approx0.26$). A capital-scaled backtest sharpens the caution: under realistic position sizing both transformer variants fall far behind LightGBM and the MLP, traced to an asymmetric payoff shape rather than weaker selection. Our contribution is not that any architecture wins, but a concrete demonstration of how, and why, such rankings mislead.
 \end{abstract}
 
 \begin{CCSXML}
@@ -79,7 +81,7 @@ A methodological contribution separate from the modeling results concerns trade 
 
 We also identify and correct a comparison bias easy to introduce unintentionally: naively comparing a single model fit for one architecture against a multi-seed ensemble for another favors whichever happens to have been ensembled, independent of which architecture is actually better. Correcting for it changes which model appears superior, and the underlying single-model gap is not statistically significant at six test years.
 
-The contributions of this paper are fourfold: (1) a demonstration, confirmed under two independent significance tests (a year-level paired bootstrap and a trade-dependence-aware block bootstrap), that naively comparing model architectures at mismatched ensembling levels is uncontrolled and can reverse which one looks superior -- shown to recur at two separate levels (MLP-versus-transformer, and plain-versus-ALiBi attention), evidence this is a general risk in trading-model comparisons rather than an isolated quirk; (2) a leakage-safe TP2 episode pipeline for SPY American call options with a documented, causal trade-selection rule that recovers a substantial return from an otherwise unprofitable signal across three independent model families, providing the empirical setting for (1); (3) a capital-scaled portfolio backtest showing the transformer's edge over LightGBM/MLP shrinks sharply under realistic position sizing (Sections~\ref{sec:addl-robustness}--\ref{sec:capitalscaled}) -- a further instance of the same caution against crowning an architecture the winner; and (4) a TP2-specific historical-attention transformer and an MV-ALiBi extension to it, stress-tested against execution-cost/early-assignment sensitivity and economic-exposure checks (Section~\ref{sec:mvalibi-ablation}).
+The contributions are fourfold: (1) a demonstration -- confirmed under a year-level paired bootstrap and a trade-dependence-aware block bootstrap -- that comparing architectures at mismatched ensembling levels is uncontrolled and can reverse which looks superior, recurring at two separate levels (MLP-versus-transformer, and plain-versus-ALiBi attention) rather than as an isolated quirk; (2) a leakage-safe TP2 episode pipeline for SPY American calls with a causal trade-selection rule that recovers a substantial return from an otherwise unprofitable signal across three independent model families, the empirical setting for (1); (3) a capital-scaled backtest showing the transformer's edge over LightGBM/MLP shrinks sharply under realistic sizing (Sections~\ref{sec:addl-robustness}--\ref{sec:capitalscaled}); and (4) a TP2-specific historical-attention transformer and an MV-ALiBi extension, stress-tested for execution-cost/early-assignment and economic-exposure sensitivity (Section~\ref{sec:mvalibi-ablation}).
 
 \section{Background and Related Work}
 \label{sec:related}
@@ -98,7 +100,27 @@ ALiBi~\cite{press2022alibi} replaces learned or sinusoidal positional embeddings
 
 \subsection{Data Source and Scope}
 \label{sec:data-source}
-We use SPY American call options from 2014--2026. The year 2013 is excluded: the data vendor reports 49{,}090 episodes in 2013 versus 438 in 2014, a discontinuity consistent with a vendor-side data-quality anomaly rather than a genuine change in market structure. After filtering to the T1/K2 strategy universe described below, our dataset contains 177{,}487 unique episodes, spanning 2014-02-03 to 2026-06-04.
+We use SPY American call options from 2014--2026. The year 2013 is excluded: the data vendor reports 49{,}090 episodes in 2013 versus 438 in 2014, a discontinuity consistent with a vendor-side data-quality anomaly rather than a genuine change in market structure. After filtering to the T1/K2 strategy universe described below, our dataset contains 177{,}487 unique episodes, spanning 2014-02-03 to 2026-06-04. Table~\ref{tab:peryear} breaks these down by year: episode counts, candidate episode-strategy pairs (two per episode), and profitable-label base rate $\pi_t$.
+
+\begin{table}[t]
+\centering
+\footnotesize
+\begin{tabular}{rrrr@{\hskip 1.4em}rrrr}
+\toprule
+Yr & Epis. & Pairs & $\pi_t$ & Yr & Epis. & Pairs & $\pi_t$ \\
+\midrule
+2014 & 438 & 876 & 8.6\% & 2021 & 20{,}588 & 41{,}176 & 15.8\% \\
+2015 & 140 & 280 & 1.1\% & 2022 & 6{,}604 & 13{,}208 & 16.0\% \\
+2016 & 3{,}786 & 7{,}572 & 5.4\% & 2023 & 12{,}731 & 25{,}462 & 14.5\% \\
+2017 & 12{,}284 & 24{,}568 & 45.8\% & 2024 & 34{,}167 & 68{,}334 & 15.9\% \\
+2018 & 5{,}969 & 11{,}938 & 26.6\% & 2025 & 41{,}577 & 83{,}154 & 11.1\% \\
+2019 & 4{,}151 & 8{,}302 & 41.6\% & 2026$^\dagger$ & 9{,}335 & 18{,}670 & 11.1\% \\
+2020 & 25{,}717 & 51{,}434 & 72.5\% & & & & \\
+\bottomrule
+\end{tabular}
+\caption{T1/K2 episodes, candidate pairs (two per episode), and profitable-label base rate $\pi_t$ by year. $\pi_t$ collapses from 45--73\% (2017--2020) to 11--16\% (2021--2026), the $\sim$4$\times$ label shift behind the calibration challenge (Section~\ref{sec:limitations}). 2013 excluded as a vendor anomaly (49{,}090 vs.\ 438 episodes in 2014). $^\dagger$2026 ends 2026-06-04 ($\approx$107 trading days).}
+\label{tab:peryear}
+\end{table}
 
 \subsection{TP2 Episode Detection}
 A TP2 episode begins when a conservative bid/ask option-price rectangle violates the TP2 inequality $C(K_1,T_1)\cdot C(K_2,T_2) < C(K_1^{\ast},T_2)\cdot C(K_2^{\ast},T_1)$ for strikes $K_1 < K_2$ and maturities $T_1 < T_2$, using rounded-up adjusted strikes $K_1^{\ast}, K_2^{\ast}$ where an exactly matching strike is unavailable. We do not additionally filter candidate pairs against a vertical- or calendar-spread no-arbitrage condition, unlike the companion SPX study~\cite{glasserman2025tp2}; that study reports such a filter removes fewer than 2\% of its violations and has minimal effect on profitability, so we do not expect this to be a large gap, but we have not verified that empirically on our data and list it as a limitation in Section~\ref{sec:limitations} rather than assuming it away.
@@ -109,7 +131,7 @@ The raw detector output is daily and rectangle-level: the same economic TP2 viol
 
 Over the full raw detection history, 2{,}430{,}220 daily violation rows collapse to 2{,}098{,}213 pair episodes. Episode duration is heavily right-skewed: 88.66\% of episodes are single-session events, the median duration is one session, and the maximum observed duration is 14 sessions. Of these raw pair episodes, 50.6\% end in true reversion (the TP2 inequality resolves) rather than expiring, losing a required leg, or failing a liquidity filter. This raw population is prior to the conservative bid/ask filter, the T1/K2 restriction, and the cost-aware labeling described below; the T1/K2 episode count used for modeling throughout the rest of this paper (177{,}487 episodes, Section~\ref{sec:data-source}) is a downstream, filtered subset of it.
 
-To track each episode beyond just its start, we build a lifecycle panel following every conservative TP2 episode across a fixed event-time window: a 20-session pre-event lookback through expiration, indexed relative to the first violation day (event day 0). Figure~\ref{fig:lifecyclepath} plots the resulting lifecycle path of normalized TP2 pressure. Pressure is flat and slightly negative pre-event, spikes sharply at day 0 by construction, decays back toward zero over following sessions, and drifts downward again near the far end of the window -- making the reversion and duration statistics above directly auditable rather than only asserted as summary counts.
+To track each episode beyond just its start, we build a lifecycle panel following every conservative TP2 episode across a fixed event-time window: a 20-session pre-event lookback through expiration, indexed relative to the first violation day (event day 0). Figure~\ref{fig:lifecyclepath} plots the resulting lifecycle path of normalized TP2 pressure. Pressure is flat and slightly negative pre-event, spikes sharply at day 0 by construction, decays back toward zero over following sessions, and drifts downward again near the far end of the window -- making the reversion and duration statistics above directly auditable rather than only asserted as summary counts. Although the panel runs through expiration, every lifecycle feature used as a model input is truncated at event day 0 (the ``$\le0$'' construction) -- only pre- and at-signal pressure, observability, and liquidity summaries enter $F^{\ast}$, never post-signal rows.
 
 \begin{figure}[t]
 \centering
@@ -132,70 +154,63 @@ Figure~\ref{fig:pipeline} details the full pipeline described in this section, f
 
 \begin{figure*}[t]
 \centering
-\resizebox{0.54\textwidth}{!}{%
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-  box/.style={draw, rounded corners, align=center, text width=3.1cm, minimum height=1.5cm, font=\small, inner sep=1.8mm},
-  arr/.style={-{Latex[length=2.2mm]}, thick},
-  stepnum/.style={circle, draw, fill=white, font=\scriptsize\bfseries, inner sep=0.4mm, minimum size=4.2mm}
+  every node/.style={font=\footnotesize},
+  b/.style={draw, rounded corners=3pt, align=center, text width=2.3cm, minimum height=1.0cm, inner sep=1.3mm, line width=0.5pt},
+  bd/.style={b, fill=cData, draw=cDataB}, bf/.style={b, fill=cFeat, draw=cFeatB},
+  bm/.style={b, fill=cModel, draw=cModelB}, be/.style={b, fill=cEval, draw=cEvalB},
+  arr/.style={-{Latex[length=2.2mm]}, line width=0.75pt, rounded corners=2pt},
+  mrg/.style={line width=0.75pt, rounded corners=2pt, cModelB!85},
+  brc/.style={-{Latex[length=2.2mm]}, line width=0.75pt, densely dashed, gray, rounded corners=2pt},
+  sn/.style={circle, draw, fill=white, font=\scriptsize\bfseries, inner sep=0.3mm, minimum size=4mm}
 ]
-
-\node[box] (raw)      at (0,0)   {SPY American call quotes, 2014--2026 (2013 excluded)};
-\node[box] (tp2)       at (4.2,0) {Conservative bid/ask TP2 rectangle detection, $A{\cdot}B < C{\cdot}D$};
-\node[box] (episode)   at (8.4,0) {Episode tracking: same rectangle across dates $\to$ one episode};
-\node[box] (restrict)  at (12.6,0){T1/K2 restriction: short shorter-dated $D$-leg only (\S3.5)};
-\node[box] (labels)    at (16.8,0){Cost-aware expiry labels: spread + \$0.65/contract, \$1{,}000 norm.};
-
-\node[box] (feat149)  at (2.1,-3.2)  {149 candidate features, 8 semantic blocks};
-\node[box] (lgbmfs)   at (6.3,-3.2) {LightGBM feature discovery: gain + permutation + stability};
-\node[box] (fstar)    at (10.5,-3.2) {$F^{\ast}$: 48 selected features (frozen)};
-
-\node[box] (lgbm) at (2.1,-6.4)   {LightGBM: 4 binary classifiers (T1/T2/K1/K2)};
-\node[box] (mlp)  at (6.3,-6.4)   {MLP: 48-64-32-1, 5{,}249 params};
-\node[box] (tf)   at (10.5,-6.4)  {Transformer: 4-head historical attention, 37{,}086 params};
-\node[box] (ens)  at (14.7,-6.4)  {5-seed ensemble: average raw probability, then calibrate once};
-
-\node[box] (calib)  at (2.1,-9.6)  {Isotonic calibration, fit on validation year only};
-\node[box] (select) at (6.3,-9.6)  {Select trade if calibrated $p \ge 0.5$ (fixed, causal)};
-\node[box] (eval)   at (10.5,-9.6) {6-fold rolling walk-forward evaluation (Table~\ref{tab:folds})};
-\node[box] (metrics) at (14.7,-9.6){Sharpe, Sortino, max drawdown, year-by-year P\&L};
-
-\draw[arr] (raw) -- (tp2);
-\draw[arr] (tp2) -- (episode);
-\draw[arr] (episode) -- (restrict);
-\draw[arr] (restrict) -- (labels);
-\draw[arr] (labels) -- (16.8,-1.8) -- (2.1,-1.8) -- (feat149);
-\draw[arr] (feat149) -- (lgbmfs);
-\draw[arr] (lgbmfs) -- (fstar);
-\draw[arr] (feat149) -- (lgbm);
-\draw[arr] (fstar) -- (10.5,-4.8) -- (6.3,-4.8) -- (mlp);
-\draw[arr] (fstar) -- (tf);
-\draw[arr] (tf) -- (ens);
-\draw[arr] (lgbm) -- (calib);
-\draw[arr] (mlp) -- (6.3,-7.6) -- (2.1,-7.6) -- (calib);
-\draw[arr] (ens) -- (14.7,-8.2) -- (2.1,-8.2) -- (calib);
-\draw[arr] (calib) -- (select);
-\draw[arr] (select) -- (eval);
-\draw[arr] (eval) -- (metrics);
-
-\node[stepnum] at (raw.north west)      {1};
-\node[stepnum] at (tp2.north west)      {2};
-\node[stepnum] at (episode.north west)  {3};
-\node[stepnum] at (restrict.north west) {4};
-\node[stepnum] at (labels.north west)   {5};
-\node[stepnum] at (feat149.north west)  {6};
-\node[stepnum] at (lgbmfs.north west)   {7};
-\node[stepnum] at (fstar.north west)    {8};
-\node[stepnum] at (lgbm.north west)     {9};
-\node[stepnum] at (mlp.north west)      {10};
-\node[stepnum] at (tf.north west)       {11};
-\node[stepnum] at (ens.north west)      {12};
-\node[stepnum] at (calib.north west)    {13};
-\node[stepnum] at (select.north west)   {14};
-\node[stepnum] at (eval.north west)     {15};
-\node[stepnum] at (metrics.north west)  {16};
-\end{tikzpicture}%
+\def\ry{0}\def\rf{-2.1}\def\rm{-4.2}\def\re{-6.3}
+\begin{scope}[on background layer]
+  \fill[cDataB!7,  rounded corners=5pt] (-2.55,0.80)  rectangle (14.15,-0.80);
+  \fill[cFeatB!7,  rounded corners=5pt] (-2.55,-1.30) rectangle (14.15,-2.90);
+  \fill[cModelB!7, rounded corners=5pt] (-2.55,-3.40) rectangle (14.15,-5.00);
+  \fill[cEvalB!7,  rounded corners=5pt] (-2.55,-5.50) rectangle (14.15,-7.10);
+\end{scope}
+\node[bd] (n1) at (0,\ry)    {SPY call quotes\\2014--2026};
+\node[bd] (n2) at (3.2,\ry)  {Conservative bid/ask\\TP2 $A{\cdot}B{<}C{\cdot}D$};
+\node[bd] (n3) at (6.4,\ry)  {Episode\\tracking};
+\node[bd] (n4) at (9.6,\ry)  {T1/K2 restriction\\(short $D$-leg)};
+\node[bd] (n5) at (12.8,\ry) {Cost-aware\\expiry labels};
+\node[bf] (n6) at (3.2,\rf) {149 candidate\\features};
+\node[bf] (n7) at (6.4,\rf) {LightGBM\\discovery};
+\node[bf] (n8) at (9.6,\rf) {$F^{\ast}$: 48 frozen\\features};
+\node[bm] (n9)  at (0,\rm)    {LightGBM\\(4 classifiers)};
+\node[bm] (n10) at (4.27,\rm) {MLP\\(5{,}249 par.)};
+\node[bm] (n11) at (8.53,\rm) {Transformer\\(37{,}086 par.)};
+\node[bm] (n12) at (12.8,\rm) {5-seed\\ensemble};
+\node[be] (n13) at (0,\re)    {Isotonic calib.\\(val.\ year)};
+\node[be] (n14) at (4.27,\re) {Select\\$p\!\ge\!0.5$};
+\node[be] (n15) at (8.53,\re) {6-fold\\walk-forward};
+\node[be] (n16) at (12.8,\re) {Sharpe / Sortino\\/ P\&L};
+\draw[arr] (n1)--(n2); \draw[arr] (n2)--(n3); \draw[arr] (n3)--(n4); \draw[arr] (n4)--(n5);
+\draw[arr] (n5.south) -- ++(0,-0.5) -| (n6.north);
+\draw[arr] (n6)--(n7); \draw[arr] (n7)--(n8);
+\draw[arr] (n8.south) -- ++(0,-0.35) -| (n11.north);
+\draw[arr] (n8.south) -- ++(0,-0.35) -| (n10.north);
+\draw[brc] (n6.south) -- ++(0,-0.3) -| (n9.north) node[pos=0.25,above,black,font=\scriptsize]{all 149};
+\draw[arr] (n11)--(n12);
+\coordinate (jn) at (0,-5.35);
+\draw[mrg] (n10.south) |- (jn);
+\draw[mrg] (n12.south) |- (jn);
+\draw[mrg] (n9.south) -- (jn);
+\fill[cModelB] (jn) circle (1.9pt);
+\draw[arr, cModelB!85] (jn) -- (n13.north);
+\draw[arr] (n13)--(n14); \draw[arr] (n14)--(n15); \draw[arr] (n15)--(n16);
+\foreach \n/\l in {n1/1,n2/2,n3/3,n4/4,n5/5,n6/6,n7/7,n8/8,n9/9,n10/10,n11/11,n12/12,n13/13,n14/14,n15/15,n16/16}
+  \node[sn] at (\n.north west) {\l};
+\node[rotate=90, cDataB,  font=\bfseries\footnotesize] at (-2.15,\ry) {DATA};
+\node[rotate=90, cFeatB,  font=\bfseries\footnotesize] at (-2.15,\rf) {FEATURES};
+\node[rotate=90, cModelB, font=\bfseries\footnotesize] at (-2.15,\rm) {MODELS};
+\node[rotate=90, cEvalB,  font=\bfseries\footnotesize] at (-2.15,\re) {EVAL};
+\end{tikzpicture}
 }
-\caption{End-to-end pipeline, numbered 1--16. Steps 1--5 build the episode-level dataset (quotes $\to$ TP2 detection $\to$ episode grouping $\to$ T1/K2 restriction $\to$ cost-aware labels). Step 6 exposes 149 candidate features; Steps 7--8 select the frozen 48-feature $F^{\ast}$ dictionary, while Step 9 trains LightGBM on all 149 independently of $F^{\ast}$. Steps 10--12 train the MLP, transformer, and its 5-seed ensemble from $F^{\ast}$. All paths converge at Steps 13--16 (calibration, $p\ge0.5$ selection, 6-fold evaluation, metrics) -- three independently trained scoring functions on one identical downstream pipeline.}
+\caption{End-to-end pipeline, numbered 1--16. Steps 1--5 build the episode-level dataset; Step 6 exposes 149 candidate features; Steps 7--8 select the frozen 48-feature $F^{\ast}$ dictionary, while LightGBM (Step 9) trains on all 149 independently of $F^{\ast}$ (dashed). Steps 10--12 train the MLP, transformer, and its 5-seed ensemble from $F^{\ast}$. The three independent scorers (Steps 9, 10, 12) converge on one identical shared downstream -- calibration, $p\ge0.5$ selection, 6-fold evaluation, and metrics (Steps 13--16).}
 \label{fig:pipeline}
 \end{figure*}
 
@@ -222,7 +237,9 @@ Train years & Validation year & Test year \\
 \end{table}
 
 \subsection{Feature Selection}
-We use LightGBM~\cite{ke2017lightgbm} as a feature-discovery tool, separate from its role as a trading model (Section~\ref{sec:lgbm-scope}). From 149 candidate features spanning eight semantic blocks (market, short-leg structure, option risk, surface location, liquidity, TP2 geometry, strategy/calendar, lifecycle pressure), we select 48 features $F^{\ast}$, dominated by the market and short-leg-structure groups (12 and 10 features), using a composite score combining gain-based importance, permutation importance, and a temporal-stability penalty across folds. Only the selected feature values feed the MLP and transformer -- LightGBM's predictions, leaf indices, and importance scores are never used downstream -- so Section~\ref{sec:results} compares three independent approaches on a shared, inspectable feature set rather than a stacked ensemble.
+We use LightGBM~\cite{ke2017lightgbm} as a feature-discovery tool, separate from its role as a trading model (Section~\ref{sec:lgbm-scope}). From 149 candidate features spanning eight semantic blocks (market, short-leg structure, option risk, surface location, liquidity, TP2 geometry, strategy/calendar, lifecycle pressure), we select 48 features $F^{\ast}$, dominated by the market and short-leg-structure groups (12 and 10 features), using a composite score combining gain-based importance, permutation importance, and a temporal-stability penalty across folds. $F^{\ast}$ is selected once and frozen: importance is pooled over all six folds (train years 2017--2024, validation years 2020--2025) and stability is the fraction of the twelve fold$\times$strategy runs placing a feature in the top 30. Because this single set is reused across folds, its selection touches validation years (2020--2025) that overlap later test years -- a feature-selection leakage not removed by the per-fold split of Section~\ref{sec:method}, which we leave to future work to close by re-selecting within each fold. Only the selected feature values feed the MLP and transformer -- LightGBM's predictions, leaf indices, and importance scores are never used downstream -- so Section~\ref{sec:results} compares three independent approaches on a shared, inspectable feature set rather than a stacked ensemble.
+
+\noindent\textbf{Implementation (all models).} Every model uses the six rolling folds, standardizes features on training data, fits isotonic calibration on the validation year, and selects at $p\ge0.5$; single-seed rows use the fixed default seed 42 (set a priori, not the best of several) and 5-seed ensembles average seeds \{42,101,202,303,404\} before one calibration. LightGBM: 350 trees, lr 0.04, 31 leaves, min-child 30, subsample/colsample 0.8, balanced class weights. MLP (5{,}249 params): Adam, lr $10^{-3}$, $L_2$ $10^{-4}$, batch 1024, $\le$80 epochs, early-stop patience 8. Transformer (37{,}086 params): hidden 64, 4 heads, 5 distances, $\le$64 history, AdamW lr $3{\times}10^{-5}$, weight decay $10^{-4}$, 8\% warm-up, grad-clip 1.0, $\le$25 epochs, val-loss checkpoint, plus a Huber return-auxiliary loss.
 
 \subsection{LightGBM Model}
 \label{sec:lgbm-scope}
@@ -233,7 +250,7 @@ The MLP baseline is a feedforward network with layer sizes 48, 64, 32, and 1 (Re
 
 \subsection{TP2 Historical-Attention Transformer}
 \label{sec:transformer}
-Each candidate episode-strategy pair is encoded as a token combining its $F^{\ast}$ feature values, a strategy embedding, and calendar features. The current token attends to up to 64 prior episode tokens, drawn only from strictly earlier calendar days, via a single cross-attention block with four heads and hidden dimension 64 (37{,}086 parameters total, roughly seven times the size of the MLP baseline). The attention logit for head $h$ between the current token $i$ and a historical token $j$ is
+Each candidate episode-strategy pair is encoded as a token combining its $F^{\ast}$ feature values, a strategy embedding, and calendar features. The current token attends to up to 64 prior episode tokens, drawn only from strictly earlier calendar days -- the 64 most recently-dated tokens before the current episode's day, in chronological order and zero-padded/masked when fewer exist, selected by date alone and never by any label or outcome (so the window is causal and reproducible) -- via a single cross-attention block with four heads and hidden dimension 64 (37{,}086 parameters total, roughly seven times the size of the MLP baseline). The attention logit for head $h$ between the current token $i$ and a historical token $j$ is
 \[
 a_{ij}^{h} \;=\; \frac{q_i \cdot k_j}{\sqrt{d}} \;+\; \text{(same/cross-strategy bonus)},
 \]
@@ -247,9 +264,9 @@ a_{ij}^{h} \;=\; \frac{q_i \cdot k_j}{\sqrt{d}} \;-\; m_h^{\top} d_{ij} \;+\; \t
 \]
 where $d_{ij}$ is a five-dimensional vector of distances between episode $i$ and historical episode $j$ -- time elapsed, option-surface location, short-leg structure, liquidity, and lifecycle stage -- and $m_h$ is a learned, strictly positive per-head slope vector obtained via a softplus transform, added as 20 extra parameters (5 distances $\times$ 4 heads) on top of the 37{,}086-parameter base architecture.
 
-The mechanism behaves exactly as designed at the level of what it learns. Despite the five distance types spanning very different raw scales (mean scale near 4.9 for time elapsed versus 0.66 for short-leg distance, roughly seven-to-one), the learned slopes converge to a tight band of 0.26--0.27 across all five types, every attention head, and -- checked across a 5-seed ensemble of 30 independently trained models -- every random initialization (mean slope 0.262--0.266, std.\ below 0.0035 in every case). The mechanism reliably compensates for the differing raw units rather than being dominated by whichever distance has the largest raw magnitude.
+The mechanism behaves as designed: despite the five distance types spanning very different raw scales (mean $\approx$4.9 for time elapsed versus 0.66 for short-leg distance), the learned slopes converge to a tight 0.26--0.27 band across all five types, every attention head, and -- across a 5-seed ensemble of 30 models -- every initialization (mean 0.262--0.266, std.\ below 0.0035), compensating for the differing units rather than being dominated by the largest-magnitude distance.
 
-Whether adding the distance-bias term helps, however, depends on an ensembling choice in the same way already documented for the MLP-versus-transformer comparison in Section~\ref{sec:seedcount}: at matched single-seed comparison, the plain-attention version reaches Sharpe 1.73 versus 1.51 with the distance-bias term added, with higher total P\&L, Sortino, and a smaller drawdown. But at matched 5-seed ensemble comparison, the ranking reverses: the distance-biased version reaches Sharpe 2.36 versus the plain version's 2.18, with higher total P\&L and a smaller drawdown (Table~\ref{tab:alibi-ablation}). Using the same paired-bootstrap and sign-test methodology as Section~\ref{sec:seedcount} on the year-by-year profit and loss differences, neither comparison reaches conventional significance: the single-seed sign test gives $p=0.109$ (plain wins 5 of 6 years, 95\% CI on the mean difference $[-\$6.4\text{K}, \$57.7\text{K}]$, includes zero), and the 5-seed sign test gives $p=0.656$ (plain wins 3 of 6 years, an even split; CI $[-\$15.5\text{K}, \$12.9\text{K}]$, includes zero). A block bootstrap~\cite{kunsch1989} confirms both remain not significant (single-seed CI $[-\$162.3\text{K}, \$405.4\text{K}]$; five-seed CI $[-\$134.9\text{K}, \$110.4\text{K}]$, both including zero). We conclude that neither the plain-attention nor the distance-biased architecture is defensibly superior from this evidence, and report both comparisons rather than only the one favorable to either variant -- the same standard of disclosure we apply to the MLP-versus-transformer comparison. We evaluate the plain-attention version as primary throughout the rest of this paper, consistent with the single-seed result and for architectural simplicity (20 fewer parameters, no distance-bias mechanism to justify), while stating plainly that this choice is not compelled by the 5-seed evidence, which favors the distance-biased variant instead.
+Whether adding the distance-bias term helps, however, depends on an ensembling choice in the same way already documented for the MLP-versus-transformer comparison in Section~\ref{sec:seedcount}: at matched single-seed comparison, the plain-attention version reaches Sharpe 1.73 versus 1.51 with the distance-bias term added, with higher total P\&L, Sortino, and a smaller drawdown. But at matched 5-seed ensemble comparison, the ranking reverses: the distance-biased version reaches Sharpe 2.36 versus the plain version's 2.18, with higher total P\&L and a smaller drawdown (Table~\ref{tab:alibi-ablation}). Using the same paired-bootstrap and sign-test methodology as Section~\ref{sec:seedcount} on the year-by-year profit and loss differences, neither comparison reaches conventional significance: the single-seed sign test (two-sided) gives $p=0.219$ (plain wins 5 of 6 years; 95\% CI on the mean difference $[-\$6.4\text{K}, \$57.7\text{K}]$, includes zero), and the 5-seed sign test gives $p=1.000$ (a 3--3 split; CI $[-\$15.5\text{K}, \$12.9\text{K}]$, includes zero) -- both underpowered at $n=6$. A block bootstrap~\cite{kunsch1989} confirms both remain not significant (single-seed CI $[-\$162.3\text{K}, \$405.4\text{K}]$; five-seed CI $[-\$134.9\text{K}, \$110.4\text{K}]$, both including zero). We conclude that neither the plain-attention nor the distance-biased architecture is defensibly superior from this evidence, and report both comparisons rather than only the one favorable to either variant -- the same standard of disclosure we apply to the MLP-versus-transformer comparison. We evaluate the plain-attention version as primary throughout the rest of this paper, consistent with the single-seed result and for architectural simplicity (20 fewer parameters, no distance-bias mechanism to justify), while stating plainly that this choice is not compelled by the 5-seed evidence, which favors the distance-biased variant instead.
 
 \begin{table}[t]
 \centering
@@ -272,27 +289,25 @@ Transformer (+ MV-ALiBi distance bias) & 5 & \$704K & 2.36 & 3.72 & $-$\$91K \\
 
 \subsection{Historical Attention Is Necessary: A No-History Ablation}
 \label{sec:nohistory}
-Sections~\ref{sec:seedcount} and \ref{sec:mvalibi-ablation} both compare architectures that retain historical cross-attention; neither isolates whether attending to history at all is what makes the transformer competitive, as opposed to simply having access to the same 48-feature dictionary. We built a minimal variant that removes cross-attention entirely -- the same input projection feeds a classification head directly, no query/key/value attention over the historical window and no distance-bias term -- identical otherwise (features, folds, val-loss checkpointing, calibration, $p\ge0.5$ rule), and far smaller (16{,}130 parameters). At matched single seed (seed 42), removing historical attention nearly halves risk-adjusted performance: Sharpe falls from 1.73 to 0.87, Sortino from 1.70 to 1.03, total P\&L from \$686.2K to \$260.3K, and positive test years fall from 6 of 6 to 4 of 6 (2021 and 2024 turn negative) -- the largest single gap of any ablation here, and direct evidence that historical cross-attention itself, not merely the shared feature dictionary or parameter count, is doing real work.
+Sections~\ref{sec:seedcount} and~\ref{sec:mvalibi-ablation} compare architectures that all retain historical cross-attention; neither isolates whether attending to history -- as opposed to just the shared 48-feature dictionary -- is what makes the transformer competitive. We built a minimal variant that removes cross-attention entirely -- the same input projection feeds a classification head directly, no query/key/value attention over the historical window and no distance-bias term -- identical otherwise (features, folds, val-loss checkpointing, calibration, $p\ge0.5$ rule), and far smaller (16{,}130 parameters). At matched single seed (seed 42), removing historical attention nearly halves risk-adjusted performance: Sharpe falls from 1.73 to 0.87, Sortino from 1.70 to 1.03, total P\&L from \$686.2K to \$260.3K, and positive test years fall from 6 of 6 to 4 of 6 (2021 and 2024 turn negative) -- the largest single gap of any ablation here, and direct evidence that historical cross-attention itself, not merely the shared feature dictionary or parameter count, is doing real work.
 
 \subsection{Probability Calibration and Trade Selection}
 \label{sec:calibration}
 For every model, we fit isotonic regression calibration~\cite{zadrozny2002transforming} on validation-year predictions and labels only, never on test-year labels, and apply the fitted calibration map unchanged to test-year predictions. For multi-seed ensembles, raw uncalibrated probabilities are averaged across seeds before calibration, and a single calibration map is fit on the averaged validation probabilities.
 
-The trade-selection rule is a fixed decision with no tunable parameters: select any episode-strategy pair whose calibrated probability is at least 0.5, and skip otherwise -- causal by construction and directly deployable, since it depends on nothing but the current trade's own calibrated probability. We evaluated and rejected two alternatives during development: a validation-tuned absolute threshold, prone to selecting degenerate, near-minimal cutoffs that chase rare large winners rather than reflecting genuine trade quality; and a rank-based top-$K$ selection fraction, non-causal because its cutoff is a quantile of the entire test period's prediction distribution -- unknowable at trade time, since it depends on predictions for dates that have not yet occurred.
-
-We use $p \ge 0.5$ because it is the natural decision boundary for a calibrated binary probability: under correct calibration, $p \ge 0.5$ is precisely the statement that a trade is more likely profitable than not, so the rule requires no tuning and no held-out data to define. It is fixed a priori, before any test-year result is examined, and is identical across every model and every fold. As a diagnostic rather than a selection procedure, we separately checked whether this fixed rule behaves consistently across the test period rather than being an artifact of one favorable stretch: split into an early half (2021--2023) and a late half (2024--2026) and scored on risk-adjusted metrics, both halves are solidly profitable under the identical, unmodified rule (Sharpe 1.17 and 2.88 respectively; 3 of 3 years profitable in each half), so the rule's behavior is not concentrated in one part of the evaluation window. This check does not inform the choice of rule and does not affect the six-year results reported in Section~\ref{sec:results}, which remain fully out-of-sample for every test year.
+The trade-selection rule has no tunable parameters: select any episode-strategy pair whose calibrated probability is at least 0.5, else skip -- causal by construction, since it depends only on the current trade's own probability. This is the natural boundary for a calibrated binary probability ($p\ge0.5$ means more likely profitable than not), fixed a priori and identical across every model and fold. We rejected two alternatives during development: a validation-tuned absolute threshold, prone to degenerate near-minimal cutoffs that chase rare winners; and a rank-based top-$K$ fraction, non-causal because its cutoff is a quantile of the whole test period's predictions, unknowable at trade time. As a diagnostic only, splitting the test period into early (2021--2023) and late (2024--2026) halves, both are solidly profitable under the unmodified rule (Sharpe 1.17 and 2.88; 3 of 3 years each), so its behavior is not concentrated in one stretch; this does not inform the rule, and the six-year results in Section~\ref{sec:results} remain fully out-of-sample.
 
 \section{Results}
 \label{sec:results}
 
-All results in this section use the identical evaluation protocol described in Section~\ref{sec:method}: isotonic calibration fit on the validation year only, the $p \ge 0.5$ selection rule, and daily-grouped Sharpe ratio, Sortino ratio, and maximum drawdown computed from the same code path for every model.
+All results in this section use the identical evaluation protocol described in Section~\ref{sec:method}: isotonic calibration fit on the validation year only, the $p \ge 0.5$ selection rule, and daily-grouped Sharpe ratio, Sortino ratio, and maximum drawdown computed from the same code path for every model. We annualize the daily-grouped Sharpe as $\sqrt{252}\,\bar{r}_d/\sigma(r_d)$, where $r_d$ is a model's total normalized P\&L on trading day $d$ over its selected trades; days with no selected trade are omitted, so this statistic rises with a model's trade density and is not directly comparable across models that differ substantially in trade count $N$ (Table~\ref{tab:consolidated}).
 
 \subsection{Unconditional Baseline}
-Trading every T1/K2 episode with no model at all, over the six 2021--2026 test years, loses \$12.52M in aggregate across 250{,}004 candidate trades (Sharpe $-1.01$, Sortino $-2.12$, maximum drawdown $-\$24.51$M, win rate 12.9\%, 2 of 6 years profitable). This is the floor every learned model must clear.
+Trading every T1/K2 episode with no model at all, over the six 2021--2026 test years, loses \$12.52M in aggregate across 250{,}004 candidate episode-strategy pairs -- the 177{,}487 episodes each contribute one T1 and one K2 candidate (Sharpe $-1.01$, Sortino $-2.12$, maximum drawdown $-\$24.51$M, win rate 12.9\%, 2 of 6 years profitable). This is the floor every learned model must clear.
 
 \subsection{Consolidated Model Comparison}
 \label{sec:seedcount}
-Table~\ref{tab:consolidated} reports every model, at every seed count we evaluated, alongside the unconditional baseline, under the identical selection rule and metrics. LightGBM, the MLP, and the transformer all convert the unconditional loss into a substantial positive return.
+Table~\ref{tab:consolidated} reports every model, at every seed count we evaluated, alongside the unconditional baseline, under the identical selection rule and metrics. LightGBM, the MLP, and the transformer all convert the unconditional loss into a substantial positive return. Two reference baselines (last two rows) bracket the result: an L2-regularized logistic regression on the same $F^{\ast}$ features -- a purely linear selector with no hidden layer -- already recovers \$2.02M (Sharpe 2.27), close to the neural models and above LightGBM, indicating that most of the tradable signal is linear in the selected features rather than architecture-specific; while random selection at matched trade count ($N{=}14{,}258$, mean of 30 draws) loses \$0.77M (Sharpe $-1.14$), confirming the learned gains are not a mechanical consequence of how many trades are taken.
 
 \begin{table}[t]
 \centering
@@ -308,16 +323,21 @@ MLP & 1 & 14{,}258 & \$1.41M & 2.60 & $-$\$215K & 6/6 \\
 MLP & 5 & 24{,}977 & \$3.43M & 1.66 & $-$\$1.21M & 4/6 \\
 Transformer & 1 & 16{,}435 & \$686K & 1.73 & $-$\$242K & 6/6 \\
 Transformer & 5 & 14{,}338 & \$695K & 2.18 & $-$\$128K & 6/6 \\
+\midrule
+Logistic (L2) & 1 & 13{,}841 & \$2.02M & 2.27 & $-$\$295K & 5/6 \\
+Random @$N$ & -- & 14{,}258 & $-$\$0.77M & $-$1.14 & -- & -- \\
 \bottomrule
 \end{tabular}%
 }
-\caption{Every model and seed count evaluated, plus the unconditional baseline, over all six 2021--2026 test years (Table~\ref{tab:folds}). `Seeds': independently trained models whose raw probabilities are averaged before one calibration step. `Trades': episode-strategy pairs traded (every valid episode for unconditional; $p\ge0.5$ for a learned model, Section~\ref{sec:calibration}). Dollar figures under the \$1{,}000-per-trade convention (Section~\ref{sec:labels}); Sharpe is annualized on daily-grouped returns; `Pos.\ yrs' counts positive-P\&L years.}
+\caption{Every model and seed count evaluated, plus the unconditional, a linear (L2-logistic), and a random-at-matched-$N$ baseline, over all six 2021--2026 test years (Table~\ref{tab:folds}). `Seeds': independently trained models whose raw probabilities are averaged before one calibration step. `Trades': episode-strategy pairs traded (every valid episode for unconditional; $p\ge0.5$ for a learned model, Section~\ref{sec:calibration}). Dollar figures under the \$1{,}000-per-trade convention (Section~\ref{sec:labels}); Sharpe is annualized on daily-grouped returns; `Pos.\ yrs' counts positive-P\&L years.}
 \label{tab:consolidated}
 \end{table}
 
 Comparing a single MLP fit against a five-seed transformer ensemble alone would not be controlled: it favors whichever model happened to be ensembled. Table~\ref{tab:consolidated} reports both architectures at matched seed counts (1 and 5), same ensembling procedure for both. Ensembling moves the two architectures in opposite directions: it improves the transformer's Sharpe (1.73$\to$2.18) and drawdown ($-$\$242K$\to-$\$128K), but degrades MLP's consistency (six of six $\to$ four of six profitable years) even as total P\&L triples -- win rate falls from 54.0\% to 33.0\% as averaging pulls predictions toward the mean and, after recalibration, lets more lower-quality trades cross the threshold.
 
-Once controlled for ensembling, the ranking does not hold cleanly either way: single MLP beats single transformer on Sharpe, but the five-seed ensembles reverse this on Sharpe, Sortino, and drawdown. A paired bootstrap~\cite{efron1993bootstrap} (20{,}000 resamples) and sign test on year-by-year P\&L differences: at single-seed, not significant ($p=0.344$, CI $[-\$37.6\text{K}, \$363.4\text{K}]$, includes zero). At five-seed, the sign test is also not significant ($p=0.656$, an even 3-3 split), but the CI, $[\$18.5\text{K}, \$927.1\text{K}]$, excludes zero, since MLP's winning years are far larger (up to \$1.33M in 2021) than the transformer's (at most \$136K in 2026). These two tests disagree at five-seed specifically; we report both rather than the more favorable one. A trade-dependence-aware block bootstrap~\cite{kunsch1989} (Section~\ref{sec:addl-robustness}) agrees: neither seed count reaches significance (single-seed CI $[-\$676.5\text{K}, \$2.53\text{M}]$; five-seed CI $[-\$2.16\text{M}, \$10.18\text{M}]$, both including zero).
+The single-seed MLP is itself markedly seed-sensitive: across the same five seeds used for its ensemble, single-seed test Sharpe ranges 1.47--2.60 (median 2.07, interquartile mean 2.07). The 2.60 in Table~\ref{tab:consolidated} is the fixed default seed (42), which happens to be the most favorable of the five; the median seed would report 2.07. That a single-seed estimate varies by more than the nominal single-versus-ensemble Sharpe gap is itself direct evidence that a single-seed point estimate is too noisy to rank architectures on -- reinforcing the central caution rather than resting the argument on six annual paired differences alone. All single-seed rows (LightGBM, MLP, transformer) use this same fixed seed 42, set a priori, not selected as the best of several.
+
+Once controlled for ensembling, the ranking does not hold cleanly either way: single MLP beats single transformer on Sharpe, but the five-seed ensembles reverse this on Sharpe, Sortino, and drawdown. A paired bootstrap~\cite{efron1993bootstrap} (20{,}000 resamples) and a sign test (reported two-sided) on year-by-year P\&L differences find neither seed count significant: single-seed $p=0.688$ (4 of 6 years favor MLP), five-seed $p=1.000$ (an even 3--3 split). The five-seed paired-bootstrap CI $[\$18.5\text{K}, \$927.1\text{K}]$ excludes zero only because MLP's winning years are far larger (up to \$1.33M in 2021) than the transformer's (at most \$136K in 2026). With just six paired years the sign test's power is only $\approx0.26$ against a model that truly wins 80\% of years, so we read these nulls as underpowered, not as evidence the architectures are equivalent. These two tests disagree at five-seed specifically; we report both rather than the more favorable one. A trade-dependence-aware block bootstrap~\cite{kunsch1989} (Section~\ref{sec:addl-robustness}) agrees: neither seed count reaches significance (single-seed CI $[-\$676.5\text{K}, \$2.53\text{M}]$; five-seed CI $[-\$2.16\text{M}, \$10.18\text{M}]$, both including zero).
 
 We also verified the T1/K2 restriction empirically: LightGBM trained on all four denominations loses \$37.23M unrestricted (Sharpe $-1.76$, 1/6 profitable years), confirming T2/K1 are structurally unprofitable, not merely theoretically disfavored.
 
@@ -364,7 +384,7 @@ We tested an expanding training window, using every year from 2014 up to the val
 \label{sec:addl-robustness}
 The paired bootstrap in Sections~\ref{sec:seedcount} and~\ref{sec:mvalibi-ablation} treats each test year as one observation, silent on within-year trade dependence. A moving block bootstrap~\cite{kunsch1989} (21-day blocks, 20{,}000 resamples, jointly resampled against unconditional on the real $\sim$1{,}320-day trading calendar) finds the Sharpe improvement over unconditional significant for MLP and both transformer variants (95\% CIs excluding zero) but \emph{not} for LightGBM ($[-0.03, 4.13]$); total P\&L differences are not significant for any model, consistent with the right-skewed year-to-year swings in Figure~\ref{fig:annualpnl}.
 
-We regressed each model's daily P\&L on daily SPY returns and on changes in a market-level average-IV proxy (feature\_avg\_iv; no VIX data exists in our source). No model's SPY beta reaches significance ($p>0.3$), arguing against a hidden equity-beta explanation. The IV-proxy relationship is small but significant for both transformer variants ($r\approx0.10$, $p<0.005$), not LightGBM or MLP ($p>0.13$) -- a modest volatility sensitivity specific to the transformer family, reported as a limitation. Net delta at entry shows every model predominantly net short (75--82\% of trades), a structural consequence of T1/K2 shorting the shorter-dated leg, not a model-specific finding.
+We regressed each model's daily P\&L on daily SPY returns and on changes in a market-level average-IV proxy (feature\_avg\_iv; we did not merge external VIX data, available from CBOE/FRED, into our vendor feed). No model's SPY beta reaches significance ($p>0.3$), arguing against a hidden equity-beta explanation. The IV-proxy relationship is small but significant for both transformer variants ($r\approx0.10$, $p<0.005$), not LightGBM or MLP ($p>0.13$) -- a modest volatility sensitivity specific to the transformer family, reported as a limitation. Net delta at entry shows every model predominantly net short (75--82\% of trades), a structural consequence of T1/K2 shorting the shorter-dated leg, not a model-specific finding.
 
 Widening execution slippage to 1.5$\times$ the quoted spread at entry leaves every model's positive-year count and ranking unchanged, though Sharpe falls 7--37\% (least sensitive: transformer variants, $-7\%$; most: LightGBM, $-37\%$). Separately, we flagged trades whose short-leg expiration falls on/after the next ex-dividend date (early-assignment risk the expiration-payoff labels do not price): 16--22\% of trades are exposed; LightGBM's exposed subset is net negative ($-\$33$K) against a strongly profitable unexposed subset, while the transformer's exposed subset has a \emph{higher} win rate than its unexposed one -- a divergence reported without a causal explanation.
 
@@ -381,7 +401,7 @@ Transformer (ALiBi, 5-seed) & 0.460 & 0.083 & 0.028 \\
 No-history ablation (\S\ref{sec:nohistory}) & 0.450 & 0.087 & 0.031 \\
 \bottomrule
 \end{tabular}
-\caption{Precision-recall AUC (average precision), Brier score, and expected calibration error (10 equal-width bins) on the 2021--2026 test-fold population, where the realized base rate is 13.0--13.8\% -- lower than the 25.33\%/23.67\% T1/K2 base rate reported for the full 2014--2026 sample in Section~\ref{sec:lgbm-scope}, reflecting the same underlying-price regime shift noted as a limitation in Section~\ref{sec:limitations}. ROC-AUC is a poor fit at this base rate, so PR-AUC is reported instead.}
+\caption{Precision-recall AUC (average precision), Brier score, and expected calibration error (10 equal-width bins) on the 2021--2026 test-fold population, where the pooled realized base rate is $\approx$13.8\%, identical across models by construction (Section~\ref{sec:lgbm-scope}) -- far below the 25.33\%/23.67\% T1/K2 base rate for the full 2014--2026 sample, reflecting the underlying-price regime shift noted in Section~\ref{sec:limitations}. ROC-AUC is invariant to base rate; we report PR-AUC because it is more sensitive to ranking within the rare positive class, and report ROC-AUC where competition is more balanced (the capital-scaled subset, Section~\ref{sec:capitalscaled}).}
 \label{tab:calibration}
 \end{table}
 
@@ -409,7 +429,7 @@ Transformer (ALiBi) & 0.9\% & 0.51 & $-2.5\%$ & 0.37 \\
 \label{tab:capitalscaled}
 \end{table}
 
-The cause is an asymmetric payoff shape, not weaker ranking or calibration. Restricted to each model's lowest-competition (``quiet'') trading days, where capital allocated per trade is largest, the transformer still wins more often than LightGBM or the MLP (69.9\% vs.\ 59.8\%/54.9\%) with the best discrimination of the three on this subset (AUC 0.906 vs.\ 0.890/0.881), but its wins are small (mean $+16.1\%$) and its losses are large (mean $-44.3\%$), a payoff ratio of 0.36 versus 4.09 for LightGBM and 3.54 for the MLP. LightGBM and the MLP concentrate profit on their largest-allocation days (capital-weighted return 23.7\%/35.8\% vs.\ a simple per-trade mean of 3.7\%/10.3\%); the transformer's best trades instead land on its smallest-allocation, highest-competition days (capital-weighted return only 1.6\% vs.\ a simple mean of 5.2\%), so its flat-notional Sharpe overstates the return it can actually capture under a realistic capital constraint. We report this as a limitation of the transformer's practical deployability at our current position-sizing convention, not of its selection signal, which the discrimination and calibration metrics above show is if anything the strongest of the three models on exactly these harder, lower-volume days.
+The cause is an asymmetric payoff shape, not weaker ranking. On each model's lowest-competition (``quiet'') days, where per-trade capital is largest, the transformer still wins more often than LightGBM or the MLP (69.9\% vs.\ 59.8\%/54.9\%) with the best discrimination (AUC 0.906 vs.\ 0.890/0.881), but its wins are small (mean $+16.1\%$) and losses large (mean $-44.3\%$) -- a payoff ratio of 0.36 versus 4.09 (LightGBM) and 3.54 (MLP). LightGBM and the MLP concentrate profit on their largest-allocation days (capital-weighted return 23.7\%/35.8\% vs.\ per-trade means 3.7\%/10.3\%), whereas the transformer's best trades land on its smallest-allocation days (1.6\% vs.\ 5.2\%), so its flat-notional Sharpe overstates what it can capture under a capital constraint -- a limitation of the transformer's deployability at our sizing convention, not of its selection signal.
 
 \section{Discussion}
 \label{sec:discussion}
@@ -419,18 +439,18 @@ The selected feature dictionary $F^{\ast}$ contains real, tradable signal: every
 
 \subsection{Model Comparison Is Sensitive to an Ensembling Confound}
 \label{sec:ensembling-discussion}
-Our central comparative finding is a caution, not a claim of superiority: whether MLP or transformer is better depends on an ensembling choice easy to leave uncontrolled, and the underlying single-model difference is not statistically significant at our sample size (Section~\ref{sec:seedcount}). The same pattern recurs inside the transformer family: whether plain attention or the MV-ALiBi variant is better also depends on an ensembling choice, reverses direction between single- and 5-seed comparison, and is not significant at either (Section~\ref{sec:mvalibi-ablation}) -- the same caution, not two unrelated findings. Weight-decay sensitivity testing additionally found the transformer's regularization mechanistically inert at its learning rate: AdamW's decoupled decay update scales with learning rate $\times$ weight decay, and at $3\times10^{-5}$ even a thousand-fold change in weight decay changes the per-step update negligibly -- a verified null result, not an unexamined default.
+Our central comparative finding is a caution, not a claim of superiority: whether MLP or transformer is better depends on an ensembling choice easy to leave uncontrolled, and the underlying single-model difference is inconclusive rather than absent -- a six-year sign test carries power only $\approx0.26$, too low to separate the architectures either way (Section~\ref{sec:seedcount}). The same pattern recurs inside the transformer family: whether plain attention or the MV-ALiBi variant is better also depends on an ensembling choice, reverses direction between single- and 5-seed comparison, and is not significant at either (Section~\ref{sec:mvalibi-ablation}) -- the same caution, not two unrelated findings.
 
 \subsection{Threats to Validity}
 \label{sec:limitations}
-The selected feature dictionary $F^{\ast}$ contains no scale-invariant, moneyness-style price-ratio feature; every price-level feature is a raw dollar quantity, and the underlying's price level drifts 50--80\% between the earliest training and latest test years. We consider this the most likely remaining source of residual regime sensitivity, unaddressed since $F^{\ast}$ is a shared artifact across all three models and revising it requires re-running feature selection for each. We have not tested recency-weighted training as an alternative to Section~\ref{sec:window}'s window choices, nor, unlike the companion SPX study~\cite{glasserman2025tp2}, filtered candidate pairs against a vertical/calendar-spread no-arbitrage condition (Section~\ref{sec:data}); that study finds such a filter removes under 2\% of violations with minimal profitability effect, so we do not expect a large impact here, though have not verified this on our own data.
+The selected feature dictionary $F^{\ast}$ contains no scale-invariant, moneyness-style price-ratio feature; every price-level feature is a raw dollar quantity, and the underlying drifts 50--80\% between the earliest training and latest test years -- the most likely source of residual regime sensitivity, unaddressed because $F^{\ast}$ is shared across all three models and revising it means re-running feature selection for each. We have not tested recency-weighted training, nor -- unlike the companion SPX study~\cite{glasserman2025tp2} -- filtered candidate pairs against a vertical/calendar-spread no-arbitrage condition (Section~\ref{sec:data}); that study finds such a filter removes under 2\% of violations with minimal effect, so we expect little impact here, though have not verified it on our data.
 
-We treat TP2 as an empirical violation signal for SPY American calls rather than a direct replication of a theorem proved for European-style, cash-settled index options~\cite{glasserman2026tp2theory,cosma2020earlyexercise}; our empirical procedure (Section~\ref{sec:data}) is built to be robust to American-style exercise and dividends at the data level (conservative bid/ask filtering, cost-aware realized returns) rather than by reproving the inequality under American exercise. Section~\ref{sec:addl-robustness} quantifies this further: 16--22\% of each model's selected trades carry ex-dividend timing on the short leg during the holding period, when early-assignment risk is highest. The \$0.65-per-contract commission matches a specific, published broker fee schedule (Section~\ref{sec:labels}), chosen independently of and prior to any result in this paper, though other brokers and volume tiers charge different rates.
+We treat TP2 as an empirical violation signal for SPY American calls rather than a replication of a theorem proved for European, cash-settled index options~\cite{glasserman2026tp2theory,cosma2020earlyexercise}; our procedure (Section~\ref{sec:data}) is robust to American exercise and dividends at the data level (conservative bid/ask filtering, cost-aware returns) rather than by reproving the inequality. Section~\ref{sec:addl-robustness} quantifies this: 16--22\% of each model's selected trades carry short-leg ex-dividend timing during the holding period, when early-assignment risk is highest. The \$0.65-per-contract commission matches a published broker schedule (Section~\ref{sec:labels}), chosen before any result here, though other brokers and volume tiers differ.
 
 \textbf{Reproducibility.} All labeling, feature-selection, training, and evaluation code, plus the processed episode/feature/label datasets, will be released upon acceptance; the raw SPY quote feed is vendor-licensed and cannot be redistributed, but every derived artifact can be.
 
 \section{Conclusion}
-Our central finding is methodological: comparing trading models is sensitive to an easy-to-miss ensembling confound that can reverse which architecture appears superior, demonstrated at two independent levels (MLP versus transformer, and plain versus MV-ALiBi attention) and confirmed under two independent significance tests -- a year-level paired bootstrap and a trade-dependence-aware block bootstrap by trading date -- with neither underlying single-model gap reaching significance either way. We report this transparently rather than presenting only the framing favorable to one architecture. The economic setting that surfaces this caution is itself a substantive result: the TP2 shape restriction on SPY American call option prices contains conditionally tradable structure -- unconditional trading is unprofitable over our sample, but three independent learned selectors (LightGBM, an MLP, and a TP2-specific historical-attention transformer) each recover a substantial positive out-of-sample return under an identical, fully causal, zero-tuning trade-selection rule verified not to have been fit to the data it is evaluated on. A block bootstrap by trading date, economic-exposure regressions, an execution-cost/early-assignment sensitivity check, calibration metrics, a no-history ablation, and a capital-scaled portfolio backtest (Sections~\ref{sec:nohistory}--\ref{sec:capitalscaled}) collectively show the result surviving realistic frictions while surfacing real, disclosed limitations -- LightGBM's edge is not significant under trade-dependence-aware bootstrap, the transformer family shows a small but significant IV-proxy sensitivity, historical attention accounts for roughly half of the transformer's Sharpe, and under capital constraints the transformer's practical edge over LightGBM/MLP shrinks sharply due to an asymmetric payoff shape rather than weaker selection quality -- itself another instance of the same caution against crowning an architecture the winner. We identify the absence of a scale-invariant price feature in our selected dictionary as an open question for future work rather than eliding it.
+Our central finding is methodological: comparing trading models is sensitive to an easy-to-miss ensembling confound that can reverse which architecture appears superior, demonstrated at two levels (MLP versus transformer, and plain versus MV-ALiBi attention) and, under both a paired and a block bootstrap, not separable either way at six test years (sign-test power $\approx0.26$). The economic setting that surfaces this caution is itself substantive: the TP2 shape restriction on SPY American call prices contains conditionally tradable structure -- unconditional trading loses money, yet three independent learned selectors each recover a substantial positive out-of-sample return under one causal, zero-tuning rule verified not to have been fit to its evaluation data. A block bootstrap, economic-exposure regressions, an execution-cost/early-assignment check, calibration metrics, a no-history ablation, and a capital-scaled backtest (Sections~\ref{sec:nohistory}--\ref{sec:capitalscaled}) show the result surviving realistic frictions while disclosing real limitations: LightGBM's edge is not significant under block bootstrap, the transformer family shows a small but significant IV-proxy sensitivity, historical attention accounts for roughly half the transformer's Sharpe, and under capital constraints the transformer's edge shrinks sharply from an asymmetric payoff shape rather than weaker selection. We flag the absence of a scale-invariant price feature as open for future work.
 
 \bibliographystyle{ACM-Reference-Format}
 \begingroup
