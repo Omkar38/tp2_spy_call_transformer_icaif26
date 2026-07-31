@@ -1,0 +1,9 @@
+{
+  "episode_true_reversion_exit": {
+    "n": 171,
+    "total_norm_pnl": -2696.679701147884,
+    "sharpe": -2.3758129445951868,
+    "mean_hold_days": 2.456140350877193,
+    "reversion_share": 1.0
+  }
+}

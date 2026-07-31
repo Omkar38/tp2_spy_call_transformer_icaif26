@@ -1,0 +1,20 @@
+{
+  "LightGBM (1)": {
+    "N_observed": 19636,
+    "ci_lo": 14761,
+    "ci_hi": 25573,
+    "rel_width": 0.5505996638826643
+  },
+  "MLP (5)": {
+    "N_observed": 24977,
+    "ci_lo": 19349,
+    "ci_hi": 31563,
+    "rel_width": 0.4889798614725546
+  },
+  "Transformer (5)": {
+    "N_observed": 14338,
+    "ci_lo": 10279,
+    "ci_hi": 18994,
+    "rel_width": 0.6077782814897473
+  }
+}

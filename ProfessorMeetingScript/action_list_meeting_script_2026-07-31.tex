@@ -1,0 +1,99 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.78in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+
+\title{Speaking Script: Walking the Professor Through the Action List}
+\author{SPY American Call TP2 Project}
+\date{July 31, 2026}
+
+\begin{document}
+\sloppy
+\maketitle
+
+\section*{Purpose}
+This script covers everything done in response to the professor's consolidated action list since our last meeting. Each section has a plain prompt for what to say; a terminology glossary is at the very end so any unfamiliar word can be looked up in one place. The draft now exists in two synced versions: an anonymous \texttt{v2} for double-blind submission and a named-author \texttt{v2\_1} (Polak, Patel, Lashkare, Stony Brook) -- identical except the author block.
+
+\section*{1. Headline: What Changed and Why}
+\textbf{What I should say:}
+
+We worked through your entire list, not just the ``if you only do five.'' The biggest theme is that almost every check you asked for reinforced the same caution -- model rankings in this pipeline are fragile to how we ensemble and how we select trades -- and several checks made the paper \emph{more honest} by walking back claims that were too strong. Nothing we found breaks the core economic result (unconditional TP2 trading loses \$12.52M; three independent selectors each turn that into a profit under one fixed causal rule), but the transformer story is now told with appropriate humility. The paper is 8 pages of body, compiles clean, and every number is re-verified against the underlying data.
+
+\section*{2. Your ``If You Only Do Five'' (\#1, \#2, \#5, \#7, \#19)}
+\textbf{What I should say:}
+
+\begin{center}
+\begin{tabular}{p{0.10\linewidth}p{0.84\linewidth}}
+\toprule
+Item & What we found \\
+\midrule
+\#1 & \textbf{Selectivity curves.} Sweeping the selection threshold, the single-seed MLP leads both transformer variants at every matched trade count $N$, and the five-seed transformer leads the single-seed transformer throughout. So the MLP's edge is \emph{not} an operating-point artifact -- it holds at matched $N$. New figure in the paper. \\
+\#2 & \textbf{Table augmented} with Sortino, win rate, mean return per trade, and skew. This exposes the real story: the highest-P\&L rows (MLP-5, logistic) also have the lowest win rate and highest right-skew -- big totals riding a few outsized winners, which Sharpe penalizes and Sortino rewards. \\
+\#5 & \textbf{Seed dispersion.} The single-seed MLP's Sharpe swings 1.47--2.60 across seeds; the transformer is far tighter (1.50--1.81), and its five-seed ensemble (2.18) beats every single seed. A single-seed point estimate is simply too noisy to rank architectures on. \\
+\#7 & \textbf{Per-year table} (already in): episode counts, candidate pairs, and the base-rate collapse from 45--73\% to 11--16\%. \\
+\#19 & \textbf{References} expanded 10 $\to$ 27, in your four blocks (benchmarking variance, tabular DL vs GBDT, relative-position bias, backtest multiple testing) plus Bali et al.\ RFS 2023. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{3. The Two Ablations That Corrected the Transformer Story}
+\textbf{What I should say:}
+
+You pushed on whether the historical-attention mechanism is really doing work, or whether the no-history ablation just looked strong because it was single-seed and smaller. Both concerns were right.
+
+\begin{itemize}
+\item \textbf{No-history at five seeds (\#3).} Single-seed, removing history looked decisive (Sharpe 1.73 $\to$ 0.87). At matched five seeds the gap collapses to 1.81 vs.\ 2.18 -- a modest $\approx$0.37, not a near-halving. The single-seed ablation was itself an instance of the ensembling confound.
+\item \textbf{Permuted-history control (\#13).} We kept the \emph{full} attention architecture and all 37,086 parameters but fed it 64 \emph{random} earlier episodes instead of the 64 most-recent. It scores Sharpe 2.14 -- almost the full model's 2.18. So the gain over no-history comes from the attention pathway itself, not from attending to \emph{relevant} history: swapping recent for random history costs only $\approx$0.04 Sharpe. This is a deflating but honest finding, and it fits the paper's skeptical framing rather than contradicting it.
+\end{itemize}
+
+\section*{4. Robustness Checks That Walked Back a Claim}
+\textbf{What I should say:}
+
+\begin{itemize}
+\item \textbf{Market-neutrality (\#12).} The old test regressed daily P\&L on same-day SPY -- no power, since P\&L books at expiry. Redone at the trade level over each trade's own holding window, all three models show a small but \emph{statistically significant positive} exposure to the underlying (MLP $\beta$=7.2, $t$=11.5), though it explains almost no variance. We corrected the paper's earlier ``no significant beta'' claim to ``a small directional tilt, long-biased rather than strictly market-neutral.''
+\item \textbf{Deflated Sharpe (\#14).} Correcting the best Sharpe (MLP 2.60) for the $\sim$21 configurations we tried plus skew/kurtosis gives a Deflated Sharpe of only $\approx$0.85 -- probable but short of the 0.95 bar. Another reason not to crown any single configuration.
+\item \textbf{Calibration robustness (\#18).} Platt scaling and isotonic select near-identical trade sets (within 0.3\%, essentially equal calibration error), so the calibration family isn't driving results; a block bootstrap puts a $\pm25$--$30\%$ confidence band on the selected trade count itself.
+\item \textbf{2026 is a partial year (\#10).} Re-running on 2021--2025 only leaves the ranking unchanged and every learned model positive in all five years -- no conclusion rests on the 107-day stub.
+\end{itemize}
+
+\section*{5. Framing and Compliance (\#11, \#20, \#24, \#25)}
+\textbf{What I should say:}
+
+We repositioned the central contribution around the \emph{interaction} between ensembling and the decision rule rather than ``mismatched seeds are a confound,'' and hedged the subtitle to ``How Ensembling and the Decision Rule Reorder Model Comparisons.'' We promoted the capital-scaled backtest to the deployment-relevant primary lens and demoted the flat-notional numbers to a selection-quality diagnostic. Abstract is down to 246 words. We kept the footnotesize bibliography and the small text-height adjustment because removing them (an ACM cosmetic) would push us over the hard 8-page limit -- a deliberate trade-off, flagged for your call.
+
+\section*{6. Open Decisions For You}
+\textbf{What I should say:}
+
+\begin{enumerate}
+\item \textbf{Page policy.} We are at 8 pages of body with references after. If ICAIF counts references toward the 8, we cut one element (recommended: the annual-P\&L figure or a robustness paragraph). Please confirm the rule.
+\item \textbf{Author order and anonymity.} Named version is Polak, Patel, Lashkare; confirm order, and confirm we submit the anonymous \texttt{v2} for double-blind review.
+\item \textbf{The permuted-history finding.} It is honest but partly undercuts the transformer's premise. Are you comfortable leading with it as a strength (rigorous self-critique), which is how it currently reads?
+\end{enumerate}
+
+\newpage
+\section*{Terminology Glossary}
+Plain-language definitions for the terms above.
+
+\begin{description}
+\item[TP2 violation] Total positivity of order 2 -- a shape rule option prices should obey across strikes and maturities; a break can signal a relative-value trade.
+\item[Episode] One detected TP2 violation, tracked from onset until it resolves or expires.
+\item[T1 / K2] The two ``short the shorter-dated leg'' strategy denominations we trade; T2/K1 (short the longer-dated leg) were excluded on theory and confirmed to lose.
+\item[Selector / selection rule] The model plus the fixed decision ``trade if calibrated probability $\ge 0.5$, else skip.''
+\item[Ensembling / seed] Training the same model with different random starting points (seeds 42, 101, \dots) and averaging predictions; the ensembling confound is comparing a single-seed model of one type against a multi-seed ensemble of another.
+\item[Selectivity curve] Sweeping the selection threshold and plotting performance versus number of trades $N$, so two models can be compared at the \emph{same} $N$ instead of at whatever $N$ each happens to pick.
+\item[Operating point] The specific $N$ a model trades at under $p\ge0.5$; an ``operating-point artifact'' is a ranking that only holds because two models sit at different $N$.
+\item[No-history / permuted-history ablation] Controls on the transformer: ``no-history'' removes attention entirely; ``permuted-history'' keeps attention and all parameters but feeds random earlier episodes -- isolating mechanism from content.
+\item[Attention / ALiBi / MV-ALiBi] Attention is how the transformer weighs past episodes; ALiBi biases it by a distance; MV-ALiBi is our multivariate version over five distances.
+\item[Sharpe / Sortino] Return per unit of risk; Sortino penalizes only downside risk, so it rewards right-skewed (occasional-big-winner) return streams that Sharpe penalizes.
+\item[Skew / win rate] Skew measures how lopsided the per-trade returns are; a low win rate with high skew means most trades are small losers offset by a few large winners.
+\item[Calibration / isotonic / Platt] Making predicted probabilities trustworthy at face value; isotonic and Platt (sigmoid) are two methods for it, fit on the validation year only.
+\item[$N_m$] The number of trades a model selects; we report a bootstrap confidence interval on it because it is itself uncertain.
+\item[Deflated Sharpe Ratio] A Sharpe corrected for how many configurations were tried (multiple testing) and for non-normal returns; above 0.95 is the usual ``real, not luck'' bar.
+\item[Block bootstrap] Resampling contiguous blocks of trading days (not single days) to get honest confidence intervals when nearby days are dependent.
+\item[Capital-scaled vs flat-notional] Flat-notional gives every trade a fixed \$1,000 (isolates selection quality); capital-scaled simulates a real \$1M account with a 1\%-of-cash daily cap (deployment-relevant).
+\item[Feature dictionary $F^{\ast}$] The frozen 48 input features shared by all models so comparisons are like-for-like.
+\end{description}
+
+\end{document}

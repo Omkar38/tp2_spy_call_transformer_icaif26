@@ -1,0 +1,33 @@
+{
+  "T": 357,
+  "sr_ann": 1.66,
+  "skew": 8.130992900220537,
+  "kurtosis": 85.69117276558622,
+  "n_trials": 21,
+  "sr0_ann": 2.009814076654898,
+  "DSR": 0.25035811778948125,
+  "var_sr_ann_across_trials": 1.093344761904762,
+  "configs": [
+    "LightGBM(1)",
+    "LightGBM 4-strat(1)",
+    "MLP(1)",
+    "MLP(5)",
+    "Transformer plain(1)",
+    "Transformer plain(5)",
+    "Transformer ALiBi(1)",
+    "Transformer ALiBi(5)",
+    "No-history(1)",
+    "Logistic-L2(1)",
+    "Random@N",
+    "Expanding-window TF(1)",
+    "Fraction-cap 0.10",
+    "Fraction-cap 0.20",
+    "Fraction-cap 0.30",
+    "ALiBi 10-seed",
+    "Prob-floor 0.10",
+    "Prob-floor 0.20",
+    "Prob-floor 0.30",
+    "Val-tuned-threshold TF",
+    "Top-K fraction rule"
+  ]
+}
