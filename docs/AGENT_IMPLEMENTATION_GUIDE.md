@@ -75,13 +75,15 @@ Retrain **logistic-L2, MLP(1), MLP(5)** on `feature_dictionary_2017_2019.csv` fe
 
 **The falsifiable prediction (Remark in §2.3):** at SPY's δ/S ≈ 0.3%/quarter, R1 requires roughly `r ≳ 2%` for dividend-spanning maturities ⇒ 2021 should be R3-heavy, 2023–2026 R1-heavy. Verifying this turns a Remark into a figure.
 
-### Task 2.1 — reference data
-- `data/reference/spy_dividends.csv`: columns `ex_date, amount`, 2013-01-01…2026-06-30. Source: data vendor, or SPY distribution history (SSGA); sanity: quarterly, amounts rising ≈ $0.69 (2013) → ≈ $1.6–1.9 (2025–26); 4 per year.
-- `data/reference/short_rates.csv`: columns `date, r` (annualized, decimal). 3-month T-bill (FRED series `DTB3`) is fine. Sanity: ≈0 for 2020-04→2022-02, ≈5.3% mid-2023→2024, declining after.
-- Commit both CSVs (they are small and redistributable).
+### Task 2.1 — reference data (CORRECTED: primary source is IN the panel)
+The daily panel (`spy_options_daily`, see its README) already carries per row: `next_ex_div_date`, `next_div_amount` (Yahoo realized series), and `risk_free_rate` (**parity-implied** per date×expiry: cross-strike OLS of C−P on K gives the discount factor and forward; fallback rows carry exactly `r == 0.04` — filter on equality). The `forward` used by the detector is the parity-implied one, so market dividend expectations are already inside the strike adjustment whenever the fit succeeded.
+
+- **2.1a (required diagnostic):** report, by year: share of fallback rows (`risk_free_rate == 0.04` exactly) and mean parity-implied r. Sanity: r≈0 in 2021, ≈5% in 2023–24. Artifact: `tables/action_list/panel_rate_diagnostics.json`. If fallback share is material in any year, flag every result that consumes r.
+- **External CSVs now only for:** (i) dividend amounts *beyond the next one* (panel stores only the next) — needed when `(t, T2]` spans ≥2 ex-dates; build `data/reference/spy_dividends.csv` (ex_date, amount; quarterly; ≈$0.69 in 2013 → ≈$1.6–1.9 in 2025–26) from SSGA/Yahoo history; (ii) validating parity-r against FRED DTB3.
+- **Look-ahead caveat (panel README):** `next_ex_div_date`/`next_div_amount` are realized-series and embed pre-declaration information. Correct for the certificates (an ex-post theory audit wants realized dividends); must never enter model FEATURES — verified: `feature_dictionary.csv` contains zero dividend-derived features.
 
 ### Task 2.2 — per-rectangle classifier `69_regime_partition.py`
-Inputs: the episode-level detection records carrying the **four-leg parameters and detection-date conservative quotes** — `(K1,T1), (K2,T2), (K̃1,T2), (K̃2,T1)` with the bid/ask prices used at detection. These come from the Archive-2 detection pipeline (`src/tp2rr2/detect_*`, episode records under `data/features/archive2_episodes/`); if the token dataset stores only the near-leg key, join back to the raw detection rows on `(episode_id, signal_date)`. **If any leg's quotes are unavailable, classify that rectangle `R_unknown` and report its share — do not impute.**
+Inputs (CORRECTED — no raw-data join needed): `TP2MVTransformer/data/tp2_t1k2_token_dataset.parquet` already carries all four legs — `feature_{A,B,C,D}_{bid,ask,mid,strike,delta,implied_volatility,…}`, with A·B the undervalued (ask-side) and C·D the overvalued (bid-side) products exactly as `src/tp2rr2/conservative_bidask.py` defines them. Join only date-level dividend/rate fields (`next_ex_div_date`, `next_div_amount`, parity `risk_free_rate`) from the daily panel on `signal_date` (+ each leg's expiry). **If a joined field is missing for a rectangle, classify it `R_unknown` and report the share — do not impute.**
 Per rectangle at detection date `t`:
 1. Ex-dates and amounts in `(t, T1]` and `(t, T2]` from the dividend calendar; `r` from the rate file at `t`.
 2. R1 check: no-div-window, else Prop 2.1(ii) for each of the four legs (each leg has its own `K`, `T`).
@@ -100,7 +102,7 @@ Alongside `M`, compute the sharpened margin per rectangle:
 `π̄(K,T) = Σ_i w_i e^{−r t_i} q_i(K)`, `w_i = δ_i + Σ_{j>i} δ_j e^{−r(t_j−t_i)}`, and
 `q_i(K) = min{1, Doob bound, sub-Gaussian bound}` where:
 - **Doob (model-free, from quotes):** `q ≤ C_obs(λ − Σ_{t_j≤τ}δ_j, τ) / (K_i − λ)` for any listed maturity `τ ≥ t_i` and any `λ < K_i = K + Σ_{t_j<t_i}δ_j`; optimize over `λ` on the strike grid and over the 1–2 nearest listed maturities. Needs detection-date call quotes at lower strikes — same source as Task 2.2's leg quotes.
-- **Sub-Gaussian (from IV proxy):** `q ≤ exp(−log²(K/F_{t_i}) / (2 σ̄² t_i))` for `K ≥ F_{t_i}`, with `σ̄` a conservative IV upper bound (use the episode's `feature_avg_iv` block, or max IV over the rectangle's strikes). Vershynin (HDP 2nd ed., §2.6) is the framework citation.
+- **Sub-Gaussian (from IV proxy):** `q ≤ exp(−log²(K/F_{t_i}) / (2 σ̄² t_i))` for `K ≥ F_{t_i}`, with `σ̄` a conservative IV upper bound (use max over the rectangle's own `feature_{A..D}_implied_volatility`, already in the token dataset). Vershynin (HDP 2nd ed., §2.6) is the framework citation.
 Add columns `margin_M_sharp, q_short_leg` to `episode_regime_labels.parquet`; re-run the R2 classification with `M♯` and report how much the dividend-robust share grows (expected: order-of-magnitude margin reduction for deep-OTM short-dated rectangles — the violation locus). Artifact: extend `regime_partition_by_year.json` with `share_R2_sharp`.
 
 ### Task 2.3c — portfolio-level Europeanization check (theory note §4.5)
@@ -116,7 +118,7 @@ Join `episode_regime_labels.parquet` to each primary model's selected trades; re
 - **3.1 LightGBM N mismatch.** Sweep@0.5 gives 18,665; the selected-trades file has 19,636. Diagnose: count episodes where *both* T1 and K2 crossed 0.5 in `lgbm_final_test_predictions.parquet` (per-strategy classifiers ⇒ likely dual-selection). Artifact: `lgbm_selection_reconciliation.json`. Paper: one clause in Fig. 4's caption if the explanation differs from "one-action-per-episode convention."
 - **3.2 Platt-vs-isotonic attribution.** `calibration_platt_vs_isotonic.json` has `total_n = 20,125`, matching no Table 2 row. Identify the config inside `65_calibration_robustness.py`, name it in §4.4.
 - **3.3 Exit-policy paired check.** For the 171 selected trades with a defined true-reversion exit (`exit_policy_comparison.json`), compute the *paired* expiry-vs-reversion PnL on the same trades. Update the §3.3 clause only if the paired result is material; n=171 stays labeled a small-sample check.
-- **3.4 Beta vs delta reconciliation.** §5.6 flags the open tension: trade-level β=+7.2 (MLP-5) vs 75–82% net-short entry delta. If per-trade entry deltas exist in the detection data, regress trade return on (underlying move × entry delta) vs raw move; if short-gamma path-dependence explains the sign, one sentence resolves a disclosed limitation.
+- **3.4 Beta vs delta reconciliation (upgraded: fully feasible).** §5.6 flags the open tension: trade-level β=+7.2 (MLP-5) vs 75–82% net-short entry delta. Per-leg entry deltas ARE in the token dataset (`feature_{A..D}_delta`, BS spot delta with dividend yield). Compute each trade's net entry delta from its traded legs, regress trade return on (underlying move × net delta) and on raw move; if short-gamma path-dependence explains the positive β, one sentence resolves a disclosed limitation.
 
 ---
 
