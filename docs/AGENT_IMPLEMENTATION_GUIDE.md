@@ -52,21 +52,9 @@
 
 ---
 
-## Priority 1 — feature-selection leakage control (1 new script + CPU reruns)
+## Priority 1 — removed (PI decision, 2026-08-01)
 
-**Why:** the *Feature Selection* run-in discloses that F* was selected pooling importance over all six folds (train years 2017–2024, val 2020–2025), so test years 2021–2025 leak into the *choice* of features. The paper currently flags this as the main unresolved validity issue. Bounding it is the highest-value camera-ready addition.
-
-### Task 1.1 — `68_fstar_leakage_control.py`
-Clone the selection logic of `01_build_feature_dictionary.py` but restrict the importance/stability computation to the **first fold only** (train 2017–2019, val 2020) — clean w.r.t. every test year. Keep the composite score (gain + permutation + stability over the 2 strategy runs available) and take the top 48. Output: `tables/feature_dictionary_2017_2019.csv`, same schema as `feature_dictionary.csv` (`selected_for_transformer`, `selected_rank` columns), plus a printed overlap count with the original F*.
-
-### Task 1.2 — rerun cheap models on the clean F*
-Retrain **logistic-L2, MLP(1), MLP(5)** on `feature_dictionary_2017_2019.csv` features (transformer rerun is optional — GPU; if skipped, say so in the artifact). Same folds, calibration, `p ≥ 0.5`.
-**Artifact:** `tables/action_list/fstar_control_comparison.json` — for each model: `{sharpe, pnl, n}` under original vs clean F*, plus feature-overlap count.
-**Paper edit** (the *Feature Selection* run-in, one sentence, both outcomes templated):
-- If headline Sharpe changes by < ~0.3 and signs/rankings hold: *"A control re-selects F* from 2017–2019 only, which is clean with respect to every test year; K of 48 features are shared. Headline results are essentially unchanged (MLP-1 Sharpe X.XX vs 2.60), so the disclosed leakage is not load-bearing."*
-- Otherwise: report the degradation plainly and move the leakage from "threat" to "material limitation" in the Discussion — do not soften it.
-
----
+The F* re-selection control (former Tasks 1.1/1.2) is dropped. Do not run it, and do not add anything about feature selection to the paper beyond the neutral description already there. Task IDs 2.x and 3.x below are unchanged.
 
 ## Priority 2 — theory-driven R1/R2/R3 regime partition (new empirics; the big one)
 
