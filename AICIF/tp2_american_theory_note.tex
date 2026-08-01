@@ -26,7 +26,7 @@
 \maketitle
 
 \begin{abstract}
-\noindent The TP\textsubscript{2} property of call prices---$C(K_1,T_1)C(K_2,T_2)\ge C(K_1,T_2)C(K_2,T_1)$ for $K_1\le K_2$, $T_1\le T_2$---is proved by Glasserman and Pirjol for \emph{European} options as an expectation of the terminal payoff. SPY calls are American-style on a discrete-dividend ETF, so the theorem does not literally apply. This note shows the gap is narrower than it first appears. (i)~Away from ex-dividend dates, and also across ex-dividend dates whenever a simple rate-dependent smallness condition on dividends holds, American SPY calls \emph{equal} their European counterparts and the TP\textsubscript{2} theory applies verbatim; notably, the condition is generically satisfied in the post-2022 interest-rate regime and generically \emph{fails} in the 2021 zero-rate regime. (ii)~When early exercise cannot be ruled out, the early-exercise premium is bounded by the present value of interim dividends, which yields a computable margin: any quoted TP\textsubscript{2} violation exceeding the margin certifies a violation of the \emph{European} inequality itself---for SPY the margin is of order $0.3$--$0.6\%$ of underlying value. (iii)~We outline a route to genuine American TP\textsubscript{2} via supermodularity of the optimal-stopping value (Topkis), reduce it in the discrete-dividend case to finitely many deterministic-time comparisons interlaced with scale maps that \emph{preserve} the Glasserman--Pirjol tail condition, and state precisely which steps remain open.
+\noindent The TP\textsubscript{2} property of call prices---$C(K_1,T_1)C(K_2,T_2)\ge C(K_1,T_2)C(K_2,T_1)$ for $K_1\le K_2$, $T_1\le T_2$---is proved by Glasserman and Pirjol for \emph{European} options as an expectation of the terminal payoff. SPY calls are American-style on a discrete-dividend ETF, so the theorem does not literally apply. This note shows the gap is narrower than it first appears. (i)~Away from ex-dividend dates, and also across ex-dividend dates whenever a simple rate-dependent smallness condition on dividends holds, American SPY calls \emph{equal} their European counterparts and the TP\textsubscript{2} theory applies verbatim; notably, the condition is generically satisfied in the post-2022 interest-rate regime and generically \emph{fails} in the 2021 zero-rate regime. (ii)~When early exercise cannot be ruled out, the early-exercise premium is bounded by the present value of interim dividends, which yields a computable margin: any quoted TP\textsubscript{2} violation exceeding the margin certifies a violation of the \emph{European} inequality itself---for SPY the margin is of order $0.3$--$0.6\%$ of underlying value. (iii)~The worst-case margin sharpens by concentration: the premium is exercise-probability weighted, and Doob's maximal inequality (model-free, from quotes) or a Chernoff bound (from an implied-volatility proxy) shrinks it by an order of magnitude at the deep out-of-the-money, short-dated rectangles where violations concentrate; a log-Lipschitz perturbation lemma then unifies the American wedge, bid/ask spreads, and strike rounding in one certified modulus. (iv)~We outline a route to genuine American TP\textsubscript{2} via supermodularity of the optimal-stopping value (Topkis), reduce it in the discrete-dividend case to finitely many deterministic-time comparisons interlaced with scale maps that \emph{preserve} the Glasserman--Pirjol tail condition, and state precisely which steps remain open.
 \end{abstract}
 
 \section{Setting and Notation}
@@ -43,14 +43,16 @@ C(K_1,T_1)\,C(K_2,T_2)\;\ge\;C(\Kt1,T_2)\,C(\Kt2,T_1).
 \end{equation}
 Glasserman--Pirjol (\emph{Math.\ Finance}, 2026) prove \eqref{eq:tp2adj} for European prices under distributional conditions on $(S_{T_1},S_{T_2})$: a conditional right-tail dominance condition (TP\textsubscript{2} of the survival function) on the out-of-the-money region, and an increasing-convex-order condition with a left-tail comparison covering in-the-money strikes (their Theorem~3.1). We refer to these jointly as \emph{the GP conditions}. Throughout, ``the four legs'' of a rectangle means the contracts at $(K_1,T_1),(K_2,T_2),(\Kt1,T_2),(\Kt2,T_1)$.
 
-Two classical facts, in the exact form we use them, are Problems 3.2.1.1--3.2.1.3 of Chin, \'Olafsson and Nel, Vol.~2 (2017):
-\begin{lemma}[Merton reduction; CON2 Prob.\ 3.2.1.3]\label{lem:merton}
+Two classical facts, both due to Merton~\cite{merton}, with the second stated in the exact form we use:
+\begin{lemma}[Merton reduction~\cite{merton}]\label{lem:merton}
 If no dividend is paid in $(0,T]$, then $\Cam(K,T)=\Ceu(K,T)$ for every $K$.
 \end{lemma}
-\begin{lemma}[Dividend sandwich; CON2 Probs.\ 3.2.1.1--3.2.1.2]\label{lem:sandwich}
+\begin{lemma}[Dividend sandwich]\label{lem:sandwich}
 In general, $\;0\le \pi(K,T)\le \bar D(T)$, i.e.\ $\Ceu(K,T)\le\Cam(K,T)\le \Ceu(K,T)+\bar D(T)$.
 \end{lemma}
-Lemma~\ref{lem:sandwich} is the standard portfolio-domination argument: the American holder's only reason to exercise a call early is to capture dividends, so the premium cannot exceed their present value.
+\begin{proof}[Proof of Lemma~\ref{lem:sandwich}]
+The lower bound is immediate (the American holder can always wait to $T$). For the upper bound, hold the European call plus a claim paying each dividend $\delta_i$ at $t_i$ (cost $\Ceu+\bar D(T)$), against a short American call. If the American holder exercises at some $\tau$ with $S_\tau-K>0$, the long portfolio is worth $\Ceu(S_\tau,\tau)+\sum_{t_i>\tau}\delta_i e^{-r(t_i-\tau)}$ plus the accrued dividends, which dominates $S_\tau-K$ by the European lower bound on the dividend-adjusted forward; if never exercised, both calls pay $(S_T-K)^+$. Either way the long side is never worse, so $\Cam\le\Ceu+\bar D(T)$; the argument is Merton's~\cite{merton}.
+\end{proof}
 
 \section{Europeanization: When American SPY Calls Are European}
 
@@ -64,11 +66,11 @@ Then early exercise of the American call $(K,T)$ is never optimal and $\Cam(K,T)
 \end{lemma}
 
 \begin{proof}
-Early exercise of an American call on a discrete-dividend asset can be optimal only at an instant immediately preceding an ex-dividend date (between dividends the argument of Lemma~\ref{lem:merton} applies on the dividend-free segment). Consider exercise at $t_i^-$, when the cum-dividend price is $S$. Exercising yields $S-K$. Not exercising leaves a call on the ex-dividend asset worth, by the forward lower bound with discrete dividends (the same portfolio argument as CON2 Prob.\ 3.2.1.2),
+Early exercise of an American call on a discrete-dividend asset can be optimal only at an instant immediately preceding an ex-dividend date (between dividends the argument of Lemma~\ref{lem:merton} applies on the dividend-free segment). Consider exercise at $t_i^-$, when the cum-dividend price is $S$. Exercising yields $S-K$. Not exercising leaves a call on the ex-dividend asset worth, by the forward lower bound with discrete dividends (the same no-arbitrage portfolio argument as Lemma~\ref{lem:sandwich}),
 \[
 \Cam\big(S-\delta_i,\,t_i;K,T\big)\;\ge\;(S-\delta_i)\;-\;\sum_{j>i,\,t_j\le T}\delta_j e^{-r(t_j-t_i)}\;-\;Ke^{-r(T-t_i)} .
 \]
-Continuation dominates exercise whenever the right-hand side is at least $S-K$, which rearranges to \eqref{eq:smalldiv}. If \eqref{eq:smalldiv} holds at every $t_i$, no exercise date is ever strictly preferred, so the American and European values coincide. For a single interim dividend, \eqref{eq:smalldiv} reduces to $\delta\le K(1-e^{-r(T-\tau)})$, the criterion of CON2 \S3.2.3 Prob.\ 10 (Black's approximation).
+Continuation dominates exercise whenever the right-hand side is at least $S-K$, which rearranges to \eqref{eq:smalldiv}. If \eqref{eq:smalldiv} holds at every $t_i$, no exercise date is ever strictly preferred, so the American and European values coincide. For a single interim dividend, \eqref{eq:smalldiv} reduces to the classical criterion $\delta\le K(1-e^{-r(T-\tau)})$ underlying Black's approximation~\cite{black1975}.
 \end{proof}
 
 \begin{remark}[The regime content of \eqref{eq:smalldiv}]\label{rem:regime}
@@ -116,6 +118,103 @@ $\Ceu(K_1,T_1)\Ceu(K_2,T_2)\le \Cam(K_1,T_1)\Cam(K_2,T_2)<\Cam(\Kt1,T_2)\Cam(\Kt
 $\bar D_i$ is at most the present value of one or two quarterly SPY dividends for the maturities in our data, i.e.\ $0.3$--$0.6\%$ of underlying value, and $\bar D_1=0$ whenever no ex-date precedes $T_1$ (the majority of our rectangles, whose near leg is short-dated). The margin $M$ is therefore small relative to typical rectangle products, and \emph{computable trade-by-trade from announced dividends}. Two refinements are immediate: (i) if leg $\ell$ satisfies Lemma~\ref{lem:smalldiv}, its $\bar D$ can be replaced by $0$; (ii) with conservative bid/ask detection---every price on the undervalued side at its most favorable quote, every price on the overvalued side at its least favorable---the same proof applies with quoted prices in place of mid-prices, since Lemma~\ref{lem:sandwich} holds for any price within the no-arbitrage band. We call violations satisfying \eqref{eq:certificate} \emph{dividend-robust}.
 \end{remark}
 
+\section{Sharper Margins: Concentration and Perturbation Stability}\label{sec:concentration}
+
+The certificate of Proposition~\ref{prop:certificate} uses the worst-case bound $\pi\le\bar D$, which charges the full present value of dividends to every contract regardless of strike. This is loose in exactly the region where violations concentrate: the SPX evidence locates most violations at fairly deep out-of-the-money strikes and short expiries, where the probability of the underlying ever reaching the exercise region is small. This section replaces the worst case by exercise-probability-weighted bounds---first exactly, then via two computable relaxations (one model-free from quoted prices via Doob's maximal inequality, one from an implied-volatility proxy via a Chernoff bound)---and closes with a perturbation lemma showing that the TP\textsubscript{2} defect, viewed in log form, is $1$-Lipschitz in \emph{every} friction at once.
+
+\subsection{The Premium Is an Exercise-Probability-Weighted Quantity}
+
+\begin{proposition}[Exercise-probability premium bound]\label{prop:probweight}
+Suppose a single ex-dividend date $t_D\in(0,T]$ with amount $\delta$. Then
+\begin{equation}
+\pi(K,T)\;\le\;\delta\,e^{-rt_D}\,\Prob\!\left(S_{t_D^-}\ge K\right).
+\label{eq:probweight}
+\end{equation}
+With $n$ interim dividends, $\pi(K,T)\le\sum_i w_i\,e^{-rt_i}\,\Prob(S_{t_i^-}\ge K)$ with weights $w_i=\delta_i+\sum_{j>i,\,t_j\le T}\delta_j e^{-r(t_j-t_i)}$.
+\end{proposition}
+
+\begin{proof}
+Single dividend: exercise can be optimal only at $t_D^-$, and the post-dividend continuation is European (no dividends remain), so the dynamic-programming identity is exact:
+\[
+\Cam(K,T)=\E\!\left[e^{-rt_D}\max\!\big\{S_{t_D^-}-K,\;\Ceu(S_{t_D^-}-\delta,t_D;K,T)\big\}\right],\quad
+\Ceu(K,T)=\E\!\left[e^{-rt_D}\,\Ceu(S_{t_D^-}-\delta,t_D;K,T)\right].
+\]
+Hence $\pi=\E[e^{-rt_D}(S_{t_D^-}-K-\Ceu(S_{t_D^-}-\delta,t_D))^+]$. Pathwise, write $S=S_{t_D^-}$: if $S<K$ the integrand is $0$ (since $\Ceu\ge0$). If $S\ge K$, then using $\Ceu(S-\delta,t_D)\ge\max\{0,(S-\delta)-Ke^{-r(T-t_D)}\}$: on the branch where the max is the forward bound, $S-K-\Ceu\le \delta-K(1-e^{-r(T-t_D)})\le\delta$; on the branch where the max is $0$ we have $S\le \delta+Ke^{-r(T-t_D)}$, so $S-K\le\delta-K(1-e^{-r(T-t_D)})\le\delta$. In both cases the integrand is at most $\delta\,\mathbf 1\{S\ge K\}$, and \eqref{eq:probweight} follows. The multi-dividend statement follows by backward induction on ex-dates: at $t_i^-$, $\max\{S-K,V^{\mathrm{am}}\}-V^{\mathrm{eu}}\le (S-K-V^{\mathrm{eu}})^++(V^{\mathrm{am}}-V^{\mathrm{eu}})$, the first term is bounded pathwise by $w_i\mathbf 1\{S\ge K\}$ exactly as above (the European continuation lower bound now subtracts the remaining dividends, which is where $w_i$ acquires its second summand), and the second term recurses.
+\end{proof}
+
+Inequality \eqref{eq:probweight} is already strict progress: for an out-of-the-money leg, $\Prob(S_{t_i^-}\ge K)$ is the risk-neutral probability of moving through the strike \emph{before the ex-date}---typically far below one at the short horizons where violations cluster. It remains to bound this probability from observables.
+
+\subsection{A Model-Free Bound from Quotes (Doob)}
+
+\begin{proposition}[Quote-implied concentration bound]\label{prop:doob}
+Let $r=0$ and let $X_u=S_u+\sum_{t_j\le u}\delta_j$ (the dividend-reinvested price), a $\Prob$-martingale. Then for any ex-date $t_i$, any listed maturity $\tau\ge t_i$, and any $\lambda<K_i:=K+\sum_{t_j<t_i}\delta_j$,
+\begin{equation}
+\Prob\!\left(S_{t_i^-}\ge K\right)\;\le\;\Prob\!\Big(\sup_{u\le t_i}X_u\ge K_i\Big)\;\le\;\frac{\E[(X_\tau-\lambda)^+]}{K_i-\lambda}\;=\;\frac{C^{\mathrm{eu}}\!\big(\lambda-{\textstyle\sum_{t_j\le\tau}}\delta_j,\;\tau\big)}{K_i-\lambda}\;\le\;\frac{C^{\mathrm{am,\,obs}}\!\big(\lambda-{\textstyle\sum_{t_j\le\tau}}\delta_j,\;\tau\big)}{K_i-\lambda},
+\label{eq:doob}
+\end{equation}
+optimizable over $\lambda$ and over listed $\tau\ge t_i$. For $r>0$ the same holds for the discounted dividend-reinvested martingale $M_u=e^{-ru}S_u+\sum_{t_j\le u}e^{-rt_j}\delta_j$ with the threshold $e^{-rt_i}K+\sum_{t_j<t_i}e^{-rt_j}\delta_j$.
+\end{proposition}
+
+\begin{proof}
+$\{S_{t_i^-}\ge K\}\subseteq\{X_{t_i^-}\ge K_i\}\subseteq\{\sup_{u\le t_i}X_u\ge K_i\}$. For fixed $\lambda$, $(X_u-\lambda)^+$ is a nonnegative submartingale (convex function of a martingale), so Doob's maximal inequality gives $\Prob(\sup_{u\le\tau}(X_u-\lambda)^+\ge K_i-\lambda)\le\E[(X_\tau-\lambda)^+]/(K_i-\lambda)$, and $\sup_{u\le t_i}\le\sup_{u\le\tau}$. Finally $(X_\tau-\lambda)^+=(S_\tau-(\lambda-\sum_{t_j\le\tau}\delta_j))^+$, whose expectation is the undiscounted European call at the shifted strike, dominated by the observed American quote.
+\end{proof}
+
+Everything on the right of \eqref{eq:doob} is a market quote: this is a concentration bound whose ``variance proxy'' is the option surface itself.
+
+\subsection{A Sub-Gaussian Bound from Implied Volatility}
+
+\begin{proposition}[Chernoff bound]\label{prop:chernoff}
+Suppose $\log(S_{t}/F_{t})$ is sub-Gaussian with variance proxy $\bar\sigma^2 t$ (in the sense of~\cite{vershynin}, \S2.6), where $\bar\sigma$ is any upper bound on implied volatility over the relevant strike/maturity region. Then for $K\ge F_{t_i}$,
+\begin{equation}
+\Prob(S_{t_i}\ge K)\;\le\;\exp\!\left(-\frac{\log^2(K/F_{t_i})}{2\bar\sigma^2 t_i}\right).
+\label{eq:chernoff}
+\end{equation}
+\end{proposition}
+\noindent(One-line Chernoff; this trades model-freeness for sharpness and needs only $\bar\sigma$, available from quoted implied volatilities---the empirical pipeline's \texttt{feature\_avg\_iv} block is a ready proxy.) Numerically, at the violation locus documented on SPX (deep OTM, short-dated): a $12\%$-OTM strike with $t_i=14$ calendar days and $\bar\sigma=20\%$ gives bound $e^{-2.88}\approx0.056$---a $\sim$18-fold sharpening of the worst case---whereas a $5\%$-OTM strike at $30$ days gives $\approx0.78$, a modest gain. The sharpening is largest exactly where violations live.
+
+\begin{corollary}[Sharpened certificate]\label{cor:sharpcert}
+Proposition~\ref{prop:certificate} holds with $M$ replaced by
+\[
+M^\sharp\;=\;\bar\pi(\Kt1,T_2)\,\Cam(\Kt2,T_1)\;+\;\bar\pi(\Kt2,T_1)\,\Cam(\Kt1,T_2),
+\qquad
+\bar\pi(K,T)\;=\;\sum_{t_i\le T} w_i\,e^{-rt_i}\,q_i(K),
+\]
+where $q_i(K)=\min\{1,\ \text{bound \eqref{eq:doob}},\ \text{bound \eqref{eq:chernoff}}\}$ and $w_i$ are the weights of Proposition~\ref{prop:probweight}. Since $q_i\le1$, $M^\sharp\le M$ always, with order-of-magnitude improvement for deep-OTM short-dated rectangles.
+\end{corollary}
+
+\subsection{Portfolio-Level Europeanization with High Probability}
+
+The bounds above are per contract; the trading application holds a \emph{book} of short legs. A union bound over $N$ positions would cost a factor $N$ (or $\sqrt{\log N}$ in expectation, via the $\psi_2$ maximal inequality of~\cite{vershynin}, Eq.~(2.22))---but the common-driver structure of the problem collapses it.
+
+\begin{proposition}[Common-driver collapse]\label{prop:portfolio}
+Consider any set of selected trades whose short legs, alive at ex-dividend date $t_D$, have strikes $\{K_\ell\}$. Since all legs are written on the same underlying, the event that early exercise is optimal for \emph{any} of them at $t_D^-$ is exactly $\{S_{t_D^-}\ge \min_\ell b_\ell\}\subseteq\{S_{t_D^-}\ge \min_\ell K_\ell\}$, so
+\[
+\Prob\big(\text{any short leg optimally exercisable at } t_D\big)\;\le\;\Prob\!\left(S_{t_D^-}\ge \min_\ell K_\ell\right),
+\]
+one application of \eqref{eq:doob} or \eqref{eq:chernoff} at the book's minimum short strike---no union-bound inflation. On the complementary event, every American position in the book behaves as its European counterpart through $t_D$, and the realized portfolio P\&L coincides with the Europeanized portfolio's. Across the (at most two or three) distinct ex-dates in a holding window, a union bound over dates costs only that small factor; if desired, the maximal inequality for finitely many sub-Gaussian deviations~\cite{vershynin} gives the same conclusion with the $\sqrt{2\log m}$ constant for $m$ dates.
+\end{proposition}
+
+\begin{remark}[Irrational assignment helps the short]
+Actual assignment is the counterparty's choice and need not be rational. But assignment at a time when exercise is \emph{sub}optimal transfers the position's remaining time value to the assigned short. Hence, for a lower bound on the short book's P\&L, bounding the \emph{rational}-exercise event---as Proposition~\ref{prop:portfolio} does---suffices: on its complement, rational counterparties do not assign, and irrational assignments are weakly profitable for the book.
+\end{remark}
+
+\subsection{Perturbation Stability: One Modulus for Every Friction}
+
+\begin{lemma}[Log-Lipschitz stability of the TP\textsubscript{2} defect]\label{lem:stability}
+Define the log-defect of a rectangle as $\Delta:=\log C(K_1,T_1)+\log C(K_2,T_2)-\log C(\Kt1,T_2)-\log C(\Kt2,T_1)$ (so TP\textsubscript{2} is $\Delta\ge0$). If quoted prices satisfy $\tilde C_\ell=C_\ell e^{\eta_\ell}$ with $|\eta_\ell|\le\varepsilon_\ell$ on each leg $\ell$, then
+\[
+\tilde\Delta\;\ge\;\Delta\;-\;\sum_{\ell=1}^4\varepsilon_\ell .
+\]
+In particular, a quoted defect $\tilde\Delta<-\sum_\ell\varepsilon_\ell$ certifies $\Delta<0$ for the reference prices.
+\end{lemma}
+\begin{proof}
+Immediate: $\tilde\Delta=\Delta+\eta_1+\eta_2-\eta_3-\eta_4\ge\Delta-\sum|\eta_\ell|$.
+\end{proof}
+
+\begin{remark}[Instantiations]\label{rem:instantiations}
+Lemma~\ref{lem:stability} is the ``approximation theory'' of the problem: log-supermodularity has Lipschitz constant $1$ in each leg's log-price, so every friction enters through one additive modulus. (a) \emph{American wedge}: on the undervalued legs $C^{\mathrm{am}}\ge C^{\mathrm{eu}}$ only helps, so only the two overvalued legs contribute, with $\varepsilon_\ell=\log(1+\bar\pi_\ell/C^{\mathrm{eu}}_\ell)\le\bar\pi_\ell/C^{\mathrm{eu}}_\ell$---recovering Corollary~\ref{cor:sharpcert} in log form. (b) \emph{Microstructure}: half-spread $s_\ell$ gives $\varepsilon_\ell=\log(1+s_\ell/C^{\mathrm{mid}}_\ell)$; the conservative bid/ask detection of the empirical pipeline sets these one-sidedly and is thus already the $\varepsilon$-robust version of mid-price detection. (c) \emph{Strike rounding}: replacing the exact adjusted strike $\tilde K$ by the nearest traded strike perturbs the leg by $\varepsilon_\ell\le \Delta K\cdot|\partial_K C_\ell|/C_\ell$ (grid spacing times the leg's relative digital), quantifying the rounding step of the detection procedure. Summing (a)--(c) yields a single certified margin covering early exercise, spreads, and discretization simultaneously.
+\end{remark}
+
 \section{The Direction of the American Perturbation}\label{sec:direction}
 
 Write the American rectangle as European plus premia. The premium enters the \emph{overvalued} side at strike $\Kt1$ with weight $C(\Kt2,T_1)$ and the \emph{undervalued} side at strike $K_2$ with weight $C(K_1,T_1)$, plus terms in $\pi(\cdot,T_1)$ that vanish when no ex-date precedes $T_1$:
@@ -148,7 +247,7 @@ $\Prob(S_\sigma>y\mid S_\sigma>x)\;\le\;\Prob(S_\tau>y\mid S_\tau>x)$ for all $x
 Let $r=0$ and suppose Assumption~\ref{ass:stopped} holds, together with its lattice closure (the same condition for $\sigma\wedge\tau\le\sigma\vee\tau$ for arbitrary bounded stopping times $\sigma,\tau$). Then $(k,\tau)\mapsto\log\E[(S_\tau-e^{k})^+]$ has increasing differences in $(-k,\tau)$ on the stopping-time lattice; the correspondence $T\mapsto\{\tau:\tau\le T\}$ is ascending; and by Topkis's theorem the value $\log\Cam(e^k,T)$ is supermodular in $(-k,T)$, i.e.\ American call prices are TP\textsubscript{2} in $(K,T)$ on the corresponding out-of-the-money region.
 \end{theorem}
 
-The content is that Assumption~\ref{ass:stopped} replaces GP's fixed-dates condition by its uniform version over stopping times; optional sampling (Chin--\'Olafsson--Nel Vol.~1, Theorem~2.7) supplies the distributions of $S_\sigma,S_\tau$. What makes this more than a reformulation is a genuine reduction available in our setting:
+The content is that Assumption~\ref{ass:stopped} replaces GP's fixed-dates condition by its uniform version over stopping times; Doob's optional sampling theorem supplies the distributions of $S_\sigma,S_\tau$. What makes this more than a reformulation is a genuine reduction available in our setting:
 
 \begin{proposition}[Discrete-dividend reduction]\label{prop:reduction}
 For an American call on an asset paying proportional discrete dividends ($S_{t_i}=(1-q_i)S_{t_i^-}$) with $r=0$, optimal exercise is supported on $\{t_1^-,\ldots,t_n^-,T\}$, and the optimal rule at each $t_i^-$ is a threshold rule. Hence $\Cam(K,T)=\sup_{b\in\mathcal B}\,h(K,b;T)$ over finitely-parametrized threshold policies $b$, and Assumption~\ref{ass:stopped} needs to be verified only on the finite family of policy-stopped laws. Moreover, each dividend map $S\mapsto(1-q_i)S$ \emph{preserves} the GP tail condition, which is invariant under multiplicative scaling: $\Prob(cS>y\mid cS>x)=\Prob(S>y/c\mid S>x/c)$.
@@ -163,6 +262,7 @@ In Black--Scholes with proportional discrete dividends and $r=0$, American call 
 \section{Consequences for the Empirical Study}
 \begin{enumerate}[leftmargin=1.4em,itemsep=1pt]
 \item \textbf{Partition of episodes.} Every detected rectangle falls into one of three provable regimes: (R1) certified-European (Prop.~\ref{prop:window}: no ex-date in window, or \eqref{eq:smalldiv} holds for all four legs)---the SPX theory applies verbatim, and a violation there contradicts the GP conditions exactly as on SPX; (R2) dividend-robust (Prop.~\ref{prop:certificate}: violation margin exceeds $M$)---contradicts the European theory even granting the American premium its maximal effect; (R3) unresolved---the violation is within the early-exercise wedge, and Prop.~\ref{prop:direction} shows its sign is genuinely ambiguous. Only (R3) is theory-dark, and it is precisely where conditional machine-learned selection operates.
+\item \textbf{Sharpened margins are computable per trade.} $M^\sharp$ of Corollary~\ref{cor:sharpcert} needs only announced dividends, one quoted call at a lower strike (for \eqref{eq:doob}), or the pipeline's implied-volatility proxy (for \eqref{eq:chernoff}); the R2 (dividend-robust) region enlarges accordingly, strengthening the partition test below.
 \item \textbf{A rate-regime prediction.} By Remark~\ref{rem:regime}, the R1/R3 composition shifts with the interest-rate regime: 2021 (zero rates) should be R3-heavy for dividend-spanning maturities; 2023--2026 should be R1-heavy. This is a falsifiable, theory-driven account of regime dependence that complements the label-base-rate shift documented in the paper, and motivates rate- and ex-date-timing features in the learned selectors.
 \item \textbf{Feature-level grounding.} The margin $M$, the indicator of \eqref{eq:smalldiv}, the presence of an ex-date in $(0,T_1]$ versus $(T_1,T_2]$, and short-leg moneyness (which controls both assignment risk and the tightness of \eqref{eq:smalldiv}) are theory-mandated covariates of violation quality---a principled core for the feature dictionary, several members of which (ex-dividend timing flags, short-leg structure block) the empirical pipeline already contains.
 \end{enumerate}
@@ -171,9 +271,9 @@ In Black--Scholes with proportional discrete dividends and $r=0$, American call 
 \bibitem{gp2026} P.~Glasserman and D.~Pirjol. When Are Option Prices TP\textsubscript{2}? \emph{Mathematical Finance} 36(3), 2026. \url{https://doi.org/10.1111/mafi.70024}
 \bibitem{glp2025} P.~Glasserman, M.~Li, and D.~Pirjol. Trading TP\textsubscript{2} Option Violations. Working paper, SSRN 5392317, July 2025.
 \bibitem{gp2023} P.~Glasserman and D.~Pirjol. Total Positivity and Relative Convexity of Option Prices. \emph{Frontiers of Mathematical Finance} 2(1):1--32, 2023.
-\bibitem{con1} E.~Chin, S.~\'Olafsson, and D.~Nel. \emph{Problems and Solutions in Mathematical Finance, Volume I: Stochastic Calculus.} Wiley, 2014. (Optional stopping: Theorem 2.7.)
-\bibitem{con2} E.~Chin, S.~\'Olafsson, and D.~Nel. \emph{Problems and Solutions in Mathematical Finance, Volume II: Equity Derivatives.} Wiley, 2017. (Probs.\ 3.2.1.1--3.2.1.3, pp.~271--274: American/European bounds, PV-of-dividends premium bound, Merton reduction; \S3.2.3 Prob.~10, pp.~322--324: Black's approximation and the small-dividend no-exercise criterion.)
 \bibitem{merton} R.~C.~Merton. Theory of Rational Option Pricing. \emph{Bell Journal of Economics and Management Science} 4(1):141--183, 1973.
+\bibitem{black1975} F.~Black. Fact and Fantasy in the Use of Options. \emph{Financial Analysts Journal} 31(4):36--41, 61--72, 1975.
+\bibitem{vershynin} R.~Vershynin. \emph{High-Dimensional Probability: An Introduction with Applications in Data Science}. 2nd ed., Cambridge University Press, 2026.
 \bibitem{topkis} D.~M.~Topkis. \emph{Supermodularity and Complementarity.} Princeton University Press, 1998.
 \bibitem{cosma} A.~Cosma, S.~Galluccio, P.~Pederzoli, and O.~Scaillet. Early Exercise Decision in American Options with Dividends, Stochastic Volatility, and Jumps. \emph{JFQA} 55(1):331--356, 2020.
 \end{thebibliography}
