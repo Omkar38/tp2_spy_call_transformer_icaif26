@@ -115,12 +115,30 @@ C(K_1,T_1)\,C(K_2,T_2)\;\ge\;C(\tilde K_1,T_2)\,C(\tilde K_2,T_1),
 \end{equation}
 where $\tilde K_1=K_1 F_{T_2}/F_{T_1}$ and $\tilde K_2=K_2 F_{T_1}/F_{T_2}$, rounded up to traded strikes when unavailable~\cite{glasserman2025tp2}. A \emph{violation} reverses Equation~\eqref{eq:tp2adj}, undervaluing the left side relative to the right. The trading construction of~\cite{glasserman2025tp2} goes long the undervalued pair and short the overvalued pair, grouped into four \emph{denominations} by which two of the four contracts are actually traded, with the other two prices serving as position weights: the $T_1$-denomination trades only the near-expiry contracts (long $C(K_2,T_2)$ units of the $(K_1,T_1)$-call, short $C(\tilde K_1,T_2)$ units of the $(\tilde K_2,T_1)$-call); $T_2$ trades only far-expiry contracts; $K_1$ and $K_2$ trade calendar pairs at a common strike. The cash premium collected at inception---the magnitude of the violation---is identical across denominations; what differs is which legs carry payoff risk. On SPX at mid-prices, the $T_1$- and $K_2$-denominated strategies (both of which \emph{short the shorter-dated leg} $(\tilde K_2,T_1)$) achieve hit rates of 95--100\% per violation and double-digit annual returns in nearly every year 2000--2022, while $T_2$/$K_1$ (short the longer-dated leg) perform poorly~\cite{glasserman2025tp2}. Our T1/K2 restriction (Section~\ref{sec:labels}) adopts exactly this structure, and our unrestricted four-denomination check reproduces their asymmetry on SPY.
 
-\subsection{From European Theory to American Practice}
+\subsection{From European Theory to American Practice: Two Reductions and a Certificate}
 \label{sec:american}
-The TP2 theorems are proved for European-style, cash-settled options on a dividend-adjusted underlying~\cite{glasserman2026tp2theory}; SPX options fit this setting, SPY options do not. SPY calls are American-style on a dividend-paying ETF with physical settlement: the short leg can be assigned early---most acutely when its expiry spans an ex-dividend date~\cite{cosma2020earlyexercise}---the proportional-dividend forward adjustment is an approximation to discrete distributions, and early-exercise premia enter quoted prices on both sides of Equation~\eqref{eq:tp2adj}. We therefore make no claim that the theorem extends to SPY. We treat TP2 as an empirical hypothesis about quoted SPY call prices, build the detection to be conservative at the data level (bid/ask rectangle rather than mid-prices, Section~\ref{sec:episode-tracking}), price every trade at the spread with commissions, and quantify the residual American-specific risk directly: 16--22\% of selected trades carry short-leg ex-dividend timing (Section~\ref{sec:robustness}). The empirical surprise of this paper---near-arbitrage on European-style SPX at mid-prices, unconditional \emph{losses} on American-style SPY at conservative quotes---is precisely a measurement of how much these frictions cost.
+The TP2 theorems are proved for European-style, cash-settled options~\cite{glasserman2026tp2theory}; SPY calls are American-style on a discrete-dividend ETF with physical settlement, so early-exercise premia $\pi(K,T)=C^{\mathrm{am}}(K,T)-C^{\mathrm{eu}}(K,T)\ge0$ enter quoted prices on both sides of Equation~\eqref{eq:tp2adj}~\cite{cosma2020earlyexercise}. The gap is narrower than it first appears. Early exercise of a call is never optimal absent dividends (so $C^{\mathrm{am}}=C^{\mathrm{eu}}$; Merton~\cite{merton1973}, Chin et al.~\cite{chin2017}, Prob.~3.2.1.3), can be optimal only immediately before an ex-dividend date, and $\pi(K,T)\le\bar D(T):=\sum_{t_i\le T}\delta_i e^{-rt_i}$, the present value of interim dividends~\cite{chin2017}. This yields:
+
+\begin{proposition}[Europeanization]\label{prop:euro}
+If either (i) no ex-dividend date lies in $(0,T]$, or (ii) at every ex-date $t_i\le T$,
+\begin{equation}
+\textstyle\delta_i+\sum_{j>i,\,t_j\le T}\delta_j e^{-r(t_j-t_i)}\;\le\;K\big(1-e^{-r(T-t_i)}\big),
+\label{eq:smalldiv}
+\end{equation}
+then $C^{\mathrm{am}}(K,T)=C^{\mathrm{eu}}(K,T)$. When this holds for all four legs of a rectangle, the TP2 theory of~\cite{glasserman2026tp2theory} applies to quoted SPY American calls exactly as to SPX.
+\end{proposition}
+\noindent Condition (ii) extends the single-dividend criterion of~\cite{chin2017} (\S3.2.3, Prob.~10) by iterating its continuation bound across ex-dates; it makes Europeanization a \emph{rate-regime property}: at SPY's $\delta/S\approx0.3\%$ per quarter and $K\approx S$, it certifies dividend-spanning contracts for $r\gtrsim2\%$ (the 2023--2026 regime) and fails for essentially all of them at $r\approx0$ (the 2021 regime)---a falsifiable, theory-driven account of regime dependence, complementary to the label-shift of Table~\ref{tab:peryear}.
+
+\begin{proposition}[Dividend-robust violation certificate]\label{prop:cert}
+Let $\bar D_i=\bar D(T_i)$. If American quotes violate Equation~\eqref{eq:tp2adj} by more than $M:=\bar D_2\,C^{\mathrm{am}}(\tilde K_2,T_1)+\bar D_1\,C^{\mathrm{am}}(\tilde K_1,T_2)$, then the underlying European prices violate it too.
+\end{proposition}
+\begin{proof}
+$C^{\mathrm{eu}}\!\le\!C^{\mathrm{am}}$ bounds the undervalued product above by its American value, while $C^{\mathrm{eu}}\!\ge\!C^{\mathrm{am}}-\bar D$ on each overvalued leg gives $C^{\mathrm{eu}}(\tilde K_1,T_2)C^{\mathrm{eu}}(\tilde K_2,T_1)\ge C^{\mathrm{am}}(\tilde K_1,T_2)C^{\mathrm{am}}(\tilde K_2,T_1)-M$ (the cross term $\bar D_1\bar D_2\ge0$ only helps); chain the three inequalities.
+\end{proof}
+\noindent For our maturities $M$ is of order $0.3$--$0.6\%$ of underlying value ($\bar D_1=0$ for the typical short-dated near leg) and is computable per trade from announced dividends. Every detected rectangle thus falls in one of three provable regimes: \emph{certified-European} (Prop.~\ref{prop:euro}), \emph{dividend-robust} (Prop.~\ref{prop:cert}: anomalous even granting $\pi$ its maximal effect), or \emph{unresolved}---where the tilt from $\pi$ is genuinely sign-ambiguous, since $\pi$ is nonincreasing in $K$ while the premium enters the overvalued side at the lower strike $\tilde K_1<K_2$ but with the smaller weight $C(\tilde K_2,T_1)<C(K_1,T_1)$. Only the unresolved regime is theory-dark, and it is exactly where conditional machine-learned selection operates; a supermodular optimal-stopping route toward unconditional American TP2 (via Topkis~\cite{topkis1998}, with the discrete-dividend case reducing to threshold policies and scale maps that preserve the tail condition of~\cite{glasserman2026tp2theory}) is outlined in a theory note released with our code.
 
 \subsection{Related Machine-Learning Work}
-ML for options spans surface fitting, hedging, pricing, execution-aware trading~\cite{kearns2013mlmicrostructure}, and cross-sectional option-return prediction at scale~\cite{bali2023option}; we pose the narrower problem of binary trade/no-trade classification conditional on a detected violation, scored purely by realized cost-aware performance. That gradient boosting and a linear model match deep architectures on 48 engineered features is consistent with systematic tabular-data evidence~\cite{grinsztajn2022why,shwartzziv2022tabular,gorishniy2021revisiting}. For the transformer's attention we test a multivariate generalization of ALiBi~\cite{press2022alibi}---relative biases being standard alternatives to positional encodings~\cite{shaw2018self,raffel2020t5,ying2021graphormer,li2024fire}---with five learned per-head distance slopes (Section~\ref{sec:transformer}). On evaluation: sensitivity of ML comparisons to seeds and budgets is established across domains~\cite{melis2018state,lucic2018gans,agarwal2021deep,bouthillier2021accounting,dodge2019show}, and backtest multiple testing has its own literature~\cite{white2000reality,hansen2005spa,harvey2016crosssection,bailey2014deflated}; the operating-point confound we document arises \emph{after} scoring, in the decision rule, and persists even at matched seed counts and honestly counted trials.
+ML for options spans surface fitting, hedging, pricing, execution-aware trading~\cite{kearns2013mlmicrostructure}, and cross-sectional option-return prediction~\cite{bali2023option}; we pose the narrower problem of trade/no-trade classification conditional on a detected violation, scored by realized cost-aware performance. That boosting and a linear model match deep architectures on 48 engineered features matches systematic tabular-data evidence~\cite{grinsztajn2022why,shwartzziv2022tabular,gorishniy2021revisiting}. The transformer tests a multivariate ALiBi generalization~\cite{press2022alibi,shaw2018self} with five learned per-head distance slopes (Section~\ref{sec:transformer}). On evaluation, seed/budget sensitivity of ML comparisons~\cite{melis2018state,lucic2018gans,agarwal2021deep,bouthillier2021accounting,dodge2019show} and backtest multiple testing~\cite{white2000reality,hansen2005spa,harvey2016crosssection,bailey2014deflated} are established; the operating-point confound arises \emph{after} scoring, in the decision rule, and persists at matched seed counts and honestly counted trials.
 
 \section{Data and Episode Construction}
 \label{sec:data}
@@ -252,7 +270,7 @@ $a^{h}_{ij}=q_i\!\cdot\!k_j/\sqrt{d}\,+\,\text{(same/cross-strategy bonus)}$.
 
 \noindent\textbf{No-history and permuted-history ablations.}
 \label{sec:ablations}
-Removing cross-attention entirely (input projection straight to the head; 16{,}130 parameters) looks decisive at matched single seed---Sharpe 1.73$\to$0.87, positive years 6/6$\to$4/6---but at matched \emph{five-seed} ensembles the gap shrinks to 2.18 vs.\ 1.81 (\$719.9K, 6/6): a real but modest $\approx$0.37, one fifth of the single-seed impression. More telling, a variant keeping all 37{,}086 parameters but attending to 64 \emph{randomly chosen} strictly-earlier episodes reaches 2.14 at five seeds---within 0.04 of the full model. The attention pathway helps; \emph{which} history it attends to barely matters. We accordingly do not claim the historical-attention design as a source of edge.
+Removing cross-attention entirely (input projection straight to the head; 16{,}130 parameters) looks decisive at matched single seed---Sharpe 1.73$\to$0.87, positive years 6/6$\to$4/6---but at matched \emph{five-seed} ensembles the gap shrinks to 2.18 vs.\ 1.81 (\$719.9K, 6/6): a real but modest $\approx$0.37, one fifth of the single-seed impression. More telling, a variant keeping all 37{,}086 parameters but attending to 64 \emph{randomly chosen} strictly-earlier episodes reaches 2.14 at five seeds---within 0.04 of the full model. The attention pathway helps; \emph{which} history it attends to barely matters.
 
 \subsection{Calibration and the Trade-Selection Rule}
 \label{sec:calibration}
@@ -311,7 +329,7 @@ Figure~\ref{fig:selectivity} controls for the operating point directly: sweeping
 %% TODO-RERUN[67]: when tables/action_list/selectivity_sweep.csv gains the
 %% "MLP (5)" rows, replace the final sentence with the matched-N read-off at
 %% N ~= 14,338 and update Figure 4 (script regenerates it automatically).
-LightGBM's curve uses the sweep's one-action-per-episode convention, which differs from its Table~\ref{tab:consolidated} selection file by $\sim$5\% in $N$ (18{,}665 vs.\ 19{,}636 at $p\ge0.5$); no comparison drawn here depends on the difference.
+LightGBM's curve uses the sweep's one-action-per-episode convention ($N$ differs $\sim$5\% from its Table~\ref{tab:consolidated} selection file); no comparison here depends on this.
 
 \begin{figure}[t]
 \centering
@@ -355,14 +373,7 @@ Transformer (ALiBi) & 0.9\% & 0.51 & $-2.5\%$ & 0.37 \\
 
 \noindent\textbf{Strategy-level breakdown.} At matched single seed (42), K2 is the common profit source: the MLP earns \$1.21M of its \$1.41M on K2 (Sharpe 2.66 vs.\ 1.62 on T1); the single-seed transformer's entire net gain is K2 (\$717K, Sharpe 2.60) against a small T1 loss ($-$\$31K) that turns positive (\$274K) only once ensembled---another ensembling-dependent sign flip; LightGBM is the most balanced (T1 \$378K/0.85, K2 \$304K/1.74). No model's result rests on a single denomination.
 
-\noindent\textbf{Year-by-year.} Figure~\ref{fig:annualpnl} plots test-year P\&L at matched single seed. Unconditional loses large in four of six years; the learned models stay in a narrow, mostly positive band, profitable in different years to different degrees.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.66\linewidth]{figures/annual_pnl_bar_chart.pdf}
-\caption{Test-year P\&L, 2021--2026, matched single seed (42), symmetric-log scale, shared axis: unconditional swings are one to two orders of magnitude larger than any learned model's.}
-\label{fig:annualpnl}
-\end{figure}
+\noindent\textbf{Year-by-year.} At matched single seed, unconditional trading loses heavily in four of six test years with swings one to two orders of magnitude larger than any learned model's, while the learned models remain in a narrow, mostly positive band---profitable in different years to different degrees (MLP and transformer 6/6 positive, LightGBM 5/6; Table~\ref{tab:consolidated})---so no conclusion rests on a single model or year.
 
 \noindent\textbf{Excluding the partial year.} 2026 covers $\approx$107 trading days. Re-running everything on 2021--2025 leaves every conclusion intact (MLP-1 \$1.38M/2.59; five-seed transformer \$532K/1.92; all learned models positive every year) and \emph{strengthens} the baseline contrast: unconditional worsens to $-\$17.45$M (Sharpe $-1.73$, 1/5 positive years), since 2026 was one of its two good years.
 
@@ -370,7 +381,7 @@ Transformer (ALiBi) & 0.9\% & 0.51 & $-2.5\%$ & 0.37 \\
 
 \noindent\textbf{Execution and early assignment.} At $1.5\times$ quoted-spread slippage, all rankings and positive-year counts are unchanged; Sharpe falls 7\% (transformers) to 37\% (LightGBM). Trades whose short leg spans an ex-dividend date---early-assignment risk the expiry labels do not price---are 16--22\% of selections; LightGBM's exposed subset is net negative ($-\$33$K) while the transformer's exposed subset has a \emph{higher} win rate than its unexposed one, a divergence we report without a causal account.
 
-\noindent\textbf{Market exposure.} Regressing each \emph{trade's} return on the underlying's return over that trade's own holding window (mean 3.6 days)---the correct test when P\&L books at exit, where a same-day daily regression has essentially no power---shows a significant \emph{positive} beta for all three models (MLP $\beta=7.2$, $t=11.5$; transformer $0.9$; LightGBM $0.7$; all $R^2<0.006$). The low $R^2$ makes the tilt noisy, not small: for the MLP, a $+1\%$ underlying move over a typical hold shifts expected trade return by $+7.2$ percentage points---roughly half its 13.7\% mean per-trade return---over a strongly rising 2021--2026 market. These strategies are long-biased, not market-neutral. Reconciling the positive realized beta with predominantly net-short entry delta (75--82\% of trades, a structural consequence of shorting the near leg) requires path-dependent effects we have not isolated, and we flag the tension openly. Separately, sensitivity to an average-IV proxy (we did not merge external VIX data) is small but significant for the transformer variants only ($r\approx0.10$, $p<0.005$). Against the \emph{unconditional} baseline, the block bootstrap finds the Sharpe improvement significant for the MLP and both transformer variants but not LightGBM (CI $[-0.03,4.13]$).
+\noindent\textbf{Market exposure.} Regressing each \emph{trade's} return on the underlying's return over its own holding window (mean 3.6 days; the correct test when P\&L books at exit) shows a significant \emph{positive} beta for all three models (MLP $\beta=7.2$, $t=11.5$; transformer $0.9$; LightGBM $0.7$; all $R^2<0.006$). The low $R^2$ makes the tilt noisy, not small: for the MLP, a $+1\%$ underlying move over a typical hold shifts expected trade return by $+7.2$ percentage points---roughly half its 13.7\% mean per-trade return---over a strongly rising 2021--2026 market. These strategies are long-biased, not market-neutral. Reconciling the positive realized beta with predominantly net-short entry delta (75--82\% of trades, a structural consequence of shorting the near leg) requires path-dependent effects we have not isolated, and we flag the tension openly. Separately, sensitivity to an average-IV proxy (we did not merge external VIX data) is small but significant for the transformer variants only ($r\approx0.10$, $p<0.005$). Against the \emph{unconditional} baseline, the block bootstrap finds the Sharpe improvement significant for the MLP and both transformer variants but not LightGBM (CI $[-0.03,4.13]$).
 
 \noindent\textbf{Classification metrics.} On the pooled test population (base rate $\approx$13.8\%, identical across models by construction), Table~\ref{tab:calibration} shows no model dominating: LightGBM discriminates best (PR-AUC 0.492) despite the weakest P\&L among learned models; the plain transformer calibrates best (ECE 0.024). ROC-AUC is base-rate-invariant; we report PR-AUC because it is the more informative summary for a rare positive class, and ROC-AUC only on the balanced quiet-day subset above. The five-seed no-history ablation's PR-AUC (0.451) trails both transformer variants---seed-matched evidence that attention adds discrimination, consistent with its modest trading gain.
 
@@ -402,7 +413,7 @@ No-history ablation (5-seed) & 0.451 & 0.089 & 0.046 \\
 \noindent\textbf{Validity.} The known threats, in decreasing order of concern: (i) the pooled feature-selection leakage of Section~\ref{sec:features}, affecting test years 2021--2025 through the choice (not the values) of features; (ii) the $\sim$4$\times$ base-rate shift between the early training folds and all test years, absorbed only by a one-year isotonic fit, with fold-level performance tracking the mismatch; (iii) no scale-invariant, moneyness-style price-ratio feature in $F^{\ast}$ while the underlying drifts 50--80\% across the sample; (iv) TP2 is proved for European cash-settled index options, not American SPY calls~\cite{glasserman2026tp2theory,cosma2020earlyexercise}---we treat it as an empirical hypothesis, with 16--22\% of selected trades carrying short-leg ex-dividend timing; (v) no vertical/calendar no-arbitrage pre-filter, reported elsewhere to matter little~\cite{glasserman2025tp2}. All code and derived episode/feature/label datasets will be released on acceptance; the raw vendor quote feed cannot be redistributed.
 
 \section{Conclusion}
-The TP2 shape restriction on call prices, provably near-arbitrage when violated on European-style index options at mid-prices~\cite{glasserman2025tp2,glasserman2026tp2theory}, is unconditionally \emph{unprofitable} to trade on American-style SPY calls once detected in conservative executable quotes and charged realistic costs---and yet remains conditionally tradable: machine-learned selectors on 48 TP2-aware features convert a \$12.52M unconditional loss into substantial positive out-of-sample returns under one causal, untuned rule, surviving slippage stress, early-assignment accounting, and capital-constrained sizing at the SPX study's own convention. This locates the economic boundary of the TP2 near-arbitrage and shows that crossing it is a learnable selection problem, not a detection problem. Methodologically, comparing the learned selectors surfaced an operating-point confound---the decision rule makes the portfolio endogenous to the model, so ensembling moved trade counts $+75\%$/$-13\%$ and reversed flat-notional Sharpe rankings---which matched-selectivity curves, seed-dispersion intervals, and deflated Sharpe ratios over the disclosed 21-configuration search resolve: no architecture defensibly wins, the feature construction carries the signal, and under deployment-relevant sizing the simplest models lead. Open problems, stated as such: per-fold feature re-selection to close the disclosed leakage, a scale-invariant feature dictionary, an explicit early-exercise-aware labeling of the short leg, and reconciliation of the positive realized market beta with predominantly short entry delta.
+The TP2 shape restriction on call prices, provably near-arbitrage when violated on European-style index options at mid-prices~\cite{glasserman2025tp2,glasserman2026tp2theory}, is unconditionally \emph{unprofitable} to trade on American-style SPY calls once detected in conservative executable quotes and charged realistic costs---and yet remains conditionally tradable: machine-learned selectors on 48 TP2-aware features convert a \$12.52M unconditional loss into substantial positive out-of-sample returns under one causal, untuned rule, surviving slippage stress, early-assignment accounting, and capital-constrained sizing at the SPX study's own convention. This locates the economic boundary of the TP2 near-arbitrage and shows that crossing it is a learnable selection problem, not a detection problem. Methodologically, comparing the learned selectors surfaced an operating-point confound---the decision rule makes the portfolio endogenous to the model, so ensembling moved trade counts $+75\%$/$-13\%$ and reversed flat-notional Sharpe rankings---which matched-selectivity curves, seed-dispersion intervals, and deflated Sharpe ratios over the disclosed 21-configuration search resolve: no architecture defensibly wins, the feature construction carries the signal, and under deployment-relevant sizing the simplest models lead. Open problems: per-fold feature re-selection to close the disclosed leakage, a scale-invariant feature dictionary, early-exercise-aware labeling of the short leg, completing the supermodular route to American TP2, and reconciling the positive realized beta with short entry delta.
 
 \bibliographystyle{ACM-Reference-Format}
 \begingroup
@@ -423,14 +434,23 @@ Paul Glasserman and Dan Pirjol. 2026. When Are Option Prices TP\textsubscript{2}
 \bibitem{glasserman2023convexity}
 Paul Glasserman and Dan Pirjol. 2023. Total Positivity and Relative Convexity of Option Prices. \textit{Frontiers of Mathematical Finance} 2, 1 (2023), 1--32.
 
+\bibitem{merton1973}
+Robert C. Merton. 1973. Theory of Rational Option Pricing. \textit{Bell Journal of Economics and Management Science} 4, 1 (1973), 141--183.
+
+\bibitem{chin2017}
+Eric Chin, Sverrir \'Olafsson, and Dian Nel. 2017. \textit{Problems and Solutions in Mathematical Finance, Volume II: Equity Derivatives}. Wiley. Problems 3.2.1.1--3.2.1.3 and \S3.2.3 Problem 10.
+
+\bibitem{topkis1998}
+Donald M. Topkis. 1998. \textit{Supermodularity and Complementarity}. Princeton University Press.
+
 \bibitem{ke2017lightgbm}
-Guolin Ke, Qi Meng, Thomas Finley, Taifeng Wang, Wei Chen, Weidong Ma, Qiwei Ye, and Tie-Yan Liu. 2017. LightGBM: A Highly Efficient Gradient Boosting Decision Tree. In \textit{Advances in Neural Information Processing Systems (NeurIPS) 30}. 3146--3154.
+Guolin Ke et al. 2017. LightGBM: A Highly Efficient Gradient Boosting Decision Tree. In \textit{NeurIPS 30}.
 
 \bibitem{zadrozny2002transforming}
-Bianca Zadrozny and Charles Elkan. 2002. Transforming Classifier Scores into Accurate Multiclass Probability Estimates. In \textit{Proceedings of KDD}. 694--699.
+Bianca Zadrozny and Charles Elkan. 2002. Transforming Classifier Scores into Accurate Multiclass Probability Estimates. In \textit{KDD}.
 
 \bibitem{cosma2020earlyexercise}
-Antonio Cosma, Stefano Galluccio, Paola Pederzoli, and Olivier Scaillet. 2020. Early Exercise Decision in American Options with Dividends, Stochastic Volatility, and Jumps. \textit{Journal of Financial and Quantitative Analysis} 55, 1 (2020), 331--356.
+Antonio Cosma et al. 2020. Early Exercise Decision in American Options with Dividends, Stochastic Volatility, and Jumps. \textit{J.\ Financial and Quantitative Analysis} 55, 1 (2020), 331--356.
 
 \bibitem{kearns2013mlmicrostructure}
 Michael Kearns and Yuriy Nevmyvaka. 2013. Machine Learning for Market Microstructure and High Frequency Trading. In \textit{High-Frequency Trading: New Realities for Traders, Markets and Regulators}. Risk Books.
@@ -457,40 +477,31 @@ Peter R. Hansen. 2005. A Test for Superior Predictive Ability. \textit{Journal o
 Xavier Bouthillier et al. 2021. Accounting for Variance in Machine Learning Benchmarks. In \textit{Proceedings of Machine Learning and Systems (MLSys)} 3.
 
 \bibitem{dodge2019show}
-Jesse Dodge, Suchin Gururangan, Dallas Card, Roy Schwartz, and Noah A. Smith. 2019. Show Your Work: Improved Reporting of Experimental Results. In \textit{Proceedings of EMNLP-IJCNLP}. 2185--2194.
+Jesse Dodge et al. 2019. Show Your Work: Improved Reporting of Experimental Results. In \textit{EMNLP-IJCNLP}.
 
 \bibitem{melis2018state}
 G\'abor Melis, Chris Dyer, and Phil Blunsom. 2018. On the State of the Art of Evaluation in Neural Language Models. In \textit{International Conference on Learning Representations (ICLR)}.
 
 \bibitem{lucic2018gans}
-Mario Lucic, Karol Kurach, Marcin Michalski, Sylvain Gelly, and Olivier Bousquet. 2018. Are GANs Created Equal? A Large-Scale Study. In \textit{Advances in Neural Information Processing Systems (NeurIPS) 31}. 698--707.
+Mario Lucic et al. 2018. Are GANs Created Equal? A Large-Scale Study. In \textit{NeurIPS 31}.
 
 \bibitem{agarwal2021deep}
-Rishabh Agarwal, Max Schwarzer, Pablo Samuel Castro, Aaron Courville, and Marc G. Bellemare. 2021. Deep Reinforcement Learning at the Edge of the Statistical Precipice. In \textit{Advances in Neural Information Processing Systems (NeurIPS) 34}. 29304--29320.
+Rishabh Agarwal et al. 2021. Deep Reinforcement Learning at the Edge of the Statistical Precipice. In \textit{NeurIPS 34}.
 
 \bibitem{grinsztajn2022why}
-L\'eo Grinsztajn, Edouard Oyallon, and Ga\"el Varoquaux. 2022. Why Do Tree-Based Models Still Outperform Deep Learning on Typical Tabular Data? In \textit{Advances in Neural Information Processing Systems (NeurIPS) 35 Datasets and Benchmarks}.
+L\'eo Grinsztajn, Edouard Oyallon, and Ga\"el Varoquaux. 2022. Why Do Tree-Based Models Still Outperform Deep Learning on Typical Tabular Data? In \textit{NeurIPS 35 D\&B}.
 
 \bibitem{shwartzziv2022tabular}
 Ravid Shwartz-Ziv and Amitai Armon. 2022. Tabular Data: Deep Learning Is Not All You Need. \textit{Information Fusion} 81 (2022), 84--90.
 
 \bibitem{gorishniy2021revisiting}
-Yury Gorishniy, Ivan Rubachev, Valentin Khrulkov, and Artem Babenko. 2021. Revisiting Deep Learning Models for Tabular Data. In \textit{Advances in Neural Information Processing Systems (NeurIPS) 34}. 18932--18943.
+Yury Gorishniy et al. 2021. Revisiting Deep Learning Models for Tabular Data. In \textit{NeurIPS 34}.
 
 \bibitem{shaw2018self}
 Peter Shaw, Jakob Uszkoreit, and Ashish Vaswani. 2018. Self-Attention with Relative Position Representations. In \textit{Proceedings of NAACL-HLT}. 464--468.
 
-\bibitem{raffel2020t5}
-Colin Raffel et al. 2020. Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer. \textit{Journal of Machine Learning Research} 21, 140 (2020), 1--67.
-
-\bibitem{ying2021graphormer}
-Chengxuan Ying et al. 2021. Do Transformers Really Perform Badly for Graph Representation? In \textit{Advances in Neural Information Processing Systems (NeurIPS) 34}. 28877--28888.
-
-\bibitem{li2024fire}
-Shanda Li et al. 2024. Functional Interpolation for Relative Positions Improves Long Context Transformers. In \textit{International Conference on Learning Representations (ICLR)}.
-
 \bibitem{bali2023option}
-Turan G. Bali, Heiner Beckmeyer, Mathis M\"orke, and Florian Weigert. 2023. Option Return Predictability with Machine Learning and Big Data. \textit{Review of Financial Studies} 36, 9 (2023), 3548--3602.
+Turan G. Bali et al. 2023. Option Return Predictability with Machine Learning and Big Data. \textit{Rev.\ Financial Studies} 36, 9 (2023), 3548--3602.
 
 \end{thebibliography}
 \endgroup
