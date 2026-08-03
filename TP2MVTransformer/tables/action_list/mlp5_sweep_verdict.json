@@ -1,0 +1,22 @@
+{
+  "verify_at_0.5": {
+    "n": 24977,
+    "pnl": 3433936.251873806,
+    "sharpe": 1.6617555804076938,
+    "sortino": 6.119653213427375,
+    "maxdd": -1207037.8771429441,
+    "win_rate": 0.3295431797253473,
+    "mean_ret_pct": 13.748393529542403,
+    "skew": 8.920100295233548,
+    "pos_years": 4,
+    "n_years": 6
+  },
+  "reproduction_ok": true,
+  "matched_N": {
+    "N": 14338,
+    "mlp5_sharpe_at_N": 1.4770706785951455,
+    "mlp5_sortino_at_N": 4.9543277142284525,
+    "tf5_sharpe_at_own_operating_point": 2.18,
+    "reversal_is_operating_point_artifact": false
+  }
+}

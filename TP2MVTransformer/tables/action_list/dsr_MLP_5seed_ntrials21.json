@@ -1,0 +1,10 @@
+{
+  "T": 357,
+  "sr_ann": 1.6617555804076938,
+  "skew": 8.130992900220537,
+  "kurtosis": 85.69117276558622,
+  "n_trials": 21,
+  "sr0_ann": 2.0098140766556027,
+  "DSR": 0.25131934059069666,
+  "configs_note": "21 evaluated configurations; 25 adds the four other seeds of the architecture whose reported single-seed row is the max over five"
+}
