@@ -42,13 +42,11 @@
 - MLP(1) from `data/mlp_baseline_test_predictions.parquet` @0.5 must give `N = 14,258`, `Sharpe 2.60`.
 - DSR check: the script's Transformer-plain-5 DSR must reproduce `0.5853507` (already committed in `dsr_Transformer_plain_(.json`).
 
-**Paper edits after the run** (three `TODO-RERUN[67]` slots):
+**Paper edits after the run** (one `TODO-RERUN[67]` slot — the DSR and calibration-sensitivity sections were removed from the paper by PI decision on 2026-08-02; the DSR and Platt JSONs remain repo artifacts only and must NOT be added back to the paper):
 - *Matched-Selectivity Curves* run-in (grep `Matched-Selectivity`), final sentence — replace per this decision table:
   - If `mlp5_sharpe_at_N > 2.18`: the reversal **is** an operating-point artifact. Use: *"At the five-seed transformer's operating point (N≈14,338), the five-seed MLP reaches Sharpe X.XX, above 2.18. The Table 2 reversal is an operating-point artifact, not an architecture ranking."* Also extend the abstract clause "and can reverse Sharpe rankings" with ", a reversal that vanishes at matched selectivity".
   - If `mlp5_sharpe_at_N ≤ 2.18`: use: *"At N≈14,338 the five-seed MLP reaches Sharpe X.XX, below 2.18. The ensemble-level ranking survives the operating-point control."* No abstract change.
-- Deflated-Sharpe paragraph (grep `Multiple Testing`) — insert the real MLP(1) DSR (forward calculation predicted ≈0.86–0.91; report whatever the artifact says) and the n_trials=25 sensitivity.
-- Calibration run-in `TODO-RERUN[67]` (Platt config attribution; grep `Platt`) — see Task 3.2; same run can settle it.
-- Figure 4 gains the `MLP (5)` curve automatically; update its caption's model list.
+- The selectivity figure gains the `MLP (5)` curve automatically; update its caption's model list. When regenerating the figure, set the axis labels to "Active-day Sharpe" and "Downside ratio" to match the renamed Table 2 columns.
 
 ---
 
@@ -106,7 +104,7 @@ Join `episode_regime_labels.parquet` to each primary model's selected trades; re
 ## Priority 3 — smaller reconciliations (camera-ready polish)
 
 - **3.1 LightGBM N mismatch.** Sweep@0.5 gives 18,665; the selected-trades file has 19,636. Diagnose: count episodes where *both* T1 and K2 crossed 0.5 in `lgbm_final_test_predictions.parquet` (per-strategy classifiers ⇒ likely dual-selection). Artifact: `lgbm_selection_reconciliation.json`. Paper: one clause in Fig. 4's caption if the explanation differs from "one-action-per-episode convention."
-- **3.2 Platt-vs-isotonic attribution.** `calibration_platt_vs_isotonic.json` has `total_n = 20,125`, matching no Table 2 row. Identify the config inside `65_calibration_robustness.py`, name it in the Calibration run-in.
+- **3.2 Platt-vs-isotonic attribution.** `calibration_platt_vs_isotonic.json` has `total_n = 20,125`, matching no Table 2 row. Identify the config inside `65_calibration_robustness.py` and record it in the artifact JSON. Do not add calibrator-sensitivity discussion to the paper; it was removed by PI decision.
 - **3.3 Exit-policy paired check.** For the 171 selected trades with a defined true-reversion exit (`exit_policy_comparison.json`), compute the *paired* expiry-vs-reversion PnL on the same trades. Update the labels run-in (grep `171`) only if the paired result is material; n=171 stays labeled a small-sample check.
 - **3.4 Beta vs delta reconciliation (upgraded: fully feasible).** The *Market exposure* run-in flags the open tension: trade-level β=+7.2 (MLP-5) vs 75–82% net-short entry delta. Per-leg entry deltas ARE in the token dataset (`feature_{A..D}_delta`, BS spot delta with dividend yield). Compute each trade's net entry delta from its traded legs, regress trade return on (underlying move × net delta) and on raw move; if short-gamma path-dependence explains the positive β, one sentence resolves a disclosed limitation.
 
