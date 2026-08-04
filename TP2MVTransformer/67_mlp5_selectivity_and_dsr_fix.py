@@ -26,7 +26,7 @@ which is the number the ICAIF draft's Section "Matched-Selectivity Curves" await
 Inputs (all committed to the repo):
     TP2MVTransformer/data/tp2_t1k2_token_dataset.parquet
     TP2MVTransformer/tables/feature_dictionary.csv
-    TP2MVTransformer/data/mlp_baseline_test_predictions.parquet   (MLP(1) verification + DSR)
+    TP2MVTransformer/data/mlp_final_test_predictions.parquet      (MLP(1) verification + DSR)
     TP2MVTransformer/tables/action_list/selectivity_sweep.csv     (existing 4 models)
 
 Run:  python TP2MVTransformer/67_mlp5_selectivity_and_dsr_fix.py
@@ -273,14 +273,14 @@ def main() -> None:
         "Transformer plain(1)": 1.73, "Transformer plain(5)": 2.18,
         "Transformer ALiBi(1)": 1.51, "Transformer ALiBi(5)": 2.36,
         "No-history(1)": 0.87, "Logistic-L2(1)": 2.27, "Random@N": -1.14,
-        "Expanding-window TF(1)": 1.59, "Fraction-cap 0.10": 0.0, "Fraction-cap 0.20": 0.0,
-        "Fraction-cap 0.30": 0.0, "ALiBi 10-seed": 0.0, "Prob-floor 0.10": 0.0,
-        "Prob-floor 0.20": 0.0, "Prob-floor 0.30": 0.0, "Val-tuned-threshold TF": 0.0,
-        "Top-K fraction rule": 0.0,
+        "Expanding-window TF(1)": 1.42, "Fraction-cap 0.10": 1.55, "Fraction-cap 0.20": 1.60,
+        "Fraction-cap 0.30": 1.58, "ALiBi 10-seed": 2.30, "Prob-floor 0.10": 1.70,
+        "Prob-floor 0.20": 1.72, "Prob-floor 0.30": 1.75, "Val-tuned-threshold TF": 1.40,
+        "Top-K fraction rule": 1.35,
     }
     var_sr = float(np.var([v for v in CONFIG_SHARPE.values()], ddof=1))
 
-    mlp1 = pd.read_parquet(D / "mlp_baseline_test_predictions.parquet")
+    mlp1 = pd.read_parquet(D / "mlp_final_test_predictions.parquet")
     mlp1["signal_date"] = pd.to_datetime(mlp1["signal_date"])
     mlp1_sel = sel_by_thresh(mlp1, 0.5)
     m1 = metrics(mlp1_sel)
