@@ -2,7 +2,7 @@
 
 **Audience:** coding agents (Claude Code / Codex / etc.) working with Jyotir and Omkar.
 **Repo:** `tp2_spy_call_transformer_icaif26`, branch `fresh-files-2026-05-12`.
-**Paper:** `AICIF/tp2_spy_call_acm_draft_v4.tex` (anonymous, submission) + `tp2_spy_call_acm_draft_v4_1.tex` (named twin).
+**Paper:** `AICIF/tp2_spy_call_acm_draft_v5.tex` (anonymous, submission) + `tp2_spy_call_acm_draft_v5_1.tex` (named twin). **v5 is canonical as of 2026-08-06** (language pass); the v4 files are frozen at the pre-pass state — never edit them. Every task below that says "the paper" means v5.
 **Theory:** `AICIF/tp2_american_theory_note.{tex,pdf}` — INTERNAL derivation document only (PI decision 2026-08-05). The submitted paper is self-contained: Props 2.1–2.2, the dividend sandwich, and their proof sketches are inline in paper §2, and the paper must NEVER cite or mention the note or "a companion analysis." The note holds the extended derivations (Doob/Chernoff margins, perturbation lemma, Topkis program) for our own use and for the tasks below.
 **Rerun queue:** `docs/REVISION_BRIEF_STATUS.md` — change log for the 2026-08-02 revision brief, the authoritative list of pending empirical reruns (brief items 13–27), and the claim-support table. Paper comments `RERUN-REQUIRED[brief-n]` mark each insertion point.
 **Deadline context:** ICAIF submission is Aug 2 AoE. Only Priority 0 is submission-relevant; the v4 text is written to be truthful *without* any rerun. Priorities 1–3 target camera-ready / the extended version.
@@ -17,7 +17,7 @@
 2. **Reproduction gates before new results.** Every retraining task below has a gate: reproduce the committed benchmark numbers first. If the gate fails, stop and reconcile — do not merge downstream numbers.
 3. **One metrics implementation.** `metrics()` and `sel_by_thresh()` in `TP2MVTransformer/60_action_list_compute.py` are the single source of truth: daily-grouped Sharpe = `mean/std × √252` over per-day summed `target_norm_pnl`; Sortino uses the std of negative days only; `mean_ret_pct = mean(norm_pnl)/10`; selection is **one action per episode** (highest-prob strategy at `p ≥ thr`). Copy these functions verbatim; never re-derive.
 4. **Both tex variants stay in sync** except the author block. After any edit to `v4.tex`, regenerate `v4_1.tex` (snippet in §"Paper mechanics"), compile both, and confirm **Pages = 8** for each. 8 pages including references is a hard ICAIF limit.
-5. **Find the paper's open slots** with: `grep -n "TODO-RERUN\|RERUN-REQUIRED" AICIF/tp2_spy_call_acm_draft_v4.tex` (`TODO-RERUN[67]` = submission-relevant P0 slots; `RERUN-REQUIRED[brief-n]` = post-submission rerun queue, specs in `docs/REVISION_BRIEF_STATUS.md`)
+5. **Find the paper's open slots** with: `grep -n "TODO-RERUN\|RERUN-REQUIRED\|FIGURE-SLOT" AICIF/tp2_spy_call_acm_draft_v5.tex` (`TODO-RERUN[67]` = submission-relevant P0 slots; `RERUN-REQUIRED[brief-n]` = post-submission rerun queue, specs in `docs/REVISION_BRIEF_STATUS.md`)
 6. **Commit hygiene:** artifact files first (JSON/CSV + regenerated figure), then the tex edit, in the same PR/commit; message states which task from this guide it closes.
 7. **The paper has NO numbered subsections** (converted to run-in bold headers to save space). Locate every edit slot by grepping the header text or the `TODO-RERUN` markers, never by subsection number. `\ref{sec:...}` labels resolve to the parent section number; that is intended.
 8b. **Excised content stays out (PI decisions, cumulative):** never reintroduce any of the following into the paper — the operating-point confound (any naming or discussion of it), matched-selectivity curves or the selectivity figure, seed-dispersion intervals, single-seed Table 2 rows, deflated Sharpe ratios, calibrator-sensitivity discussion, feature-selection-leakage discussion, or references to the companion theory note. The supporting artifacts stay committed as the internal record.
@@ -152,21 +152,21 @@ Join `episode_regime_labels.parquet` to each primary model's selected trades; re
 
 ```bash
 cd AICIF
-pdflatex -interaction=nonstopmode tp2_spy_call_acm_draft_v4.tex   # run twice
-pdflatex -interaction=nonstopmode tp2_spy_call_acm_draft_v4.tex
-pdfinfo tp2_spy_call_acm_draft_v4.pdf | grep Pages                 # must print 8
-grep -c undefined tp2_spy_call_acm_draft_v4.log                    # must print 0
+pdflatex -interaction=nonstopmode tp2_spy_call_acm_draft_v5.tex   # run twice
+pdflatex -interaction=nonstopmode tp2_spy_call_acm_draft_v5.tex
+pdfinfo tp2_spy_call_acm_draft_v5.pdf | grep Pages                 # must print 8
+grep -c undefined tp2_spy_call_acm_draft_v5.log                    # must print 0
 ```
 
 Regenerate the named twin after every v4 edit (never edit v4_1 directly):
 
 ```python
-src = open('tp2_spy_call_acm_draft_v4.tex').read()
+src = open('tp2_spy_call_acm_draft_v5.tex').read()
 src = src.replace(r'\documentclass[sigconf,review,anonymous]{acmart}',
                   r'\documentclass[sigconf,review]{acmart}')
 anon = open('author_block_anon.txt').read()   # the \author{Anonymous...}...\shortauthors block
 named = open('author_block_named.txt').read() # the three-author Stony Brook block
-open('tp2_spy_call_acm_draft_v4_1.tex','w').write(src.replace(anon, named))
+open('tp2_spy_call_acm_draft_v5_1.tex','w').write(src.replace(anon, named))
 ```
 
 (The two blocks are verbatim in the current files — extract them once into the two txt files above, or inline them.)
