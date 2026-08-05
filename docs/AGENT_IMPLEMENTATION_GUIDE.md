@@ -20,6 +20,7 @@
 5. **Find the paper's open slots** with: `grep -n "TODO-RERUN\|RERUN-REQUIRED" AICIF/tp2_spy_call_acm_draft_v4.tex` (`TODO-RERUN[67]` = submission-relevant P0 slots; `RERUN-REQUIRED[brief-n]` = post-submission rerun queue, specs in `docs/REVISION_BRIEF_STATUS.md`)
 6. **Commit hygiene:** artifact files first (JSON/CSV + regenerated figure), then the tex edit, in the same PR/commit; message states which task from this guide it closes.
 7. **The paper has NO numbered subsections** (converted to run-in bold headers to save space). Locate every edit slot by grepping the header text or the `TODO-RERUN` markers, never by subsection number. `\ref{sec:...}` labels resolve to the parent section number; that is intended.
+8b. **Excised content stays out (PI decisions, cumulative):** never reintroduce any of the following into the paper — the operating-point confound (any naming or discussion of it), matched-selectivity curves or the selectivity figure, seed-dispersion intervals, single-seed Table 2 rows, deflated Sharpe ratios, calibrator-sensitivity discussion, feature-selection-leakage discussion, or references to the companion theory note. The supporting artifacts stay committed as the internal record.
 8. **Match the paper's voice in every sentence you insert:** short sentences; no evaluative adjectives or adverbs (nothing like "strikingly", "remarkably", "decisively"); plain words an undergraduate can follow. The templates below already follow this style — use them verbatim with numbers filled in.
 
 ## Environment
@@ -33,7 +34,21 @@
 ## Priority 0 — run the script that already exists (hours; submission-relevant)
 
 ### Task 0.1 — MLP-5 selectivity curve + DSR fix — **DONE (2026-08-04, commits `fee0d96` + `3afcd53`)**
-Gates matched exactly; verdict `mlp5_sweep_verdict.json`: MLP-5 Sharpe 1.477 at N=14,338 vs transformer 2.18 → the "ranking survives" branch (no abstract change). The four-findings paragraph and five-series caption are in the paper; both variants at 8 pages. Kept below for reference and reruns.
+Gates matched exactly; verdict `mlp5_sweep_verdict.json`: MLP-5 Sharpe 1.477 at N=14,338 vs transformer 2.18. NOTE (2026-08-05): the four-findings paragraph, the selectivity figure, and the entire operating-point/matched-selectivity discussion were subsequently REMOVED from the paper by PI decision (full excision — see Task 0.2 and ground rule 9). The artifacts from this task remain committed as the internal record; do not delete them and do not put them back in the paper.
+
+### Task 0.2 — two-rule evaluation + five-seed re-anchor (inference-only; NO retraining)
+**Context (PI decision 2026-08-05):** the operating-point-confound contribution, matched-selectivity figure, seed-dispersion discussion, and every single-seed Table 2 row were removed from the paper. Table 2 now reports one protocol: five-seed ensembles for MLP/transformers, single fits for LightGBM/logistic. To preempt the reviewer question "do the rankings depend on how many trades each model takes?", the paper will report every model under TWO prespecified rules — the committed probability rule (calibrated p ≥ 0.5) and a coverage rule (each model's top N = 14,000 candidates by calibrated probability). Everything runs from committed prediction files.
+
+**Inputs (all in repo):** `data/mlp_5seed_ensemble_test_predictions.parquet`; the transformer plain/ALiBi ensemble prediction files used by scripts 66/67; `lgbm_final_test_predictions.parquet`; logistic predictions (if no file exists, refit from the 60-series config — deterministic, seconds). Copy `metrics()` and `sel_by_thresh()` from `60_action_list_compute.py` verbatim (ground rule 3).
+
+**Steps:**
+1. **Gates first** — reproduce each family's committed p≥0.5 row: LightGBM 19,636 / $682K / 1.25 (its selection-file convention); MLP-5 24,977 / $3.43M / 1.66; TF-plain-5 14,338 / $695K / 2.18; TF-ALiBi-5 14,648 / $704K / 2.36; Logistic 13,841 / $2.02M / 2.27. A failed gate stops the task.
+2. **Coverage rule:** one action per episode (higher calibrated probability, ties toward T1); rank all candidates by calibrated probability over the full 2021–2026 test span; take the top N = 14,000 per model; compute the full `metrics()` row. Apply the SAME one-action convention to LightGBM here — this simultaneously quantifies the ~5% selection-file difference (subsumes Task 3.1).
+3. **Five-seed re-anchor** (paper slots marked `RERUN-REQUIRED[fiveseed-reanchor]`): from the five-seed ensemble predictions recompute (a) the strategy-level T1/K2 breakdown, (b) the year-by-year P&L bands, (c) PR-AUC / Brier / ECE for the MLP ensemble (the classification-metrics table's MLP row is currently single-seed).
+4. **Artifacts:** `tables/action_list/two_rule_comparison.json` (per model × rule: N, PnL, sharpe, downside ratio, win rate, mean_ret_pct, skew, pos_years) and `tables/action_list/fiveseed_breakdowns.json`. Same commit as the tex edit.
+5. **Tex edits (both variants; ≤8 pages; zero undefined):** fill the `TODO-RERUN[two-rule]` slot in the evaluation paragraph using the template in that comment; add two columns (Sharpe@14K, P&L@14K) to Table 2, or a compact second table if the columns overflow the column width; rewrite the two robustness run-ins and the calibration-table MLP row from `fiveseed_breakdowns.json`, keeping the existing sentence structure; delete the fulfilled comment markers.
+
+**Voice rule binds:** report both rules as two prespecified evaluations, with no commentary about thresholds, operating points, or ranking reversals. See ground rule 9.
 **Script (already written):** `TP2MVTransformer/67_mlp5_selectivity_and_dsr_fix.py`
 **Why:** the paper currently states, honestly (slot marked `TODO-RERUN[67]`), that the five-seed-MLP vs five-seed-transformer comparison at matched trade count *cannot be adjudicated* because `34_mlp_5seed_ensemble.py` never saved full-population predictions. This task closes that gap. It also repairs `63_market_neutral_dsr_exit.py`'s filename collision (`label[-3] == "("` for both `MLP(1)` and `MLP(5)`, so `dsr_MLP_(.json` holds only MLP(5)).
 
