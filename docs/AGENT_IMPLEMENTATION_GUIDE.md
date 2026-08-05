@@ -3,7 +3,7 @@
 **Audience:** coding agents (Claude Code / Codex / etc.) working with Jyotir and Omkar.
 **Repo:** `tp2_spy_call_transformer_icaif26`, branch `fresh-files-2026-05-12`.
 **Paper:** `AICIF/tp2_spy_call_acm_draft_v4.tex` (anonymous, submission) + `tp2_spy_call_acm_draft_v4_1.tex` (named twin).
-**Theory:** `AICIF/tp2_american_theory_note.{tex,pdf}` — Propositions referenced below live there and in paper §2.
+**Theory:** `AICIF/tp2_american_theory_note.{tex,pdf}` — INTERNAL derivation document only (PI decision 2026-08-05). The submitted paper is self-contained: Props 2.1–2.2, the dividend sandwich, and their proof sketches are inline in paper §2, and the paper must NEVER cite or mention the note or "a companion analysis." The note holds the extended derivations (Doob/Chernoff margins, perturbation lemma, Topkis program) for our own use and for the tasks below.
 **Rerun queue:** `docs/REVISION_BRIEF_STATUS.md` — change log for the 2026-08-02 revision brief, the authoritative list of pending empirical reruns (brief items 13–27), and the claim-support table. Paper comments `RERUN-REQUIRED[brief-n]` mark each insertion point.
 **Deadline context:** ICAIF submission is Aug 2 AoE. Only Priority 0 is submission-relevant; the v4 text is written to be truthful *without* any rerun. Priorities 1–3 target camera-ready / the extended version.
 
