@@ -53,14 +53,6 @@
 \title{Machine-Learned Conditional Trading of TP2 Violations in SPY American Call Options}
 \subtitle{From Near-Arbitrage Theory to Cost-Aware Selection, with a Caution on Comparing Trading Models}
 
-\author{Pawel Polak}
-\affiliation{%
-  \institution{Stony Brook University}
-  \city{Stony Brook}
-  \state{New York}
-  \country{USA}}
-\email{pawel.polak@stonybrook.edu}
-
 \author{Jyotir Manishkumar Patel}
 \affiliation{%
   \institution{Stony Brook University}
@@ -68,6 +60,14 @@
   \state{New York}
   \country{USA}}
 \email{jyotirmanishku.patel@stonybrook.edu}
+
+\author{Pawel Polak}
+\affiliation{%
+  \institution{Stony Brook University}
+  \city{Stony Brook}
+  \state{New York}
+  \country{USA}}
+\email{pawel.polak@stonybrook.edu}
 
 \author{Omkar Lashkare}
 \affiliation{%
@@ -77,7 +77,7 @@
   \country{USA}}
 \email{omkarvilas.lashkare@stonybrook.edu}
 
-\renewcommand{\shortauthors}{Polak, Patel, Lashkare}
+\renewcommand{\shortauthors}{Patel, Polak, Lashkare}
 
 \begin{abstract}
 Call prices are totally positive of order two (TP2) when the ratio of a higher-strike call to a lower-strike call increases with maturity. This property is stronger than the absence of calendar-spread arbitrage. On SPX index options, TP2 violations are rare, revert fast, and are profitable to trade at mid-prices, with hit rates near 100\% per violation. We study the same structure where the theory's proof conditions do not apply: SPY \emph{American} calls, which have early exercise, discrete dividends, and physical settlement. We prove contract-specific conditions under which latent American call values coincide with European ones, and a dividend-robust certificate under which a sufficiently large executable-side violation cannot be explained by the early-exercise premium. We detect violations in bid/ask quotes and price every trade with spread and commission costs. The near-arbitrage behavior disappears. Trading all 250{,}004 forward-adjusted T1/K2 violation trades over 2021--2026 \emph{loses} \$12.52M (win rate 12.9\%, Sharpe $-1.01$). The signal is only tradable conditionally, and machine learning recovers it. LightGBM, an MLP, a TP2-specific transformer, and an $L_2$-regularized logistic regression each produce positive out-of-sample returns. All are evaluated under the same causal $p\ge0.5$ selection rule. The result holds on rolling walk-forward splits, under $1.5\times$ spread slippage, and under a cash-budgeted sizing experiment. Results are reported separately by whether the short leg spans an ex-dividend date.
