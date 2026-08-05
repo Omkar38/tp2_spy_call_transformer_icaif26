@@ -3,7 +3,8 @@
 **Audience:** coding agents (Claude Code / Codex / etc.) working with Jyotir and Omkar.
 **Repo:** `tp2_spy_call_transformer_icaif26`, branch `fresh-files-2026-05-12`.
 **Paper:** `AICIF/tp2_spy_call_acm_draft_v4.tex` (anonymous, submission) + `tp2_spy_call_acm_draft_v4_1.tex` (named twin).
-**Theory:** `AICIF/tp2_american_theory_note.{tex,pdf}` — Propositions referenced below live there and in paper §2.3.
+**Theory:** `AICIF/tp2_american_theory_note.{tex,pdf}` — Propositions referenced below live there and in paper §2.
+**Rerun queue:** `docs/REVISION_BRIEF_STATUS.md` — change log for the 2026-08-02 revision brief, the authoritative list of pending empirical reruns (brief items 13–27), and the claim-support table. Paper comments `RERUN-REQUIRED[brief-n]` mark each insertion point.
 **Deadline context:** ICAIF submission is Aug 2 AoE. Only Priority 0 is submission-relevant; the v4 text is written to be truthful *without* any rerun. Priorities 1–3 target camera-ready / the extended version.
 
 ---
@@ -16,7 +17,7 @@
 2. **Reproduction gates before new results.** Every retraining task below has a gate: reproduce the committed benchmark numbers first. If the gate fails, stop and reconcile — do not merge downstream numbers.
 3. **One metrics implementation.** `metrics()` and `sel_by_thresh()` in `TP2MVTransformer/60_action_list_compute.py` are the single source of truth: daily-grouped Sharpe = `mean/std × √252` over per-day summed `target_norm_pnl`; Sortino uses the std of negative days only; `mean_ret_pct = mean(norm_pnl)/10`; selection is **one action per episode** (highest-prob strategy at `p ≥ thr`). Copy these functions verbatim; never re-derive.
 4. **Both tex variants stay in sync** except the author block. After any edit to `v4.tex`, regenerate `v4_1.tex` (snippet in §"Paper mechanics"), compile both, and confirm **Pages = 8** for each. 8 pages including references is a hard ICAIF limit.
-5. **Find the paper's open slots** with: `grep -n "TODO-RERUN" AICIF/tp2_spy_call_acm_draft_v4.tex`
+5. **Find the paper's open slots** with: `grep -n "TODO-RERUN\|RERUN-REQUIRED" AICIF/tp2_spy_call_acm_draft_v4.tex` (`TODO-RERUN[67]` = submission-relevant P0 slots; `RERUN-REQUIRED[brief-n]` = post-submission rerun queue, specs in `docs/REVISION_BRIEF_STATUS.md`)
 6. **Commit hygiene:** artifact files first (JSON/CSV + regenerated figure), then the tex edit, in the same PR/commit; message states which task from this guide it closes.
 7. **The paper has NO numbered subsections** (converted to run-in bold headers to save space). Locate every edit slot by grepping the header text or the `TODO-RERUN` markers, never by subsection number. `\ref{sec:...}` labels resolve to the parent section number; that is intended.
 8. **Match the paper's voice in every sentence you insert:** short sentences; no evaluative adjectives or adverbs (nothing like "strikingly", "remarkably", "decisively"); plain words an undergraduate can follow. The templates below already follow this style — use them verbatim with numbers filled in.
@@ -31,9 +32,10 @@
 
 ## Priority 0 — run the script that already exists (hours; submission-relevant)
 
-### Task 0.1 — MLP-5 selectivity curve + DSR fix
+### Task 0.1 — MLP-5 selectivity curve + DSR fix — **DONE (2026-08-04, commits `fee0d96` + `3afcd53`)**
+Gates matched exactly; verdict `mlp5_sweep_verdict.json`: MLP-5 Sharpe 1.477 at N=14,338 vs transformer 2.18 → the "ranking survives" branch (no abstract change). The four-findings paragraph and five-series caption are in the paper; both variants at 8 pages. Kept below for reference and reruns.
 **Script (already written):** `TP2MVTransformer/67_mlp5_selectivity_and_dsr_fix.py`
-**Why:** the paper's §5.3 currently states, honestly, that the five-seed-MLP vs five-seed-transformer comparison at matched trade count *cannot be adjudicated* because `34_mlp_5seed_ensemble.py` never saved full-population predictions. This task closes that gap. It also repairs `63_market_neutral_dsr_exit.py`'s filename collision (`label[-3] == "("` for both `MLP(1)` and `MLP(5)`, so `dsr_MLP_(.json` holds only MLP(5)).
+**Why:** the paper currently states, honestly (slot marked `TODO-RERUN[67]`), that the five-seed-MLP vs five-seed-transformer comparison at matched trade count *cannot be adjudicated* because `34_mlp_5seed_ensemble.py` never saved full-population predictions. This task closes that gap. It also repairs `63_market_neutral_dsr_exit.py`'s filename collision (`label[-3] == "("` for both `MLP(1)` and `MLP(5)`, so `dsr_MLP_(.json` holds only MLP(5)).
 
 **What it does:** retrains the 5-seed MLP ensemble exactly as script 34 (seeds 42/101/202/303/404, identical `MLPClassifier` hyperparameters, per-fold `StandardScaler`, average raw probs → one isotonic fit), saves `data/mlp_5seed_ensemble_test_predictions.parquet`, appends `MLP (5)` rows to `tables/action_list/selectivity_sweep.csv`, regenerates `AICIF/figures/selectivity_curves.pdf` (now 5 curves), writes `mlp5_sweep_verdict.json` with the matched-N read-off at N≈14,338, and recomputes DSRs with collision-free filenames (`dsr_MLP_1seed_ntrials{21,25}.json`, `dsr_MLP_5seed_ntrials{21,25}.json`).
 
@@ -56,12 +58,14 @@ The F* re-selection control (former Tasks 1.1/1.2) is dropped. Do not run it, an
 
 ## Priority 2 — theory-driven R1/R2/R3 regime partition (new empirics; the big one)
 
+**STATUS (2026-08-05): partially done externally.** A first end-to-end run (full quarterly ex-dividend calendar, FRED DTB3 rate — the panel's parity-rate column is a 0.04 fallback on ~80% of rows, confirming Task 2.1a's prediction) produced pooled and by-year shares, now committed as `tables/action_list/regime_partition_full_by_year.csv` and cited in the paper: R1 59.3% (52.2% no-dividend + 7.1% small-dividend), R2 4.7%, R3 36.0%. **Framing correction that supersedes the template below:** the small-dividend (cond.-ii) share tracks the rate — zero through 2022, 10–19% in 2023–2025 — but overall Europeanization is calendar-driven; do not write "2023–2026 are R1-heavy, tracking the short rate" as a blanket claim. Still open: the per-episode labels artifact (2.2), per-model selected-trade shares/P&L by regime (2.4) — whose numbers exist in the PI report but have no committed artifact yet — plus the sharpened margins (2.3b) and the portfolio bound (2.3c), and committing the classification script itself.
+
 **Why:** the paper's *From European Theory to American Practice* run-in (Props 2.1–2.2) and `tp2_american_theory_note.pdf` define three provable regimes per violation rectangle:
 - **R1 certified-European** — no ex-dividend date in `(t, T2]`, or the small-dividend condition (Prop 2.1(ii)) holds for **all four legs**: `δ_i + Σ_{j>i} δ_j e^{−r(t_j−t_i)} ≤ K(1 − e^{−r(T−t_i)})` at every ex-date `t_i ≤ T`. Here `C_am = C_eu` and the Glasserman–Pirjol theory applies verbatim.
 - **R2 dividend-robust** — not R1, but the conservative-quote violation premium exceeds `M = D̄2·C(K̃2,T1) + D̄1·C(K̃1,T2)` where `D̄i = Σ_{t_j ≤ T_i} δ_j e^{−r t_j}` (Prop 2.2): a European-theory violation even granting the early-exercise premium its maximal effect.
 - **R3 unresolved** — inside the wedge; sign-ambiguous; where ML selection operates.
 
-**The falsifiable prediction (Remark in §2.3):** at SPY's δ/S ≈ 0.3%/quarter, R1 requires roughly `r ≳ 2%` for dividend-spanning maturities ⇒ 2021 should be R3-heavy, 2023–2026 R1-heavy. Verifying this turns a Remark into a figure.
+**The falsifiable prediction (rate-regime discussion in paper §2):** the Europeanization condition is contract-specific; the break-even horizon `T − t_i ≥ −log(1 − δ_i/K)/r` is ≈55 calendar days at r=2% and ≈22 at r=5% for δ/K=0.003, so near-zero-rate 2021 should be R3-heavy and 2023–2026 R1-heavy for dividend-spanning maturities. Do NOT phrase the result as a blanket `r ≳ 2%` rule; report shares by year against the parity rate. Verifying this turns a Remark into a figure.
 
 ### Task 2.1 — reference data (CORRECTED: primary source is IN the panel)
 The daily panel (`spy_options_daily`, see its README) already carries per row: `next_ex_div_date`, `next_div_amount` (Yahoo realized series), and `risk_free_rate` (**parity-implied** per date×expiry: cross-strike OLS of C−P on K gives the discount factor and forward; fallback rows carry exactly `r == 0.04` — filter on equality). The `forward` used by the detector is the parity-implied one, so market dividend expectations are already inside the strike adjustment whenever the fit succeeded.
@@ -82,19 +86,18 @@ Output: `tables/action_list/regime_partition_by_year.json` — per year: counts 
 ### Task 2.3 — the test and the figure
 - Table: year × {R1, R2, R3} shares. Test the prediction: R3-share in 2021 vs 2023–2026 (report shares and a two-sample proportion z, dividend-spanning rectangles only).
 - Figure `AICIF/figures/regime_partition.pdf`: stacked shares by year with the short rate overlaid on a secondary axis. Follow the existing figure style (matplotlib, `figsize=(7.2,3.0)`-family, no seaborn).
-- **Paper edit:** one run-in under *Robustness* — *"Regime partition (Props 2.1–2.2). X% of episodes are certified-European (R1), Y% dividend-robust (R2), Z% unresolved (R3); as predicted by the rate condition, 2021 is R3-heavy (Z₂₀₂₁%) while 2023–2026 are R1-heavy (…), tracking the short rate."* Page budget: adding this + the figure requires an offsetting cut — first candidate is compressing §5.6 "Excluding the partial year" to one clause; second is dropping the regime figure and keeping only the table row inline.
+- **Paper edit: DONE for the shares (2026-08-05)** — pooled shares + the rate-tracking footnote are in §2's post-certificate paragraph (grep `59.3`). The superseded template ("2023–2026 are R1-heavy, tracking the short rate") must not be used: condition (ii) tracks the rate; the no-dividend share is calendar-driven. The regime figure stays out of the 8-page version (its data is the committed CSV); the "Excluding the partial year" compression was already spent as an offset.
 
-### Task 2.3b — sharpened margins M♯ (concentration bounds; theory note §4)
-Alongside `M`, compute the sharpened margin per rectangle:
-`M♯ = π̄(K̃1,T2)·C(K̃2,T1) + π̄(K̃2,T1)·C(K̃1,T2)`, with per-leg
-`π̄(K,T) = Σ_i w_i e^{−r t_i} q_i(K)`, `w_i = δ_i + Σ_{j>i} δ_j e^{−r(t_j−t_i)}`, and
-`q_i(K) = min{1, Doob bound, sub-Gaussian bound}` where:
-- **Doob (model-free, from quotes):** `q ≤ C_obs(λ − Σ_{t_j≤τ}δ_j, τ) / (K_i − λ)` for any listed maturity `τ ≥ t_i` and any `λ < K_i = K + Σ_{t_j<t_i}δ_j`; optimize over `λ` on the strike grid and over the 1–2 nearest listed maturities. Needs detection-date call quotes at lower strikes — same source as Task 2.2's leg quotes.
-- **Sub-Gaussian (from IV proxy):** `q ≤ exp(−log²(K/F_{t_i}) / (2 σ̄² t_i))` for `K ≥ F_{t_i}`, with `σ̄` a conservative IV upper bound (use max over the rectangle's own `feature_{A..D}_implied_volatility`, already in the token dataset). Vershynin (HDP 2nd ed., §2.6) is the framework citation.
-Add columns `margin_M_sharp, q_short_leg` to `episode_regime_labels.parquet`; re-run the R2 classification with `M♯` and report how much the dividend-robust share grows (expected: order-of-magnitude margin reduction for deep-OTM short-dated rectangles — the violation locus). Artifact: extend `regime_partition_by_year.json` with `share_R2_sharp`.
+### Task 2.3b — sharpened margins M^quote and M^model (theory note, Corollary "Two sharpened margins")
+Alongside `M`, compute TWO sharpened margins per rectangle, both of the form
+`M♯ = π̄(K̃1,T2)·C^bid(K̃2,T1) + π̄(K̃2,T1)·C^bid(K̃1,T2)`, with per-leg
+`π̄(K,T) = Σ_i w_i e^{−r t_i} q_i(K)`, `w_i = δ_i + Σ_{j>i} δ_j e^{−r(t_j−t_i)}`, differing only in `q_i`:
+- **M^quote (rigorous; primary):** `q_i = min{1, Doob bound}`. Doob, from ask quotes and martingality alone: `q ≤ C^ask(λ′, τ) / (K_i − λ)` for a listed maturity `τ ≥ t_i` and any `λ` with `Σ_{t_j≤τ} δ_j < λ < K_i = K + Σ_{t_j<t_i} δ_j`, shifted strike `λ′ = λ − Σ_{t_j≤τ} δ_j > 0`; if `λ′` is not listed, round the strike DOWN (conservative). Optimize over `λ` on the strike grid and the 1–2 nearest listed maturities. The `r>0` form is in the note's appendix ("The Positive-Rate Doob Bound"). Needs detection-date call quotes at lower strikes — same source as Task 2.2's leg quotes.
+- **M^model (diagnostic; model-dependent):** `q_i = min{1, Doob, Chernoff}` with `q ≤ exp(−log²(K/F_{t_i}) / (2 σ̄² t_i))` for `K ≥ F_{t_i}`, `t_i` in CALENDAR YEARS (never a 252-day convention). Valid only under an explicit sub-Gaussian assumption on the log-forward return with variance proxy `σ̄²t`; taking `σ̄` as the max over the rectangle's own `feature_{A..D}_implied_volatility` is a modeling approximation, not a consequence of quotes. Vershynin (HDP 2nd ed., §2.6) is the framework citation. Reference magnitudes: q ≈ 0.015 at 12%-OTM/14d/σ̄=20%; q ≈ 0.70 at 5%-OTM/30d.
+Classification rule: the primary R2 label uses `M^quote` only. A violation exceeding `M^model` but not `M^quote` is labeled model-assisted/diagnostic in every artifact and sentence — never "certified." Add columns `margin_M_quote, margin_M_model, q_short_leg` to `episode_regime_labels.parquet`; re-run the R2 classification under each margin and report the share growth (expected: order-of-magnitude margin reduction for deep-OTM short-dated rectangles — the violation locus). Artifact: extend `regime_partition_by_year.json` with `share_R2_quote, share_R2_model`.
 
-### Task 2.3c — portfolio-level Europeanization check (theory note §4.5)
-For each ex-dividend date in 2021–2026 and each model's live book at that date, compute `K_min` = minimum short-leg strike among open positions and the bound `q(K_min)` from 2.3b. Report the time series `P(any early assignment optimal at t_D) ≤ q(K_min)` and its max/mean per model. This quantifies, with high probability, that the realized book coincided with its Europeanized counterpart — one number per ex-date, no union-bound inflation (all legs share the SPY driver). Artifact: `portfolio_europeanization_bounds.json`.
+### Task 2.3c — portfolio-level common-driver bound (theory note, "Common-driver bound")
+For each ex-dividend date in 2021–2026 and each model's live book at that date, compute `K_min` = minimum short-leg strike among open positions and the quote-version bound `q(K_min)` from 2.3b. This bounds `P(any position is inside its rational exercise region at t_D)` — one number per ex-date, no union-bound inflation (all legs share the SPY driver). Two caveats bind the wording: on the complement, American and European cash flows coincide only THROUGH that date (future early-exercise optionality may remain), and the bound addresses rational exercise, not operational assignment. Report the time series and its max/mean per model. Artifact: `portfolio_europeanization_bounds.json`.
 
 ### Task 2.4 (optional) — selector performance by regime
 Join `episode_regime_labels.parquet` to each primary model's selected trades; report Sharpe/PnL within R1/R2/R3. Artifact: `regime_stratified_performance.json`. Interesting either way: theory says R1 violations are "true" anomalies; if the models' edge concentrates in R3, that says selection is pricing the American wedge itself.
@@ -104,7 +107,7 @@ Join `episode_regime_labels.parquet` to each primary model's selected trades; re
 ## Priority 3 — smaller reconciliations (camera-ready polish)
 
 - **3.1 LightGBM N mismatch.** Sweep@0.5 gives 18,665; the selected-trades file has 19,636. Diagnose: count episodes where *both* T1 and K2 crossed 0.5 in `lgbm_final_test_predictions.parquet` (per-strategy classifiers ⇒ likely dual-selection). Artifact: `lgbm_selection_reconciliation.json`. Paper: one clause in Fig. 4's caption if the explanation differs from "one-action-per-episode convention."
-- **3.2 Platt-vs-isotonic attribution.** `calibration_platt_vs_isotonic.json` has `total_n = 20,125`, matching no Table 2 row. Identify the config inside `65_calibration_robustness.py` and record it in the artifact JSON. Do not add calibrator-sensitivity discussion to the paper; it was removed by PI decision.
+- **3.2 Platt-vs-isotonic attribution — RESOLVED (2026-08-04 review).** The `total_n = 20,125` config is a per-fold recalibration of LightGBM. Record the attribution in the artifact JSON; the calibrator-sensitivity sentence no longer exists in the paper and must not return.
 - **3.3 Exit-policy paired check.** For the 171 selected trades with a defined true-reversion exit (`exit_policy_comparison.json`), compute the *paired* expiry-vs-reversion PnL on the same trades. Update the labels run-in (grep `171`) only if the paired result is material; n=171 stays labeled a small-sample check.
 - **3.4 Beta vs delta reconciliation (upgraded: fully feasible).** The *Market exposure* run-in flags the open tension: trade-level β=+7.2 (MLP-5) vs 75–82% net-short entry delta. Per-leg entry deltas ARE in the token dataset (`feature_{A..D}_delta`, BS spot delta with dividend yield). Compute each trade's net entry delta from its traded legs, regress trade return on (underlying move × net delta) and on raw move; if short-gamma path-dependence explains the positive β, one sentence resolves a disclosed limitation.
 
@@ -133,7 +136,7 @@ open('tp2_spy_call_acm_draft_v4_1.tex','w').write(src.replace(anon, named))
 
 (The two blocks are verbatim in the current files — extract them once into the two txt files above, or inline them.)
 
-**Do not:** exceed 8 pages; renumber Propositions 2.1/2.2 or Equations (1)–(3) (cross-referenced in §2.3, §3.2, §5.1); put author names or Stony Brook anywhere in the anonymous variant; edit committed artifacts under `tables/action_list/` (write new files); reformat unrelated tex; claim any number that has no artifact.
+**Do not:** exceed 8 pages; renumber Propositions 2.1/2.2 or Equations (1)–(3) (cross-referenced throughout); put author names or Stony Brook anywhere in the anonymous variant; edit committed artifacts under `tables/action_list/` (write new files); reformat unrelated tex; claim any number that has no artifact.
 
 **Git note for agents running inside Cowork cloud sessions:** the mounted repo cannot delete files, so git leaves stale `*.lock` files under `.git/`. Before committing: `find .git -maxdepth 2 -name "*.lock"` and `mv` them into `_to_delete/`; after your commit, tell the human to run `rm -f .git/*.lock && rm -rf _to_delete && git push`. Local (non-Cowork) agents are unaffected.
 

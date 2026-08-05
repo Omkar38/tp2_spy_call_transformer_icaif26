@@ -1,0 +1,49 @@
+rank,block,feature,gain,permutation,stability,definition
+1,short_d_leg,feature_D_theta,0.042,0.024,1.0,Theta (one-day time decay) of the short leg D.
+2,market,feature_F_T1,0.032,0.01,1.0,Parity-implied forward price of SPY for near maturity T1 (from put-call parity per date/expiry).
+3,market,strategy_selected_mid_sum,0.054,0.127,0.917,Sum of the two traded legs' mid prices (the trade's gross notional).
+4,liquidity,feature_bidask_executable_ratio,0.031,0.105,0.917,Executable-quote ratio (C_bid*D_bid)/(A_ask*B_ask): overvalued product at bid over undervalued product at ask; >1 means the violation still holds at tradable quotes.
+5,short_d_leg,feature_D_ask,0.058,0.032,0.917,Ask price of the short leg D.
+6,short_d_leg,feature_D_vega,0.046,0.023,0.917,Vega (price change per 1 vol point) of the short leg D.
+7,strategy_calendar,signal_month,0.039,0.013,0.917,Calendar month (1-12) of the signal date (a causal dividend-seasonality proxy).
+8,surface_location,feature_T1_DTE,0.028,0.016,0.917,Calendar days to expiry of the near maturity T1.
+9,market,feature_F_T2,0.022,0.011,0.917,Parity-implied forward price of SPY for far maturity T2.
+10,tp2_geometry,feature_severity,0.122,0.091,0.833,TP2 violation magnitude at mid prices: (C_mid*D_mid) - (A_mid*B_mid) = overvalued product minus undervalued product (units: USD squared).
+11,short_d_leg,feature_D_delta,0.026,0.028,0.833,Delta (~ prob. of finishing in-the-money) of the short leg D.
+12,option_risk,feature_iv_slope_T2,0.016,0.026,0.833,Volatility skew at the far maturity: B_IV - C_IV.
+13,market,feature_B_implied_volatility,0.009,0.003,0.833,"Implied volatility of leg B (higher-strike far-dated call C(K2,T2), bought)."
+14,liquidity,strategy_selected_mean_spread_pct,0.037,0.061,0.75,Mean bid-ask spread (as % of mid) across the traded legs.
+15,surface_location,feature_B_strike,0.013,0.021,0.75,Strike of leg B (K2).
+16,option_risk,feature_A_theta,0.009,0.034,0.667,Theta of leg A.
+17,surface_location,feature_term_gap,0.017,0.007,0.667,"Maturity gap in days, T2 - T1."
+18,surface_location,feature_strike_gap,0.007,0.013,0.667,"Strike gap, K2 - K1 (USD)."
+19,option_risk,feature_B_theta,0.008,0.008,0.667,Theta of leg B.
+20,short_d_leg,feature_D_implied_volatility,0.008,0.001,0.583,Implied volatility of the short leg D.
+21,short_d_leg,feature_D_mid,0.039,0.017,0.5,Mid price of the short leg D.
+22,market,feature_A_implied_volatility,0.027,0.013,0.5,"Implied volatility of leg A (lower-strike near-dated call C(K1,T1), bought)."
+23,surface_location,feature_T2_DTE,0.012,0.005,0.5,Calendar days to expiry of the far maturity T2.
+24,short_d_leg,feature_D_bid,0.01,0.019,0.5,Bid price of the short leg D (the execution price when shorting it).
+25,surface_location,feature_A_strike,0.01,0.003,0.5,Strike of leg A (K1).
+26,option_risk,feature_A_vega,0.007,0.009,0.5,Vega of leg A.
+27,option_risk,feature_iv_term_K2,0.006,0.004,0.5,IV term-structure at the high strike: B_IV - D_IV (far minus near maturity).
+28,option_risk,feature_avg_iv,0.006,0.007,0.5,Average implied volatility across the four legs (rectangle-level IV level).
+29,market,feature_underlying_price,0.014,0.008,0.417,SPY underlying close on the signal date.
+30,market,feature_K2_forward_adjusted,0.008,0.004,0.417,Forward-aligned strike K~2 = K2 * F_T1/F_T2 (rounded to a listed strike).
+31,market,feature_C_implied_volatility,0.006,0.007,0.417,"Implied volatility of leg C (adjusted-lower-strike far-dated call C(K~1,T2), sold)."
+32,option_risk,feature_B_vega,0.006,0.007,0.417,Vega of leg B.
+33,market,feature_B_ask,0.004,0.006,0.417,Ask (offer) price of leg B.
+34,market,feature_A_bid,0.009,0.012,0.333,Bid price of leg A.
+35,short_d_leg,feature_D_bid_size,0.004,0.007,0.333,Contracts quoted at the short leg's bid (NBBO size).
+36,short_d_leg,feature_D_strike,0.007,0.001,0.333,"Strike of the short leg D (the adjusted strike K~2, rounded)."
+37,option_risk,feature_B_delta,0.006,0.005,0.333,Delta of leg B.
+38,liquidity,feature_B_spread_pct,0.004,0.006,0.333,Bid-ask spread of leg B as a percent of its mid.
+39,option_risk,feature_A_delta,0.013,0.009,0.25,Delta of leg A.
+40,liquidity,feature_B_spread,0.004,0.014,0.25,Absolute bid-ask spread of leg B (USD).
+41,market,feature_K1_forward_adjusted,0.005,0.011,0.25,Forward-aligned strike K~1 = K1 * F_T2/F_T1 (rounded to a listed strike).
+42,tp2_geometry,feature_normalized_severity,0.005,0.006,0.25,"Scale-free violation size at mid: severity / (rhs + lhs), in [0,1]."
+43,lifecycle_pressure,lc_pressure_max_le0,0.002,0.015,0.25,Maximum normalized TP2 'pressure' (normalized severity) over the pre-/at-signal window (event day <= 0).
+44,market,feature_A_ask_size,0.006,0.004,0.25,Number of contracts quoted at leg A's ask (NBBO size).
+45,liquidity,feature_D_open_interest,0.005,0.002,0.25,Open interest of the short leg D.
+46,short_d_leg,feature_D_ask_size,0.004,0.002,0.25,Contracts quoted at the short leg's ask.
+47,tp2_geometry,feature_rhs,0.012,0.002,0.167,"Overvalued product at mid: C_mid*D_mid = C(K~1,T2)*C(K~2,T1)."
+48,option_risk,feature_iv_slope_T1,0.006,0.006,0.167,Volatility skew at the near maturity: D_IV - A_IV.
