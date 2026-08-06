@@ -51,7 +51,29 @@ Gates matched exactly; verdict `mlp5_sweep_verdict.json`: MLP-5 Sharpe 1.477 at 
 4. **Artifacts:** `tables/action_list/two_rule_comparison.json` (per model × rule: N, PnL, sharpe, downside ratio, win rate, mean_ret_pct, skew, pos_years) and `tables/action_list/fiveseed_breakdowns.json`. Same commit as the tex edit.
 5. **Tex edits (both variants; ≤8 pages; zero undefined):** fill the `TODO-RERUN[two-rule]` slot in the evaluation paragraph using the template in that comment; add two columns (Sharpe@14K, P&L@14K) to Table 2, or a compact second table if the columns overflow the column width; rewrite the two robustness run-ins and the calibration-table MLP row from `fiveseed_breakdowns.json`, keeping the existing sentence structure; delete the fulfilled comment markers.
 
-**Voice rule binds:** report both rules as two prespecified evaluations, with no commentary about thresholds, operating points, or ranking reversals. See ground rules 8b–8d.
+**Voice rule binds:** report both rules as two prespecified evaluations, with no commentary about thresholds, operating points, or ranking reversals. See ground rules 8b–8d. **NOTE (review 2026-08-06): the common top-N columns are downgraded to P2 — include only if replacing weaker material. Steps 1 and 3 remain live and are absorbed into Task 0.4 below.**
+
+### Task 0.4 — Review-2 reruns and verifications (2026-08-06; current P0/P1 queue)
+**Binding terminology for ALL new text** (the paper was revised to match; never reintroduce old terms): "strong violation" or "quote-side violation" (never "executable violation"); the four categories are *no-distribution European-equivalent / dividend-spanning European-equivalent / dividend-bound robust / unresolved* (never "certified-European" outside the fixed abstract); "equal-weight premium-budget accounting experiment" with "normalized cash-balance growth" outputs (never "cash-budgeted", "the SPX convention", or "CAGR"); "positive test periods" (never "positive years"); "pre-specified chronological $p\ge0.5$ rule" (never "causal"); "feature set" (never "feature dictionary"); "logistic benchmark" (never "linear floor").
+
+**P0 — mandatory:**
+- **0.4a [rev2-P0.8] One-action rule for every model.** Re-select LightGBM under one action per episode (higher calibrated probability, ties toward T1); verify every family follows it; regenerate Table 2 in full (counts, P&L, Sharpe, win, mean return, skew, positive periods), the classification table, and every denomination breakdown in prose; then delete the caveat sentence at the `rev2-P0.8` marker. Subsumes old Task 3.1.
+- **0.4b [rev2-P0.9] Selected-tail calibration.** Per model: mean calibrated probability among selected trades and selected win rate → two new columns in the classification table (ECE may be dropped for width). Resolve the MLP inconsistency (selected win rate 33% under calibrated $p\ge0.5$); if mean selected $p>0.5$, state the temporal calibration failure in one sentence at the marker.
+
+**P1 — highest-value additions:**
+- **0.4c [rev2-P1.1] Source-compatible unconditional decomposition.** T1 and K2 rows under four implementations: midpoint daily pairs; strong daily pairs; strong + commissions; final episode sample. Use the paper's payoff formulas $\Pi^{T_1},\Pi^{K_2}$ and gross-exposure normalization in every row; report only rows that exist. Compact panel at the `rev2-P1.1` marker.
+- **0.4d [rev2-P1.2 = brief-16] No-ex-dividend-short result.** Per model, P&L after excluding selected trades whose short leg spans an ex-date; one column or one sentence at the brief-16 marker.
+- **0.4e [rev2-P1.3 = brief-15] Performance by theoretical category.** Unconditional label rate and mean return by the four categories; selected P&L by category for the primary model. Two sentences at the brief-15 marker. If categories do not differ economically, say so.
+- **0.4f [rev2-P1.4 = brief-14] Forward overlap/sign check.** Template: "Replacing the parity-implied forward with a spot/rate/dividend construction retains x% of episodes and leaves the signs of the principal P&L results unchanged."
+- **0.4g [rev2-P3] Negative periods.** From `fiveseed_breakdowns.json`, one sentence naming each model's negative test periods.
+
+**VERIFY — code reading, no retraining; escalate mismatches to the PI before anything else:**
+- **0.4h [rev2-G]** Exact price convention in the gross exposure $G$ (executed bid/ask vs mid) → one clause at the marker.
+- **0.4i [rev2-chronology]** F* selection timing: single pre-test pass or fold-specific → fix the sentence at the marker if needed.
+- **0.4j [review 2.5]** Audit the label code's payoffs against the paper's $\Pi^{T_1},\Pi^{K_2}$ displays (weights = entry prices of the two non-traded contracts). A mismatch is a stop-everything finding.
+- **0.4k** Confirm the filter sentence in Source/Scope against the ingest code; extend with actual conditions if more filters exist.
+
+**Figure plan after review-2:** ONE principal figure — the cumulative-P&L equity curves (Task 0.3a). The pipeline figure is deleted; the regime figure is suspended from the paper (data in text; PDF stays committed for talks).
 
 ### Task 0.3 — figure pack: cumulative P&L curves (inference-only; fills the freed space)
 **Goal:** one two-panel, single-column figure for the Results section. Panel (a): cumulative daily P&L, 2021–2026, under the \$1,000 flat-notional convention — Unconditional, LightGBM, MLP (5-seed), Transformer (plain, 5-seed), Logistic. Panel (b): cash-budgeted equity (\$1M start, 1%/day premium cap) — LightGBM, MLP, Transformer. One y-axis per panel, stacked panels sharing the x-axis; NEVER a dual-axis plot.
