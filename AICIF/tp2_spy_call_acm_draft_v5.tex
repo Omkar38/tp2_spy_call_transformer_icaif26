@@ -200,7 +200,7 @@ On the undervalued pair, $C^{\mathrm{eu}}\le C^{\mathrm{am},*}\le C^{\mathrm{ask
 \end{proof}
 \noindent $M$ has the units of the price products; its economic size is best reported after normalization (for example $M/S_0^2$, or $M$ relative to the overvalued product), with each dividend term $\bar D_i$ of order $0.3$--$0.6\%$ of the underlying price and $\bar D_1=0$ when no ex-date precedes the near expiry. It can be computed per trade from announced dividends.
 
-Each detected rectangle then falls into one of four categories: \emph{no-distribution European-equivalent} (no ex-date before $T_2$), \emph{dividend-spanning European-equivalent} (Proposition~\ref{prop:euro}(ii)), \emph{dividend-bound robust} (Proposition~\ref{prop:cert} among the remaining observations), and \emph{unresolved}. Because early-exercise premia enter both products, their nonnegativity alone does not determine the sign of the American-versus-European change; this is why the last category exists. Computed over all 177{,}487 episodes from announced dividends and the FRED three-month rate, 52.2\% span no distribution before $T_2$, 7.1\% satisfy the zero-premium dividend condition, 4.7\% satisfy the dividend-bound certificate, and 36.0\% remain unresolved.\footnote{The dividend-spanning European-equivalent share is zero through 2022 and 10--19\% in 2023--2025, tracking the short rate; the no-distribution share is calendar-driven. Per-year shares and the per-model classification of selected trades by category are part of the released implementation.} Over the 2021--2026 test span (125{,}002 episodes), the corresponding shares are 61.0\%, 10.0\%, 0.7\%, and 28.2\%, so 71.0\% of test-period episodes are European-equivalent under Proposition~\ref{prop:euro}. The learned selectors operate across all four categories. A full American-TP2 theorem, for example via supermodularity of the optimal-stopping value in $(\log K,T)$~\cite{topkis1998}, remains open.
+Each detected rectangle then falls into one of four categories: \emph{no-distribution European-equivalent} (no ex-date before $T_2$), \emph{dividend-spanning European-equivalent} (Proposition~\ref{prop:euro}(ii)), \emph{dividend-bound robust} (Proposition~\ref{prop:cert} among the remaining observations), and \emph{unresolved}. Because early-exercise premia enter both products, their nonnegativity alone does not determine the sign of the American-versus-European change; this is why the last category exists. Computed over all 177{,}487 episodes from announced dividends and the FRED three-month rate, 52.2\% span no distribution before $T_2$, 7.1\% satisfy the zero-premium dividend condition, 4.7\% satisfy the dividend-bound certificate, and 36.0\% remain unresolved.\footnote{The dividend-spanning European-equivalent share is zero through 2022 and 10--19\% in 2023--2025, tracking the short rate; the no-distribution share is calendar-driven. Per-year shares and the per-model classification of selected trades by category are part of the released implementation.} Over the 2021--2026 test span (125{,}002 episodes), the corresponding shares are 61.0\%, 10.0\%, 0.7\%, and 28.2\%, so 71.0\% of test-period episodes are European-equivalent under Proposition~\ref{prop:euro}. The learned selectors operate across all four categories. A full American-TP2 theorem remains open; one candidate route is to establish supermodularity of the optimal-stopping value in $(\log K,T)$ within the general lattice-theoretic framework of~\cite{topkis1998}.
 
 The analysis is restricted to calls because the early-exercise mechanism is different for American puts. For calls, exercise pressure is tied to discrete distributions, which permits the dividend-based bounds above. For puts, the benefit from early exercise includes interest on the strike and can arise away from ex-dividend dates, so the reductions used here do not extend directly to American puts. This restriction concerns the American analysis in this paper; the European theory develops the corresponding RR2 property for puts, and the SPX study analyzes RR2 violations empirically~\cite{glasserman2026tp2theory,glasserman2025tp2}.
 %% FIGURE-SLOT[regime] — SUSPENDED by review 2026-08-06 (one principal figure:
@@ -212,7 +212,7 @@ The analysis is restricted to calls because the early-exercise mechanism is diff
 %% an artifact, replacing the footnote's deferral clause.
 
 \medskip\noindent\textbf{Related Machine-Learning Work.}
-ML for options spans surface fitting, hedging, pricing, execution-aware trading~\cite{kearns2013mlmicrostructure}, and cross-sectional option-return prediction~\cite{bali2023option}; we pose the narrower problem of trade/no-trade classification conditional on a detected violation, scored by realized cost-aware performance. Boosting, deep, and linear models are all effective on 48 engineered features, with complementary strengths, consistent with systematic tabular-data evidence~\cite{grinsztajn2022why,gorishniy2021revisiting}. The transformer tests a multivariate ALiBi generalization~\cite{press2022alibi,shaw2018self} with five learned per-head distance slopes (Section~\ref{sec:transformer}). On evaluation, seed/budget sensitivity of ML comparisons~\cite{melis2018state,lucic2018gans,agarwal2021deep,bouthillier2021accounting,dodge2019show} and backtest multiple testing~\cite{white2000reality,harvey2016crosssection,bailey2014deflated} are established; we therefore fix the selection rules in advance and report seed-averaged ensembles.
+ML for options spans surface fitting, hedging, pricing, and cross-sectional option-return prediction~\cite{bali2023option}, with an adjacent literature on ML for execution and market microstructure~\cite{kearns2013mlmicrostructure}; we pose the narrower problem of trade/no-trade classification conditional on a detected violation, scored by realized cost-aware performance. Boosting, deep, and linear models are all effective on 48 engineered features, with complementary strengths, in line with systematic tree-versus-neural comparisons on tabular data~\cite{grinsztajn2022why,gorishniy2021revisiting}. The transformer tests a multivariate ALiBi generalization~\cite{press2022alibi,shaw2018self} with five learned per-head distance slopes (Section~\ref{sec:transformer}). On evaluation, seed/budget sensitivity of ML comparisons~\cite{melis2018state,lucic2018gans,agarwal2021deep,bouthillier2021accounting,dodge2019show} and backtest multiple testing~\cite{white2000reality,harvey2016crosssection,bailey2014deflated} are established; we therefore fix the selection rules in advance and report seed-averaged ensembles.
 
 \section{Data and Episode Construction}
 \label{sec:data}
@@ -460,70 +460,70 @@ Paul Glasserman, Mike Li, and Dan Pirjol. 2025. Trading TP\textsubscript{2} Opti
 Ofir Press, Noah A. Smith, and Mike Lewis. 2022. Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation. In \textit{International Conference on Learning Representations (ICLR)}.
 
 \bibitem{glasserman2026tp2theory}
-Paul Glasserman and Dan Pirjol. 2026. When Are Option Prices TP\textsubscript{2}? \textit{Mathematical Finance} 36, 3 (2026). \url{https://doi.org/10.1111/mafi.70024}
+Paul Glasserman and Dan Pirjol. 2026. When Are Option Prices TP\textsubscript{2}? \textit{Mathematical Finance} 36, 3 (2026), 571--594. \url{https://doi.org/10.1111/mafi.70024}
 
 \bibitem{glasserman2023convexity}
-Paul Glasserman and Dan Pirjol. 2023. Total Positivity and Relative Convexity of Option Prices. \textit{Frontiers of Mathematical Finance} 2, 1 (2023), 1--32.
+Paul Glasserman and Dan Pirjol. 2023. Total Positivity and Relative Convexity of Option Prices. \textit{Frontiers of Mathematical Finance} 2, 1 (2023), 1--32. \url{https://doi.org/10.3934/fmf.2023001}
 
 \bibitem{merton1973}
-Robert C. Merton. 1973. Theory of Rational Option Pricing. \textit{Bell Journal of Economics and Management Science} 4, 1 (1973), 141--183.
+Robert C. Merton. 1973. Theory of Rational Option Pricing. \textit{Bell Journal of Economics and Management Science} 4, 1 (1973), 141--183. \url{https://doi.org/10.2307/3003143}
 
 \bibitem{black1975}
-Fischer Black. 1975. Fact and Fantasy in the Use of Options. \textit{Financial Analysts Journal} 31, 4 (1975), 36--41, 61--72.
+Fischer Black. 1975. Fact and Fantasy in the Use of Options. \textit{Financial Analysts Journal} 31, 4 (1975), 36--41, 61--72. \url{https://doi.org/10.2469/faj.v31.n4.36}
 
 \bibitem{topkis1998}
 Donald M. Topkis. 1998. \textit{Supermodularity and Complementarity}. Princeton University Press.
 
 \bibitem{ke2017lightgbm}
-Guolin Ke et al. 2017. LightGBM: A Highly Efficient Gradient Boosting Decision Tree. In \textit{NeurIPS 30}.
+Guolin Ke et al. 2017. LightGBM: A Highly Efficient Gradient Boosting Decision Tree. In \textit{NeurIPS 30}, 3146--3154.
 
 \bibitem{zadrozny2002transforming}
-Bianca Zadrozny and Charles Elkan. 2002. Transforming Classifier Scores into Accurate Multiclass Probability Estimates. In \textit{KDD}.
+Bianca Zadrozny and Charles Elkan. 2002. Transforming Classifier Scores into Accurate Multiclass Probability Estimates. In \textit{KDD}, 694--699. \url{https://doi.org/10.1145/775047.775151}
 
 \bibitem{cosma2020earlyexercise}
-Antonio Cosma et al. 2020. Early Exercise Decision in American Options with Dividends, Stochastic Volatility, and Jumps. \textit{J.\ Financial and Quantitative Analysis} 55, 1 (2020), 331--356.
+Antonio Cosma et al. 2020. Early Exercise Decision in American Options with Dividends, Stochastic Volatility, and Jumps. \textit{J.\ Financial and Quantitative Analysis} 55, 1 (2020), 331--356. \url{https://doi.org/10.1017/S0022109018001229}
 
 \bibitem{kearns2013mlmicrostructure}
 Michael Kearns and Yuriy Nevmyvaka. 2013. Machine Learning for Market Microstructure and High Frequency Trading. In \textit{High-Frequency Trading}. Risk Books.
 
 \bibitem{kunsch1989}
-Hans R. K\"unsch. 1989. The Jackknife and the Bootstrap for General Stationary Observations. \textit{Annals of Statistics} 17, 3 (1989), 1217--1241.
+Hans R. K\"unsch. 1989. The Jackknife and the Bootstrap for General Stationary Observations. \textit{Annals of Statistics} 17, 3 (1989), 1217--1241. \url{https://doi.org/10.1214/aos/1176347265}
 
 \bibitem{bailey2014deflated}
-David H. Bailey and Marcos L\'opez de Prado. 2014. The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality. \textit{Journal of Portfolio Management} 40, 5 (2014), 94--107.
+David H. Bailey and Marcos L\'opez de Prado. 2014. The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality. \textit{Journal of Portfolio Management} 40, 5 (2014), 94--107. \url{https://doi.org/10.3905/jpm.2014.40.5.094}
 
 \bibitem{harvey2016crosssection}
-Campbell R. Harvey, Yan Liu, and Heqing Zhu. 2016. $\ldots$ and the Cross-Section of Expected Returns. \textit{Rev.\ Financial Studies} 29, 1 (2016), 5--68.
+Campbell R. Harvey, Yan Liu, and Heqing Zhu. 2016. $\ldots$ and the Cross-Section of Expected Returns. \textit{Rev.\ Financial Studies} 29, 1 (2016), 5--68. \url{https://doi.org/10.1093/rfs/hhv059}
 
 \bibitem{white2000reality}
-Halbert White. 2000. A Reality Check for Data Snooping. \textit{Econometrica} 68, 5 (2000), 1097--1126.
+Halbert White. 2000. A Reality Check for Data Snooping. \textit{Econometrica} 68, 5 (2000), 1097--1126. \url{https://doi.org/10.1111/1468-0262.00152}
 
 \bibitem{bouthillier2021accounting}
 Xavier Bouthillier et al. 2021. Accounting for Variance in Machine Learning Benchmarks. In \textit{MLSys} 3.
 
 \bibitem{dodge2019show}
-Jesse Dodge et al. 2019. Show Your Work: Improved Reporting of Experimental Results. In \textit{EMNLP-IJCNLP}.
+Jesse Dodge et al. 2019. Show Your Work: Improved Reporting of Experimental Results. In \textit{EMNLP-IJCNLP}, 2185--2194. \url{https://doi.org/10.18653/v1/D19-1224}
 
 \bibitem{melis2018state}
 G\'abor Melis, Chris Dyer, and Phil Blunsom. 2018. On the State of the Art of Evaluation in Neural Language Models. In \textit{International Conference on Learning Representations (ICLR)}.
 
 \bibitem{lucic2018gans}
-Mario Lucic et al. 2018. Are GANs Created Equal? A Large-Scale Study. In \textit{NeurIPS 31}.
+Mario Lucic et al. 2018. Are GANs Created Equal? A Large-Scale Study. In \textit{NeurIPS 31}, 698--707.
 
 \bibitem{agarwal2021deep}
-Rishabh Agarwal et al. 2021. Deep Reinforcement Learning at the Edge of the Statistical Precipice. In \textit{NeurIPS 34}.
+Rishabh Agarwal et al. 2021. Deep Reinforcement Learning at the Edge of the Statistical Precipice. In \textit{NeurIPS 34}, 29304--29320.
 
 \bibitem{grinsztajn2022why}
-L\'eo Grinsztajn, Edouard Oyallon, and Ga\"el Varoquaux. 2022. Why Do Tree-Based Models Still Outperform Deep Learning on Typical Tabular Data? In \textit{NeurIPS 35 D\&B}.
+L\'eo Grinsztajn, Edouard Oyallon, and Ga\"el Varoquaux. 2022. Why Do Tree-Based Models Still Outperform Deep Learning on Typical Tabular Data? In \textit{NeurIPS 35 D\&B}. \url{https://doi.org/10.52202/068431-0037}
 
 \bibitem{gorishniy2021revisiting}
-Yury Gorishniy et al. 2021. Revisiting Deep Learning Models for Tabular Data. In \textit{NeurIPS 34}.
+Yury Gorishniy et al. 2021. Revisiting Deep Learning Models for Tabular Data. In \textit{NeurIPS 34}, 18932--18943.
 
 \bibitem{shaw2018self}
-Peter Shaw, Jakob Uszkoreit, and Ashish Vaswani. 2018. Self-Attention with Relative Position Representations. In \textit{NAACL-HLT}.
+Peter Shaw, Jakob Uszkoreit, and Ashish Vaswani. 2018. Self-Attention with Relative Position Representations. In \textit{NAACL-HLT}, 464--468. \url{https://doi.org/10.18653/v1/N18-2074}
 
 \bibitem{bali2023option}
-Turan G. Bali et al. 2023. Option Return Predictability with Machine Learning and Big Data. \textit{Rev.\ Financial Studies} 36, 9 (2023), 3548--3602.
+Turan G. Bali et al. 2023. Option Return Predictability with Machine Learning and Big Data. \textit{Rev.\ Financial Studies} 36, 9 (2023), 3548--3602. \url{https://doi.org/10.1093/rfs/hhad017}
 
 \end{thebibliography}
 \endgroup
