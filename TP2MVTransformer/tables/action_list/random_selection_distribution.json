@@ -1,0 +1,61 @@
+{
+  "n_draws": 1000,
+  "seed": 12345,
+  "matched_N": 14258,
+  "model_pnl": {
+    "LightGBM(old149)": 682411.4099733703,
+    "MLP-5(new)": 3472384.271579243,
+    "Transformer-plain-5(new)": 839760.4330360598
+  },
+  "levels": {
+    "L1_count_only": {
+      "pnl_mean": -708176.3662179266,
+      "pnl_median": -714686.7554724258,
+      "pnl_p5": -943485.373249415,
+      "pnl_p95": -454865.0550870475,
+      "sharpe_mean": -0.9561201558984066,
+      "sharpe_p5": -1.4108504190018167,
+      "sharpe_p95": -0.5343853729274747,
+      "p_random_ge_zero": 0.0,
+      "p_random_ge_model": {
+        "LightGBM(old149)": 0.0,
+        "MLP-5(new)": 0.0,
+        "Transformer-plain-5(new)": 0.0
+      },
+      "gate_30draw_mean_pnl": -720346.4829259424
+    },
+    "L2_year_denom": {
+      "pnl_mean": 81697.56822937304,
+      "pnl_median": 74622.69591938768,
+      "pnl_p5": -179159.34836948503,
+      "pnl_p95": 366100.9760550242,
+      "sharpe_mean": 0.053935595004226754,
+      "sharpe_p5": -0.15348039134250488,
+      "sharpe_p95": 0.24984195552213023,
+      "p_random_ge_zero": 0.695,
+      "p_random_ge_model": {
+        "LightGBM(old149)": 0.0,
+        "MLP-5(new)": 0.0,
+        "Transformer-plain-5(new)": 0.0
+      },
+      "gate_30draw_mean_pnl": -11213.578477057295
+    },
+    "L3_perday_full": {
+      "pnl_mean": 720428.8201208393,
+      "pnl_median": 718624.1960175305,
+      "pnl_p5": 590690.4591384868,
+      "pnl_p95": 858499.3798998463,
+      "sharpe_mean": 0.8647734533477865,
+      "sharpe_p5": 0.7593088618023078,
+      "sharpe_p95": 0.9736723238031437,
+      "p_random_ge_zero": 1.0,
+      "p_random_ge_model": {
+        "LightGBM(old149)": 0.673,
+        "MLP-5(new)": 0.0,
+        "Transformer-plain-5(new)": 0.078
+      },
+      "gate_30draw_mean_pnl": 684708.1995096193
+    }
+  },
+  "note": "L1 reproduces the paper's matched-count Random@N (~-$0.77M, sign/magnitude soft gate). L2 adds year+denomination matching. L3 adds per-day count (full brief-23 spec) -- the hardest baseline, isolating within-day trade selection. FINDING: L3 random beats LightGBM/transformer-plain a large fraction of the time (their edge is day-selection); MLP-5 survives L3. Flag for PI before any paper claim."
+}

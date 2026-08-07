@@ -1,0 +1,43 @@
+{
+  "models": {
+    "LightGBM": {
+      "fractional": {
+        "ending_capital": 2088678.6927930478,
+        "cagr": 0.14576661426240678,
+        "max_drawdown": -0.06314252902029405
+      },
+      "integer": {
+        "ending_capital": 1757461.009397215,
+        "cagr": 0.10979442780778204,
+        "max_drawdown": -0.7115831313083942
+      }
+    },
+    "MLP": {
+      "fractional": {
+        "ending_capital": 2365819.2527800887,
+        "cagr": 0.1724462763029604,
+        "max_drawdown": -0.05193083201047244
+      },
+      "integer": {
+        "ending_capital": 2852783.447790039,
+        "cagr": 0.21369828760092302,
+        "max_drawdown": -0.5519535408915722
+      }
+    },
+    "Transformer": {
+      "fractional": {
+        "ending_capital": 1035380.8208798788,
+        "cagr": 0.006444291004072511,
+        "max_drawdown": -0.03669325781726873
+      },
+      "integer": {
+        "ending_capital": 1613308.673531982,
+        "cagr": 0.09238498870935996,
+        "max_drawdown": -0.7146609292299425
+      }
+    }
+  },
+  "starting_capital": 1000000.0,
+  "daily_deploy_fraction": 0.01,
+  "note": "brief-18. Fractional gate reproduces Table 3 CAGRs (LightGBM 14.6/MLP 17.2/Transformer 0.6%). Integer = whole contracts, q=max(1,round(dollars/entry_gross_exposure)), skip if 1 contract exceeds headroom. Per-leg ratio tolerance (1/2.5/5%) needs per-leg contract counts -- noted."
+}

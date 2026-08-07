@@ -1,0 +1,177 @@
+{
+  "per_model_by_regime": {
+    "LightGBM(149,old)": {
+      "total_pnl": 682411.4099733703,
+      "by_regime": {
+        "R1": {
+          "n": 15296,
+          "pnl": 354551.60236136435,
+          "sharpe": 0.765,
+          "win_rate": 0.487,
+          "pnl_share": 0.52
+        },
+        "R2": {
+          "n": 597,
+          "pnl": -47550.00150206288,
+          "sharpe": -1.973,
+          "win_rate": 0.37,
+          "pnl_share": -0.07
+        },
+        "R3": {
+          "n": 3743,
+          "pnl": 375409.80911406875,
+          "sharpe": 2.896,
+          "win_rate": 0.603,
+          "pnl_share": 0.55
+        },
+        "R_unknown": {
+          "n": 0,
+          "pnl": 0.0,
+          "sharpe": NaN,
+          "win_rate": NaN,
+          "pnl_share": 0.0
+        }
+      }
+    },
+    "MLP-5(new)": {
+      "total_pnl": 3472384.271579243,
+      "by_regime": {
+        "R1": {
+          "n": 14109,
+          "pnl": 3236181.435788889,
+          "sharpe": 2.06,
+          "win_rate": 0.38,
+          "pnl_share": 0.932
+        },
+        "R2": {
+          "n": 391,
+          "pnl": -82663.5894977865,
+          "sharpe": -5.675,
+          "win_rate": 0.396,
+          "pnl_share": -0.024
+        },
+        "R3": {
+          "n": 4898,
+          "pnl": 318866.42528814037,
+          "sharpe": 1.131,
+          "win_rate": 0.372,
+          "pnl_share": 0.092
+        },
+        "R_unknown": {
+          "n": 0,
+          "pnl": 0.0,
+          "sharpe": NaN,
+          "win_rate": NaN,
+          "pnl_share": 0.0
+        }
+      }
+    },
+    "Transformer-plain-5(new)": {
+      "total_pnl": 839760.4330360598,
+      "by_regime": {
+        "R1": {
+          "n": 11191,
+          "pnl": 372148.9283717271,
+          "sharpe": 1.244,
+          "win_rate": 0.563,
+          "pnl_share": 0.443
+        },
+        "R2": {
+          "n": 520,
+          "pnl": 12665.931408126486,
+          "sharpe": 0.635,
+          "win_rate": 0.502,
+          "pnl_share": 0.015
+        },
+        "R3": {
+          "n": 4220,
+          "pnl": 454945.57325620623,
+          "sharpe": 2.943,
+          "win_rate": 0.661,
+          "pnl_share": 0.542
+        },
+        "R_unknown": {
+          "n": 0,
+          "pnl": 0.0,
+          "sharpe": NaN,
+          "win_rate": NaN,
+          "pnl_share": 0.0
+        }
+      }
+    },
+    "Transformer-ALiBi-5(new)": {
+      "total_pnl": 866368.3045926038,
+      "by_regime": {
+        "R1": {
+          "n": 11012,
+          "pnl": 399881.430789101,
+          "sharpe": 1.339,
+          "win_rate": 0.589,
+          "pnl_share": 0.462
+        },
+        "R2": {
+          "n": 523,
+          "pnl": 6455.264462720101,
+          "sharpe": 0.31,
+          "win_rate": 0.497,
+          "pnl_share": 0.007
+        },
+        "R3": {
+          "n": 4007,
+          "pnl": 460031.6093407827,
+          "sharpe": 3.088,
+          "win_rate": 0.676,
+          "pnl_share": 0.531
+        },
+        "R_unknown": {
+          "n": 0,
+          "pnl": 0.0,
+          "sharpe": NaN,
+          "win_rate": NaN,
+          "pnl_share": 0.0
+        }
+      }
+    },
+    "Logistic(new)": {
+      "total_pnl": 1346057.2309572652,
+      "by_regime": {
+        "R1": {
+          "n": 8360,
+          "pnl": 1279313.3421890754,
+          "sharpe": 2.006,
+          "win_rate": 0.485,
+          "pnl_share": 0.95
+        },
+        "R2": {
+          "n": 491,
+          "pnl": -63326.27818880415,
+          "sharpe": -3.601,
+          "win_rate": 0.477,
+          "pnl_share": -0.047
+        },
+        "R3": {
+          "n": 3952,
+          "pnl": 130070.16695699395,
+          "sharpe": 0.858,
+          "win_rate": 0.519,
+          "pnl_share": 0.097
+        },
+        "R_unknown": {
+          "n": 0,
+          "pnl": 0.0,
+          "sharpe": NaN,
+          "win_rate": NaN,
+          "pnl_share": 0.0
+        }
+      }
+    }
+  },
+  "unconditional_R1R2_only": {
+    "n": 170550,
+    "pnl": -2444571.243253825,
+    "sharpe": -0.221,
+    "win_rate": 0.14
+  },
+  "regime_map": "R1=no_div+small_div (certified-European), R2=dividend_robust, R3=unresolved",
+  "note": "Task 2.4 / brief-15 remaining, on the NEW models (LightGBM old-149). Closes decomposition rung-5."
+}

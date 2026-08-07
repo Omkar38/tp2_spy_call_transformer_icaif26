@@ -1,0 +1,5 @@
+model,full_pnl,retained_pnl,sign_unchanged
+MLP-5(new),3472384.271579243,2515467.4037277102,True
+Transformer-plain-5(new),839760.4330360598,507945.06418247276,True
+Transformer-ALiBi-5(new),866368.3045926038,563865.8558796732,True
+Logistic(new),1346057.2309572652,932717.088893876,True

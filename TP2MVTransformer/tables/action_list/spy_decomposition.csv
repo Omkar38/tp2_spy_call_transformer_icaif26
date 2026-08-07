@@ -1,0 +1,4 @@
+rung,note,n,pnl,win_rate,sharpe
+0. SPX at mid (external),SPX four-contract structure wins 95-100% at mid (Glasserman); not recomputed here,,,,
+1. SPY bid/ask (pre-commission),"conservative execution, no commissions",234885.0,60994102.75523707,0.9472805841156311,4.177559015965053
+2. SPY +commissions (unconditional net),GATE: paper unconditional -$12.52M,234885.0,-12521428.952018024,0.13776103199438022,-1.016592058475389

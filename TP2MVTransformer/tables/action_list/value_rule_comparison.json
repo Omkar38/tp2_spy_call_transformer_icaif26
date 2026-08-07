@@ -1,0 +1,29 @@
+{
+  "value_rule": {
+    "n": 36470,
+    "pnl": 3797456.6138625136,
+    "sharpe": 0.9409942192384427,
+    "sortino": 5.391282051856595,
+    "win_rate": 0.2797641897449959,
+    "pos_years": 4
+  },
+  "reference_p05_lightgbm": {
+    "n": 19636,
+    "pnl": 682411,
+    "sharpe": 1.25
+  },
+  "config": {
+    "objective": "regression",
+    "n_estimators": 350,
+    "learning_rate": 0.04,
+    "num_leaves": 31,
+    "min_child_samples": 30,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "n_jobs": -1,
+    "verbose": -1,
+    "random_state": 42
+  },
+  "rule": "LightGBM regressor E[R|X]; trade higher-E[R] denomination when E[R]>0, one action/episode",
+  "note": "brief-20. Value-sensitive rule beside the p>=0.5 classification rule. Same 149 features/folds as script 27. metrics() verbatim from 60."
+}

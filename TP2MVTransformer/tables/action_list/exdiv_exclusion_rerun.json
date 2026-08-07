@@ -1,0 +1,156 @@
+{
+  "models": {
+    "LightGBM": {
+      "full": {
+        "n": 19636,
+        "pnl": 682411.4099733703,
+        "sharpe": 1.2516782996590325,
+        "sortino": 1.1215698428345031,
+        "maxdd": -254256.3202080741,
+        "win_rate": 0.5056019555917702,
+        "mean_ret_pct": 3.475307649080109,
+        "skew": 9.37814795916642,
+        "pos_years": 5,
+        "n_years": 6
+      },
+      "excl_exdiv": {
+        "n": 16460,
+        "pnl": 715862.3762375233,
+        "sharpe": 1.4184349067747073,
+        "sortino": 1.24386530617437,
+        "maxdd": -254256.3202080741,
+        "win_rate": 0.49386391251518835,
+        "mean_ret_pct": 4.349103136315451,
+        "skew": 9.012040574232756,
+        "pos_years": 6,
+        "n_years": 6
+      },
+      "pct_exposed": 0.16174373599511102,
+      "exposed_n": 3176,
+      "exposed_pnl": -33450.966264152914,
+      "exposed_win_rate": 0.5664357682619647
+    },
+    "MLP-5": {
+      "full": {
+        "n": 24977,
+        "pnl": 3433936.251873806,
+        "sharpe": 1.6617555804076938,
+        "sortino": 6.119653213427375,
+        "maxdd": -1207037.8771429441,
+        "win_rate": 0.3295431797253473,
+        "mean_ret_pct": 13.748393529542403,
+        "skew": 8.920100295233548,
+        "pos_years": 4,
+        "n_years": 6
+      },
+      "excl_exdiv": {
+        "n": 19759,
+        "pnl": 3819398.994578106,
+        "sharpe": 2.0466370356832164,
+        "sortino": 10.53934648772265,
+        "maxdd": -894293.6238140533,
+        "win_rate": 0.3334682929298041,
+        "mean_ret_pct": 19.329920515097452,
+        "skew": 8.010073821968836,
+        "pos_years": 6,
+        "n_years": 6
+      },
+      "pct_exposed": 0.2089121992232854,
+      "exposed_n": 5218,
+      "exposed_pnl": -385462.74270429986,
+      "exposed_win_rate": 0.314679954005366
+    },
+    "Transformer-plain-5": {
+      "full": {
+        "n": 14338,
+        "pnl": 695173.3871695839,
+        "sharpe": 2.1784624754871778,
+        "sortino": 2.9786944290997996,
+        "maxdd": -128216.04628563777,
+        "win_rate": 0.6000139489468546,
+        "mean_ret_pct": 4.848468316149979,
+        "skew": 1.8093733070569795,
+        "pos_years": 6,
+        "n_years": 6
+      },
+      "excl_exdiv": {
+        "n": 11711,
+        "pnl": 461875.91789187305,
+        "sharpe": 2.1327893167039136,
+        "sortino": 2.2730882115113484,
+        "maxdd": -119306.12248762706,
+        "win_rate": 0.5793698232431048,
+        "mean_ret_pct": 3.9439494312345063,
+        "skew": 1.9596089730320267,
+        "pos_years": 5,
+        "n_years": 6
+      },
+      "pct_exposed": 0.1832194169340215,
+      "exposed_n": 2627,
+      "exposed_pnl": 233297.4692777109,
+      "exposed_win_rate": 0.6920441568328892
+    },
+    "Transformer-ALiBi-5": {
+      "full": {
+        "n": 14648,
+        "pnl": 703705.154582378,
+        "sharpe": 2.359584529269594,
+        "sortino": 3.7211763238805124,
+        "maxdd": -90990.57130829847,
+        "win_rate": 0.6014472965592572,
+        "mean_ret_pct": 4.804104004521969,
+        "skew": 0.9542059599503702,
+        "pos_years": 6,
+        "n_years": 6
+      },
+      "excl_exdiv": {
+        "n": 12048,
+        "pnl": 469496.0887260782,
+        "sharpe": 2.4675067307898755,
+        "sortino": 3.165160411115489,
+        "maxdd": -82880.00596970081,
+        "win_rate": 0.5802622841965471,
+        "mean_ret_pct": 3.896879886504633,
+        "skew": 0.9952037761396552,
+        "pos_years": 5,
+        "n_years": 6
+      },
+      "pct_exposed": 0.1774986346258875,
+      "exposed_n": 2600,
+      "exposed_pnl": 234209.0658562997,
+      "exposed_win_rate": 0.6996153846153846
+    },
+    "Logistic": {
+      "full": {
+        "n": 13206,
+        "pnl": 1841763.4971672923,
+        "sharpe": 2.697223634241171,
+        "sortino": 4.016550024717322,
+        "maxdd": -291313.9168817185,
+        "win_rate": 0.5328638497652582,
+        "mean_ret_pct": 13.94641448710656,
+        "skew": 6.395579057332146,
+        "pos_years": 5,
+        "n_years": 6
+      },
+      "excl_exdiv": {
+        "n": 10351,
+        "pnl": 1628066.1253857994,
+        "sharpe": 2.741042672675567,
+        "sortino": 3.780956900473425,
+        "maxdd": -291313.9168817185,
+        "win_rate": 0.5249734325185972,
+        "mean_ret_pct": 15.728587821329336,
+        "skew": 5.946860505266868,
+        "pos_years": 6,
+        "n_years": 6
+      },
+      "pct_exposed": 0.21618961078297744,
+      "exposed_n": 2855,
+      "exposed_pnl": 213697.37178149255,
+      "exposed_win_rate": 0.5614711033274956
+    }
+  },
+  "flag_rule": "exposed = next_ex_div_date(at signal) <= feature_D_expiration (short leg D / T1)",
+  "note": "brief-16. Full-sample gate reproduces Table 2 (Logistic uses committed 13,206). metrics() verbatim from 60; ex-div flag replicates 49_execution_robustness."
+}

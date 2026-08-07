@@ -1,0 +1,36 @@
+{
+  "models": {
+    "MLP-5(new)": {
+      "n": 16817,
+      "mean_net_delta": -0.016436331770267158,
+      "pct_net_short": 0.6622465362430874,
+      "beta_linear": 16.487481875307374,
+      "r2_linear": 0.0767001165830955,
+      "beta_with_gamma": 8.26882941077279,
+      "gamma_coef": 193.5254498871616,
+      "r2_with_gamma": 0.11095075667786225
+    },
+    "Transformer-ALiBi-5(new)": {
+      "n": 12887,
+      "mean_net_delta": 0.003982871550090415,
+      "pct_net_short": 0.3768914409870412,
+      "beta_linear": 2.521752334776916,
+      "r2_linear": 0.028818102246253474,
+      "beta_with_gamma": 1.5317327559535792,
+      "gamma_coef": 22.57463385343459,
+      "r2_with_gamma": 0.03776162261371452
+    },
+    "all_valid_T1K2": {
+      "n": 315158,
+      "mean_net_delta": -0.04040576317235035,
+      "pct_net_short": 0.816419065992296,
+      "beta_linear": 2.1958772042635903,
+      "r2_linear": 0.011072410766056029,
+      "beta_with_gamma": 2.673669839083163,
+      "gamma_coef": 13.050192975280577,
+      "r2_with_gamma": 0.020063362794077166
+    }
+  },
+  "net_delta_def": "dA+dB-dC-dD (buy A,B; sell C,D)",
+  "note": "P3.4. Position is net-short delta but realized linear beta is positive; test whether the squared-move (gamma/convexity) term absorbs it -> short-gamma path-dependence, not a directional bet. move = SPY(exit)/SPY(signal)-1."
+}
