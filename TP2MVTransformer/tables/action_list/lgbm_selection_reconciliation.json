@@ -1,0 +1,9 @@
+{
+  "total_leg_selections_at_0p5": 28579,
+  "one_action_per_episode": 18665,
+  "episodes_both_legs_cross": 9914,
+  "episodes_one_leg_cross": 8751,
+  "selected_trades_file_convention": 19636,
+  "diff_dual_selection": 9914,
+  "explanation": "per-strategy classifiers; selected-trades file keeps both legs (dual-selection); one-action keeps higher-prob leg."
+}

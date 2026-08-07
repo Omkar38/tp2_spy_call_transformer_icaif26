@@ -1,0 +1,32 @@
+{
+  "models": {
+    "MLP-5(new)": {
+      "n": 9202,
+      "expiry_pnl": 2967271.870973008,
+      "reversion_pnl": -427402.9298665861,
+      "paired_diff_expiry_minus_reversion": 3394674.8008395946,
+      "expiry_win_vs_reversion": 0.5800912845033689,
+      "expiry_sharpe": 2.212911341323108,
+      "reversion_sharpe": -4.339785251783836
+    },
+    "Transformer-ALiBi-5(new)": {
+      "n": 9845,
+      "expiry_pnl": 453996.9027319177,
+      "reversion_pnl": -48866.58389972623,
+      "paired_diff_expiry_minus_reversion": 502863.48663164396,
+      "expiry_win_vs_reversion": 0.5570340274250889,
+      "expiry_sharpe": 1.4581025044851694,
+      "reversion_sharpe": -0.7180718635520698
+    },
+    "union_new_models": {
+      "n": 16208,
+      "expiry_pnl": 3403668.801541288,
+      "reversion_pnl": -534934.0969327663,
+      "paired_diff_expiry_minus_reversion": 3938602.8984740544,
+      "expiry_win_vs_reversion": 0.556083415597236,
+      "expiry_sharpe": 2.1503959309735663,
+      "reversion_sharpe": -3.3267653209933665
+    }
+  },
+  "note": "P3.3 paired exit-policy check (same trades, expiry vs reversion), on trades with both policies valid, 2021-26. Positive expiry-minus-reversion confirms hold-to-expiry is the better choice. The committed exit_policy_comparison.json reported the reversion side only (171 trades, -$2,697)."
+}

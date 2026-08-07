@@ -1,0 +1,62 @@
+{
+  "model": "MLP-5 (new perfect pipeline)",
+  "whole": {
+    "n": 19398,
+    "pnl": 3472384.271579243,
+    "sharpe": 1.916,
+    "win_rate": 0.378
+  },
+  "t1_k2_breakdown": {
+    "K2": {
+      "n": 13513,
+      "pnl": 2482001.6944355294,
+      "sharpe": 2.601,
+      "win_rate": 0.48
+    },
+    "T1": {
+      "n": 5885,
+      "pnl": 990382.5771437138,
+      "sharpe": 1.19,
+      "win_rate": 0.143
+    }
+  },
+  "year_bands": {
+    "2021": {
+      "n": 11949,
+      "pnl": 1814452.2907644194,
+      "sharpe": 1.68,
+      "win_rate": 0.232
+    },
+    "2022": {
+      "n": 389,
+      "pnl": 4193.513166156876,
+      "sharpe": 0.62,
+      "win_rate": 0.846
+    },
+    "2023": {
+      "n": 2422,
+      "pnl": 1418738.849027974,
+      "sharpe": 4.913,
+      "win_rate": 0.508
+    },
+    "2024": {
+      "n": 1010,
+      "pnl": 5364.712321654937,
+      "sharpe": 0.376,
+      "win_rate": 0.668
+    },
+    "2025": {
+      "n": 3219,
+      "pnl": 197664.50797956376,
+      "sharpe": 3.897,
+      "win_rate": 0.637
+    },
+    "2026": {
+      "n": 409,
+      "pnl": 31970.398319474043,
+      "sharpe": 5.85,
+      "win_rate": 0.663
+    }
+  },
+  "note": "Task 0.2 fiveseed re-anchor on the NEW MLP-5 (supersedes committed 24,977 breakdown per new-model directive)."
+}

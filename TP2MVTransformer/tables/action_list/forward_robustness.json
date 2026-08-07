@@ -1,0 +1,29 @@
+{
+  "n_valid_episodes": 125002,
+  "retention_pct": 0.6588934577046768,
+  "median_K1_target_shift": 0.29093975412911277,
+  "median_K2_target_shift": 0.29785850799237323,
+  "pnl_sign_check": {
+    "MLP-5(new)": {
+      "full_pnl": 3472384.271579243,
+      "retained_pnl": 2515467.4037277102,
+      "sign_unchanged": true
+    },
+    "Transformer-plain-5(new)": {
+      "full_pnl": 839760.4330360598,
+      "retained_pnl": 507945.06418247276,
+      "sign_unchanged": true
+    },
+    "Transformer-ALiBi-5(new)": {
+      "full_pnl": 866368.3045926038,
+      "retained_pnl": 563865.8558796732,
+      "sign_unchanged": true
+    },
+    "Logistic(new)": {
+      "full_pnl": 1346057.2309572652,
+      "retained_pnl": 932717.088893876,
+      "sign_unchanged": true
+    }
+  },
+  "note": "brief-14. Independent forward F(T)=(spot-PV(div<T))e^{rT} vs parity-implied. Retention = both adjusted-strike targets shift <0.5 strike (same listed contract). P&L-sign on new-model selected trades restricted to retained episodes. Single-next-dividend approx; isolates forward on existing episodes (no full chain re-enumeration -- that needs the detector on 4.9M quotes)."
+}

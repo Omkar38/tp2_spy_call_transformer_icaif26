@@ -1,0 +1,43 @@
+{
+  "gate_149": {
+    "n": 19636,
+    "pnl": 682411.4099733703,
+    "sharpe": 1.2516782996590332,
+    "sortino": 1.1215698428345038,
+    "maxdd": -254256.3202080741,
+    "win_rate": 0.5056019555917702,
+    "mean_ret_pct": 3.475307649080109,
+    "skew": 9.37814795916642,
+    "pos_years": 5,
+    "n_years": 6
+  },
+  "lgbm_f48": {
+    "n": 20150,
+    "pnl": 887110.9149441917,
+    "sharpe": 1.7129601368375516,
+    "sortino": 1.5204426651031373,
+    "maxdd": -267203.2683478766,
+    "win_rate": 0.5563275434243177,
+    "mean_ret_pct": 4.402535558035691,
+    "skew": 9.7070536945261,
+    "pos_years": 6,
+    "n_years": 6
+  },
+  "n_features_149": 136,
+  "n_features_48": 46,
+  "note": "Same-input control: LightGBM retrained on the 48 F* (MLP/transformer feature set). 149 gate reproduced exactly. metrics()/sel_by_thresh copied verbatim from 60_action_list_compute.py.",
+  "config": {
+    "objective": "binary",
+    "metric": "binary_logloss",
+    "n_estimators": 350,
+    "learning_rate": 0.04,
+    "num_leaves": 31,
+    "min_child_samples": 30,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "class_weight": "balanced",
+    "n_jobs": -1,
+    "verbose": -1,
+    "random_state": 42
+  }
+}

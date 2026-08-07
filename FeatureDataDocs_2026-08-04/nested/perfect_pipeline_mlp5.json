@@ -1,0 +1,41 @@
+{
+  "per_seed_set": {
+    "A": {
+      "n": 19398,
+      "pnl": 3472384.271579243,
+      "sharpe": 1.9163,
+      "sortino": 8.5228,
+      "win_rate": 0.3779,
+      "pos_years": 6
+    },
+    "B": {
+      "n": 13855,
+      "pnl": 2144254.8882472375,
+      "sharpe": 2.6973,
+      "sortino": 11.5217,
+      "win_rate": 0.4995,
+      "pos_years": 5
+    },
+    "C": {
+      "n": 19562,
+      "pnl": 2526539.1499186503,
+      "sharpe": 1.8606,
+      "sortino": 6.1534,
+      "win_rate": 0.3546,
+      "pos_years": 5
+    }
+  },
+  "sharpe_mean": 2.158,
+  "sharpe_std": 0.382,
+  "pnl_mean": 2714392.7699150434,
+  "pnl_std": 558240.4808125707,
+  "fk_common_across_seed_sets": {
+    "2021": 44,
+    "2022": 46,
+    "2023": 46,
+    "2024": 46,
+    "2025": 45,
+    "2026": 45
+  },
+  "config": "deterministic LightGBM + 5-seed ensemble feature selection, per-fold training-years-only"
+}

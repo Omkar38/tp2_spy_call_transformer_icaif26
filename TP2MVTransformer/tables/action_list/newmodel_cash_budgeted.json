@@ -1,0 +1,35 @@
+{
+  "models": {
+    "LightGBM(149,old)": {
+      "premium_cagr": 0.14576661426240678,
+      "integer_cagr": 0.10979442780778204,
+      "margin_cagr": 0.010143970923254475,
+      "n_trades": 18547
+    },
+    "MLP-5(new)": {
+      "premium_cagr": 0.13368711780669917,
+      "integer_cagr": 0.07247032153415756,
+      "margin_cagr": 0.012691217740069538,
+      "n_trades": 18631
+    },
+    "Transformer-plain-5(new)": {
+      "premium_cagr": 0.0667217234024664,
+      "integer_cagr": 0.03333943932983874,
+      "margin_cagr": 0.021847092735967966,
+      "n_trades": 15397
+    },
+    "Transformer-ALiBi-5(new)": {
+      "premium_cagr": 0.060503241582090306,
+      "integer_cagr": 0.08068760280062537,
+      "margin_cagr": 0.022758954989959834,
+      "n_trades": 14967
+    },
+    "Logistic(new)": {
+      "premium_cagr": 0.0744560425210039,
+      "integer_cagr": 0.31517008890526177,
+      "margin_cagr": 0.018912688186627502,
+      "n_trades": 12346
+    }
+  },
+  "note": "brief-18 + brief-19 on NEW models (LightGBM=old 149). New-model trade sets = new selected trades joined to labels. No Table-3 gate for new models (new baseline); LightGBM(old) anchors Table 3. integer = whole contracts (min 1); margin = Reg-T conservative (effective_return = realized_return * premium/margin). Reuses script 42."
+}

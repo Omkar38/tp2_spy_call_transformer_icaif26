@@ -1,0 +1,16 @@
+{
+  "model": "L2 logistic on F* (committed/leaky 48 features)",
+  "config": "penalty=l2, C=1.0, class_weight=balanced; per-fold StandardScaler; val isotonic; causal p>=0.5; one action/episode",
+  "feature_set": "committed full-span F* (48)",
+  "replaces": "paper Table 2 Logistic-L2 row (13,841/$2.02M/2.27), which had no committed source",
+  "n": 13206,
+  "pnl": 1841763.4971672923,
+  "sharpe": 2.6972,
+  "sortino": 4.0166,
+  "maxdd": -291313.9168817185,
+  "win_rate": 0.5329,
+  "mean_ret_pct": 13.9464,
+  "skew": 6.3956,
+  "pos_years": 5,
+  "n_years": 6
+}

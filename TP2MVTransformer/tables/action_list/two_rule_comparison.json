@@ -1,0 +1,96 @@
+{
+  "rule_A_prob_0p5": {
+    "LightGBM (1)": {
+      "N": 19636,
+      "PnL": 682411.4099733703,
+      "sharpe": 1.2516782996590325,
+      "downside_ratio": 1.1215698428345031,
+      "win_rate": 0.5056019555917702,
+      "mean_ret_pct": 3.475307649080109,
+      "skew": 9.37814795916642,
+      "pos_years": 5,
+      "n_years": 6
+    },
+    "MLP (5)": {
+      "N": 24977,
+      "PnL": 3433936.251873806,
+      "sharpe": 1.6617555804076938,
+      "downside_ratio": 6.119653213427375,
+      "win_rate": 0.3295431797253473,
+      "mean_ret_pct": 13.748393529542403,
+      "skew": 8.920100295233548,
+      "pos_years": 4,
+      "n_years": 6
+    },
+    "Transformer plain (5)": {
+      "N": 14338,
+      "PnL": 695173.3871695839,
+      "sharpe": 2.1784624754871778,
+      "downside_ratio": 2.9786944290997996,
+      "win_rate": 0.6000139489468546,
+      "mean_ret_pct": 4.848468316149979,
+      "skew": 1.8093733070569795,
+      "pos_years": 6,
+      "n_years": 6
+    },
+    "Transformer ALiBi (5)": {
+      "N": 14648,
+      "PnL": 703705.154582378,
+      "sharpe": 2.359584529269594,
+      "downside_ratio": 3.7211763238805124,
+      "win_rate": 0.6014472965592572,
+      "mean_ret_pct": 4.804104004521969,
+      "skew": 0.9542059599503702,
+      "pos_years": 6,
+      "n_years": 6
+    }
+  },
+  "rule_B_coverage_topN": {
+    "N": 14000,
+    "LightGBM (1)": {
+      "N": 14000,
+      "PnL": 499509.7713632872,
+      "sharpe": 1.2832012050164614,
+      "downside_ratio": 1.109042926824047,
+      "win_rate": 0.5639285714285714,
+      "mean_ret_pct": 3.5679269383091943,
+      "skew": 9.09554234694715,
+      "pos_years": 4,
+      "n_years": 6
+    },
+    "MLP (5)": {
+      "N": 14000,
+      "PnL": 1531922.228401923,
+      "sharpe": 1.3839502179622258,
+      "downside_ratio": 4.705229786942878,
+      "win_rate": 0.2665,
+      "mean_ret_pct": 10.942301631442309,
+      "skew": 9.281677382069585,
+      "pos_years": 4,
+      "n_years": 4
+    },
+    "Transformer plain (5)": {
+      "N": 14000,
+      "PnL": 621562.1618400619,
+      "sharpe": 2.1531679556431875,
+      "downside_ratio": 2.6259357980058478,
+      "win_rate": 0.6011428571428571,
+      "mean_ret_pct": 4.439729727429013,
+      "skew": -0.02553344883388583,
+      "pos_years": 6,
+      "n_years": 6
+    },
+    "Transformer ALiBi (5)": {
+      "N": 14000,
+      "PnL": 672870.5238513465,
+      "sharpe": 2.255034927003247,
+      "downside_ratio": 3.4204743346573587,
+      "win_rate": 0.5966428571428571,
+      "mean_ret_pct": 4.806218027509617,
+      "skew": 0.9390518348292475,
+      "pos_years": 5,
+      "n_years": 6
+    }
+  },
+  "note_logistic": "L2-logistic floor gate (13,841/$2.02M/2.27) NOT reproduced: no committed prediction file or training script found (65 is Platt calibration only). Pending config."
+}

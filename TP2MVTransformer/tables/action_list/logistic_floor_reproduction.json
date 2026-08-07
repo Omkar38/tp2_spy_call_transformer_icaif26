@@ -1,0 +1,30 @@
+{
+  "config": "L2 logistic on F*, C=1.0, class_weight=balanced, per-fold StandardScaler, val isotonic, p>=0.5",
+  "committed_paper_row": {
+    "N": 13841,
+    "pnl": 2020000.0,
+    "sharpe": 2.27
+  },
+  "reproduced_p0p5": {
+    "n": 13206,
+    "pnl": 1841763.4971672923,
+    "sharpe": 2.697223634241171,
+    "sortino": 4.016550024717322,
+    "win_rate": 0.5328638497652582,
+    "mean_ret_pct": 13.94641448710656,
+    "skew": 6.395579057332146,
+    "pos_years": 5,
+    "n_years": 6
+  },
+  "reproduced_coverage_top14k": {
+    "n": 14000,
+    "pnl": 1935262.2738126516,
+    "sharpe": 2.7366286481216915,
+    "sortino": 4.227867065295129,
+    "win_rate": 0.5343571428571429,
+    "mean_ret_pct": 13.823301955804656,
+    "skew": 6.313871952508489,
+    "pos_years": 5,
+    "n_years": 6
+  }
+}

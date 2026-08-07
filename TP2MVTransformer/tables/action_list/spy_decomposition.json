@@ -1,0 +1,64 @@
+{
+  "unconditional_ladder": [
+    {
+      "rung": "0. SPX at mid (external)",
+      "note": "SPX four-contract structure wins 95-100% at mid (Glasserman); not recomputed here"
+    },
+    {
+      "rung": "1. SPY bid/ask (pre-commission)",
+      "n": 234885,
+      "pnl": 60994102.75523707,
+      "win_rate": 0.9472805841156311,
+      "sharpe": 4.177559015965053,
+      "note": "conservative execution, no commissions"
+    },
+    {
+      "rung": "2. SPY +commissions (unconditional net)",
+      "n": 234885,
+      "pnl": -12521428.952018024,
+      "win_rate": 0.13776103199438022,
+      "sharpe": -1.016592058475389,
+      "note": "GATE: paper unconditional -$12.52M"
+    }
+  ],
+  "commission_drag": 73515531.7072551,
+  "model_rungs": {
+    "LightGBM(149,old)": {
+      "full_model_pnl": 682411.4099733703,
+      "full_model_sharpe": 1.2516782996590325,
+      "no_exdiv_pnl": 715862.3762375233,
+      "no_exdiv_sharpe": 1.4184349067747073
+    },
+    "MLP-5(new)": {
+      "full_model_pnl": 3472384.271579243,
+      "full_model_sharpe": 1.9162531455497969,
+      "no_exdiv_pnl": 3582951.001236081,
+      "no_exdiv_sharpe": 2.1943718847817815
+    },
+    "Transformer-plain-5(new)": {
+      "full_model_pnl": 839760.4330360598,
+      "full_model_sharpe": 2.0485914544558574,
+      "no_exdiv_pnl": 596328.6696432014,
+      "no_exdiv_sharpe": 1.8755899375034681
+    },
+    "Transformer-ALiBi-5(new)": {
+      "full_model_pnl": 866368.3045926038,
+      "full_model_sharpe": 2.1340483037469635,
+      "no_exdiv_pnl": 647815.2963273369,
+      "no_exdiv_sharpe": 2.0192524255543405
+    },
+    "Logistic(new)": {
+      "full_model_pnl": 1346057.2309572652,
+      "full_model_sharpe": 1.8200951402852212,
+      "no_exdiv_pnl": 1262023.312073459,
+      "no_exdiv_sharpe": 1.9325646474046763
+    }
+  },
+  "rung5_R1R2_only_unconditional_net": {
+    "n": 170550,
+    "pnl": -2444571.243253825,
+    "sharpe": -0.221,
+    "win_rate": 0.14
+  },
+  "note": "brief-25. Rungs 1-2 exact from committed label P&L (net gate -$12.52M reproduced). Headline: the structure is +$61M at bid/ask; commissions (-$73.5M at $0.65/contract/side) drive the unconditional loss; model selection then recovers positive P&L; survives ex-div exclusion. mid rung is the external SPX reference; R1/R2 rung pending regime labels."
+}

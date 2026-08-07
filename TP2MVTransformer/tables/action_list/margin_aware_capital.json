@@ -1,0 +1,27 @@
+{
+  "models": {
+    "LightGBM": {
+      "premium_cagr": 0.14576661426240678,
+      "margin_cagr": 0.010143970923254475,
+      "premium_ending": 2088678.6927930475,
+      "margin_ending": 1056149.7348756543,
+      "median_premium_over_margin": 1.0044152167626246
+    },
+    "MLP": {
+      "premium_cagr": 0.1724462763029604,
+      "margin_cagr": 0.02121273701672788,
+      "premium_ending": 2365819.2527800887,
+      "margin_ending": 1120324.0581557576,
+      "median_premium_over_margin": 1.0157495427317702
+    },
+    "Transformer": {
+      "premium_cagr": 0.006444291004072511,
+      "margin_cagr": 0.020506963174770965,
+      "premium_ending": 1035380.8208798788,
+      "margin_ending": 1116139.5229647476,
+      "median_premium_over_margin": 1.4353563635924407
+    }
+  },
+  "margin_rule": "Reg-T conservative: short C,D = max(0.20U-OTM,0.10U)+premium; long A,B = premium debit; x100",
+  "note": "brief-19. Premium-based gate reproduces Table 3. Margin-aware reserves Reg-T margin, so effective return = realized_return * premium/margin (margin > premium dilutes return on capital). Reg-T conservative (naked short legs); OCC spread netting would give a lower margin / higher CAGR. Reuses script 42. Underlying = spy_close."
+}

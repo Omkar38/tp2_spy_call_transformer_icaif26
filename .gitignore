@@ -35,3 +35,12 @@ reports/**/*.html
 Literature/
 _to_delete/
 .DS_Store
+
+# session intermediate/abandoned outputs (not pushed)
+FeatureDataDocs_2026-08-04/stage1/
+FeatureDataDocs_2026-08-04/stage2/
+FeatureDataDocs_2026-08-04/stage/
+FeatureDataDocs_2026-08-04/stage1_strict/
+FeatureDataDocs_2026-08-04/stage2_strict/
+FeatureDataDocs_2026-08-04/repro_check/
+FeatureDataDocs_2026-08-04/.mplconfig/
