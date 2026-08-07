@@ -314,17 +314,21 @@ For the neural models, the same validation year serves both checkpoint selection
 \section{Results}
 \label{sec:results}
 
-All models are evaluated using the same six walk-forward folds, the same validation-year isotonic calibration, and the same pre-specified $p\ge0.5$ trading rule, with at most one trade per episode and ties resolved in favor of T1; portfolio statistics are calculated identically for every model. The active-day Sharpe ratio is the annualized ratio ($\times\sqrt{252}$) of mean daily P\&L to its standard deviation over days with at least one open position; days without positions are omitted. We report total normalized P\&L, active-day Sharpe, a date-block bootstrap 95\% interval~\cite{kunsch1989} for total P\&L, and the number of positive test periods, with a separate premium-budget experiment in Section~\ref{sec:capitalscaled}.
+The theoretical results determine how the empirical TP2 violations should be interpreted. Proposition~\ref{prop:euro} identifies episodes for which the American call values coincide with their European counterparts, while Proposition~\ref{prop:cert} identifies additional violations that cannot be explained by early-exercise premia. The trading experiments then ask a different question: conditional on a TP2 violation having been detected, can it be traded profitably after costs? The machine-learning models are used for this second-stage selection problem and are evaluated across all theoretical categories.
+All models use the same six walk-forward folds, the same validation-year isotonic calibration, and the same pre-specified $p\ge0.5$ trading rule. Each episode generates at most one trade, with ties resolved in favor of T1. Portfolio statistics are calculated in the same way for every model.
+The active-day Sharpe ratio is the annualized ratio ($\times\sqrt{252}$) of mean daily P\&L to its standard deviation, calculated over days on which the strategy has at least one open position. Days without positions are omitted. We report total normalized P\&L, active-day Sharpe, a date-block bootstrap 95\% interval~\cite{kunsch1989} for total P\&L, and the number of test periods with positive P\&L. We also report a separate premium-budget experiment in Section~\ref{sec:capitalscaled}.
 
 \smallskip\noindent\textbf{Unconditional Baseline and Model Comparison.}
-Trading all 250{,}004 candidate trades over 2021--2026 loses \$12.52M under the \$1{,}000-per-trade normalization, with an active-day Sharpe of $-1.01$, maximum drawdown of $-\$24.51$M, a 12.9\% win rate, and two of six test periods profitable. The contrast with the SPX evidence~\cite{glasserman2025tp2} appears only after commissions. Before commissions, still entering long positions at the ask and short positions at the bid, the same SPY trades win 94.7\% of the time and generate \$61.0M in normalized P\&L; adding per-contract commissions produces the \$12.52M loss. Under our normalization, the detected violations survive the quoted bid--ask spread but not the commission charge when every candidate is traded.
-The machine-learning models select a smaller subset of these candidates, and each produces positive aggregate out-of-sample P\&L over the test periods (Table~\ref{tab:consolidated}, Figure~\ref{fig:equity}). Logistic regression earns \$1.35M at an active-day Sharpe of 1.82; the MLP ensemble has the largest total at \$3.47M; the plain and ALiBi transformers earn \$840K and \$866K at Sharpe ratios of 2.05 and 2.13; the MLP and ALiBi transformer are profitable in all six test periods. The date-block bootstrap intervals exclude zero for the two transformer variants and logistic regression, while the LightGBM and MLP intervals include zero: in both cases a larger share of total P\&L comes from a smaller number of large winners.
-Random selection does not explain the gains. Across 1{,}000 random draws matched to each model's trade count, average P\&L is $-\$0.71$M. Under a stricter comparison that also matches each model's active days and trades per day, only 8\% of draws exceed the plain transformer's total, whereas 67\% exceed LightGBM's, suggesting that much of LightGBM's result reflects which days it trades rather than within-day trade selection.
+Trading all 250{,}004 candidate trades over 2021--2026 produces a loss of \$12.52M under the \$1{,}000-per-trade normalization. The active-day Sharpe ratio is $-1.01$, maximum drawdown is $-\$24.51$M, the win rate is 12.9\%, and only two of the six test periods are profitable.
+This differs from the SPX evidence in~\cite{glasserman2025tp2}, where the corresponding T1 and K2 constructions have near-perfect hit rates at mid-prices and T1 remains profitable under the strong-violation screen. In SPY, however, the result changes sharply once commissions are included. Before commissions, but still entering long positions at the ask and short positions at the bid, the same trades win 94.7\% of the time and generate \$61.0M in normalized P\&L. Adding the per-contract commissions changes this to the \$12.52M loss reported above. Thus, within our SPY construction, the detected violations survive the quoted bid--ask spread but not the commission charge when every candidate is traded. This decomposition concerns the SPY backtest itself; it does not attribute the difference between our results and the SPX results of~\cite{glasserman2025tp2} to commissions alone.
+The machine-learning models are used to select a smaller subset of these candidates. Each model produces positive aggregate out-of-sample P\&L over the 2021--2026 test periods (Table~\ref{tab:consolidated} and Figure~\ref{fig:equity}). Logistic regression earns \$1.35M with an active-day Sharpe ratio of 1.82. The MLP ensemble has the largest total P\&L at \$3.47M. The plain and ALiBi transformers earn \$840K and \$866K, with Sharpe ratios of 2.05 and 2.13, respectively. The MLP and ALiBi transformer are profitable in all six test periods.
+The date-block bootstrap intervals exclude zero for the two transformer variants and for logistic regression. The corresponding intervals for LightGBM and the MLP include zero, with their aggregate P\&L more concentrated in a smaller number of large winning trades.
+We also compare the selected portfolios with random subsets of the candidate trades. Across 1{,}000 random draws matched to each model's number of selected trades, average P\&L is $-\$0.71$M. We then impose a stricter comparison by matching the model's active days and number of trades per day. Under this comparison, only 8\% of random draws exceed the plain transformer's total P\&L. For LightGBM, 67\% of the matched random draws exceed its P\&L, suggesting that much of its result is associated with which days it chooses to trade rather than with within-day trade selection.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.68\linewidth]{figures/equity_curves_newmodel.pdf}
-\caption{Test periods 2021--2026. (a)~Cumulative normalized P\&L under the \$1{,}000-per-trade convention: the unconditional strategy loses \$12.52M, while each model-selected portfolio ends the sample positive. (b)~Account equity in the premium-budget experiment (\$1M start, 1\%-of-cash daily premium limit) for LightGBM, the MLP, and the plain transformer.}
+\includegraphics[width=0.72\linewidth]{figures/equity_curves_newmodel.pdf}
+\caption{Test periods 2021--2026. (a)~Cumulative normalized P\&L under the \$1{,}000-per-trade convention. The unconditional strategy loses \$12.52M, while each model-selected portfolio ends the sample with positive cumulative P\&L. (b)~Account equity in the premium-budget experiment, starting from \$1M with a daily new-position premium limit of 1\% of available cash, shown for LightGBM, the MLP, and the plain transformer.}
 \label{fig:equity}
 \end{figure}
 
@@ -345,7 +349,7 @@ Logistic ($L_2$) & 12{,}803 & \$1.35M & 1.82 & $[\$0.05\mathrm{M},\ \$2.73\mathr
 \bottomrule
 \end{tabular}%
 }
-\caption{Model comparison over the 2021--2026 test periods; 2026 is partial. The MLP and transformer results are five-seed ensembles, with raw probabilities averaged before calibration; LightGBM and logistic regression are single fits. The 95\% intervals are from a date-block bootstrap of total P\&L. Dollar values use the \$1{,}000-per-trade normalization.}
+\caption{Model comparison over the 2021--2026 test periods; 2026 is partial. The MLP and transformer results are five-seed ensembles, with raw probabilities averaged before calibration. LightGBM and logistic regression are single fits. The 95\% intervals are obtained from a date-block bootstrap of total P\&L. Dollar values use the \$1{,}000-per-trade normalization.}
 \label{tab:consolidated}
 \end{table}
 
@@ -357,8 +361,10 @@ Logistic ($L_2$) & 12{,}803 & \$1.35M & 1.82 & $[\$0.05\mathrm{M},\ \$2.73\mathr
 
 \smallskip\noindent\textbf{Equal-Weight Premium-Budget Accounting Experiment.}
 \label{sec:capitalscaled}
-The \$1{,}000-per-trade normalization compares trade selection but imposes no capital constraint. A second experiment therefore tracks an account starting with \$1M in cash, committing at most 1\% of available cash to new-position premiums each day, divided equally across that day's selected trades. This accounting differs from the gross-exposure sizing of the SPX study~\cite{glasserman2025tp2}, so we interpret the results as growth in a normalized cash account, not as deployable return on capital.
-Under the baseline fractional-contract convention, LightGBM and the MLP produce the highest annualized growth, 14.6\% and 13.4\%; logistic regression grows at 7.4\% and the plain and ALiBi transformers at 6.7\% and 6.1\% (Table~\ref{tab:capitalscaled}, Figure~\ref{fig:equity}b). These figures depend on the sizing assumptions: requiring integer contract quantities changes the ranking and growth rates substantially, and reserving Reg-T margin for short positions, without netting, reduces growth to approximately 1--2\% for all models. The difference between Tables~\ref{tab:consolidated} and~\ref{tab:capitalscaled} shows that selecting profitable trades and allocating limited capital across them are different problems.
+The \$1{,}000-per-trade normalization is useful for comparing trade selection, but it does not impose a capital constraint. We therefore run a second experiment that tracks an account starting with \$1M in cash. On each day, at most 1\% of available cash can be committed to premiums on new positions, with the amount divided equally across trades selected that day.
+This accounting differs from the gross-exposure sizing convention used in the SPX study~\cite{glasserman2025tp2}. We therefore interpret the results as growth in a normalized cash account rather than as an estimate of deployable return on capital.
+Under the baseline fractional-contract convention, LightGBM and the MLP produce the highest annualized cash-balance growth, at 14.6\% and 13.4\%, respectively. Logistic regression grows at 7.4\%, while the plain and ALiBi transformers produce 6.7\% and 6.1\% (Table~\ref{tab:capitalscaled} and Figure~\ref{fig:equity}b).
+These figures depend on the sizing assumptions. Requiring integer numbers of contracts changes both the ranking and the growth rates. Reserving Reg-T margin for short positions, without allowing margin netting, reduces annualized growth to approximately 1--2\% for all models. The differences between Tables~\ref{tab:consolidated} and~\ref{tab:capitalscaled} show that selecting profitable trades and allocating limited capital across those trades are separate problems.
 
 \begin{table}[t]
 \centering
@@ -375,7 +381,7 @@ Transformer (ALiBi, 5-seed) & 6.1\% & 8.1\% & 2.3\% \\
 Logistic ($L_2$) & 7.4\% & 31.5\% & 1.9\% \\
 \bottomrule
 \end{tabular}
-\caption{Annualized cash-balance growth in the premium-budget experiment, 2021--2026 (\$1M start, 1\%-of-cash daily premium limit, equal weighting within a day), for fractional contracts, integer contracts, and fractional contracts with Reg-T margin reserved for short positions without netting. Growth under the stated accounting convention, not deployable return on capital.}
+\caption{Annualized cash-balance growth in the premium-budget experiment over 2021--2026. The account starts with \$1M and limits new-position premiums to 1\% of available cash per day, allocated equally across trades. Results are shown for fractional contracts, integer contracts, and fractional contracts with Reg-T margin reserved for short positions without netting. These figures describe growth under the stated accounting convention and should not be interpreted as deployable returns on capital.}
 \label{tab:capitalscaled}
 \end{table}
 
@@ -383,50 +389,63 @@ Logistic ($L_2$) & 7.4\% & 31.5\% & 1.9\% \\
 \label{sec:robustness}
 
 \noindent\textbf{Strategy-level breakdown.}
-The results are not confined to one denomination: the MLP earns \$0.99M from T1 trades and \$2.48M from K2 trades, and LightGBM is more evenly divided, with \$378K from T1 and \$304K from K2 (Sharpe ratios 0.85 and 1.74).
+The results are not confined to one of the two retained denominations. The MLP earns \$0.99M from T1 trades and \$2.48M from K2 trades. LightGBM is more evenly divided, with \$378K from T1 and \$304K from K2. The corresponding Sharpe ratios are 0.85 and 1.74.
 
 \noindent\textbf{By test period.}
-The unconditional strategy loses in four of six test periods, with year-to-year P\&L movements far larger than any model-selected strategy's (Figure~\ref{fig:equity}a). The MLP and ALiBi transformer are positive in every period; the plain transformer and logistic regression are negative only in 2022 ($-\$27$K and $-\$34$K), where the ALiBi transformer earns \$3K; LightGBM has one negative period.
+The unconditional strategy loses money in four of the six test periods. Its year-to-year P\&L movements are also substantially larger than those of the model-selected strategies (Figure~\ref{fig:equity}a). The MLP and ALiBi transformer are positive in every test period. The plain transformer and logistic regression are negative only in 2022, with losses of \$27K and \$34K, respectively. The ALiBi transformer earns \$3K in that year. LightGBM has one negative test period.
 
 \noindent\textbf{Excluding the partial year.}
-The 2026 sample covers approximately 107 trading days; restricting the unconditional benchmark to the five complete years 2021--2025 gives a \$17.45M loss and an active-day Sharpe of $-1.73$.
+The 2026 sample contains approximately 107 trading days. Restricting the unconditional benchmark to the five complete test years, 2021--2025, produces a loss of \$17.45M and an active-day Sharpe ratio of $-1.73$.
 
 \noindent\textbf{Training window.}
-For LightGBM, an expanding training window earns slightly more total P\&L than the three-year rolling window (\$734.9K versus \$686.2K), largely by trading more heavily late in the sample, but its Sharpe is lower in five of six test years and negative in 2024 ($-0.13$ versus 1.59). We retain the rolling window.
+We compare the three-year rolling window with an expanding training window for LightGBM. The expanding specification earns slightly more total P\&L (\$734.9K compared with \$686.2K), but its Sharpe ratio is lower in five of the six test years and negative in 2024 ($-0.13$, compared with 1.59 for the rolling specification). We therefore retain the three-year training window.
 
 \noindent\textbf{Early assignment.}
-Between 16\% and 27\% of selected trades have a short leg spanning an ex-dividend date, an early-assignment exposure the expiration labels do not represent. Removing them raises the active-day Sharpe from 1.25 to 1.42 (LightGBM), 1.92 to 2.19 (MLP), and 1.82 to 1.93 (logistic), and lowers it from 2.05 to 1.88 and 2.13 to 2.02 for the two transformers; all five retain positive aggregate P\&L.
+Between 16\% and 27\% of model-selected trades have a short leg that spans an ex-dividend date. We repeat the analysis after removing these trades. The active-day Sharpe increases from 1.25 to 1.42 for LightGBM, from 1.92 to 2.19 for the MLP, and from 1.82 to 1.93 for logistic regression. It decreases from 2.05 to 1.88 for the plain transformer and from 2.13 to 2.02 for the ALiBi transformer. All five strategies retain positive aggregate P\&L after the exclusion.
 
 \noindent\textbf{Selection rule.}
-Replacing the probability rule with a value-based rule that trades whenever predicted expected normalized return is positive raises LightGBM's total P\&L to \$3.80M but lowers its Sharpe to 0.94: the value rule selects substantially more marginal trades. We retain the pre-specified probability rule.
+The main specification trades when the calibrated probability of a positive net return is at least 0.5. As an alternative, we consider a value-based rule that trades whenever predicted expected normalized return is positive. For LightGBM, this increases total P\&L to \$3.80M but reduces the active-day Sharpe ratio to 0.94. We retain the pre-specified probability rule as the main specification.
 
 \noindent\textbf{Quote quality and the forward.}
-Stricter quote-quality screens applied individually do not change the qualitative results; applied simultaneously they leave only 5--7\% of candidates and remove aggregate profitability, so the results come primarily from ordinary quoted observations rather than a small subset meeting all of the strictest conditions. Reconstructing the violations with an independently estimated forward retains 66\% of episodes' adjusted-strike targets, and aggregate P\&L remains positive for all five specifications.
+We repeat the analysis under several stricter quote-quality screens. Applying the screens individually does not change the main results. Applying all screens simultaneously leaves only 5--7\% of the candidate trades and removes aggregate profitability.
+We also reconstruct the violations using an independently estimated forward. Under this specification, 66\% of episodes retain the same adjusted-strike targets, and aggregate P\&L remains positive for each model specification.
 
 \noindent\textbf{Regime concentration.}
-Dividing selected trades by the dividend--rate regime at the episode date, the MLP and logistic regression earn 93--95\% of their total P\&L in the zero-premium regime, while the transformers are less concentrated, with approximately 53--54\% of theirs from the later positive-rate regime.
+We divide the selected trades according to the dividend--rate regime at the time of the episode. The MLP and logistic regression earn 93--95\% of their total P\&L in the zero-premium regime. The transformer portfolios are less concentrated: approximately 53--54\% of their P\&L comes from the later positive-rate regime.
 %% VERIFY[regime-mapping]: confirm with coauthors that R1 = zero-premium regime
 %% and R3 = positive-rate regime in the task-2.4 artifact before submission.
 
 \noindent\textbf{Feature-selection stability.}
-Repeating the fold-specific feature selection with three independent seed sets gives an MLP active-day Sharpe of $2.16\pm0.38$, so the reported performance is not specific to a single selection run.
+We repeat the fold-specific feature-selection procedure using three independent sets of random seeds. The resulting MLP active-day Sharpe ratio is $2.16\pm0.38$, indicating that the reported result is not specific to a single feature-selection run.
 
 \noindent\textbf{Market exposure.}
-The strategies retain exposure to SPY. Although 82\% of trades have negative net delta at entry, a trade-level regression of MLP returns on the underlying return gives a positive coefficient of 16.5, which falls to 8.3 when the squared underlying move is added---consistent with substantial nonlinear exposure from the short near-dated option. We do not interpret the strategies as market-neutral.
+The selected strategies retain exposure to movements in SPY. Although 82\% of trades have negative net delta at entry, a trade-level regression of MLP returns on the underlying move produces a positive coefficient of 16.5. Adding the squared underlying move reduces this coefficient to 8.3, consistent with an important nonlinear component from the short near-dated option. We therefore do not interpret the strategies as market-neutral.
 
-\noindent\textbf{Classification metrics.}\phantomsection\label{tab:calibration}
-On the pooled test sample (positive-label rate approximately 13.8\%, 10 equal-width bins), the two transformers have the lowest expected calibration error (ECE 0.036 and 0.038, Brier 0.087), LightGBM and logistic regression both have ECE 0.049 (Brier 0.086 and 0.093), and the MLP has the highest ECE at 0.065 (Brier 0.113), consistent with the selected-tail result of Section~\ref{sec:calibration}. Calibration and P\&L order differently: the MLP has the largest total P\&L despite the highest calibration error.
+\noindent\textbf{Classification metrics.}
+Table~\ref{tab:calibration} reports the Brier score and expected calibration error (ECE) on the pooled test sample, where the positive-label rate is approximately 13.8\%. The two transformer specifications have the lowest ECE, at 0.036 and 0.038. LightGBM and logistic regression both have an ECE of 0.049, while the MLP has the highest value at 0.065. This is consistent with the selected-tail calibration result discussed in Section~\ref{sec:calibration}. Calibration performance does not have the same ordering as trading P\&L: the MLP has the largest total P\&L despite having the highest calibration error.
 
-\section{Discussion and Threats to Validity}
-\label{sec:limitations}
-Under the assumptions and trading conventions of the paper, the results support three conclusions. First, the American exercise feature can be ruled out for a substantial part of the sample: the two zero-premium categories cover 59.3\% of episodes, and the dividend-bound certificate classifies another 4.7\%. Second, trading all detected SPY violations produces negative aggregate normalized P\&L after commissions. Third, each of the four model families selects a smaller set of trades with positive aggregate out-of-sample P\&L. The results do not depend entirely on a complex architecture: logistic regression is profitable with a bootstrap interval excluding zero, as do the transformers at smaller totals than the MLP, whose largest total comes with an interval including zero because much of it derives from relatively few large winners.
-Several qualifications apply. Within SPY, the before- versus after-commission comparison shows that commissions account for the reversal under our normalization; it does not identify why the SPY results differ from those reported for SPX, since the two studies also differ in underlying, exercise and settlement conventions, sample period, data source, and episode construction. The American-option results are similarly specific: Propositions~\ref{prop:euro}--\ref{prop:cert} determine when early exercise cannot affect the four contract values or cannot be large enough to explain the observed violation, not that every resulting European-equivalent rectangle must satisfy TP2.
-The trading implementation has limitations. Early assignment is not simulated, although 16--27\% of selected trades have a short leg spanning an ex-dividend date; the baseline permits fractional contract quantities; margin is not imposed in the main P\&L, and a conservative Reg-T reserve reduces premium-budget growth to roughly 1--2\% per year; the forward-adjusted inequality remains an empirical benchmark for SPY under discrete distributions; and the selected portfolios retain exposure to the underlying and should not be read as market-neutral.
-Finally, the data distribution changes substantially over the sample: in the early folds the profitable-trade base rate falls by roughly a factor of four between training and testing, the one-year isotonic calibration is the only pipeline component that explicitly adjusts, and the remaining miscalibration is visible in some results. The fold-specific $F_k^\ast$ also contains no scale-invariant price-ratio feature while SPY changes substantially in level. All code and derived episode, feature, and label datasets will be released upon acceptance; the underlying vendor quote data cannot be redistributed.
+\begin{table}[t]
+\centering
+\footnotesize
+\begin{tabular}{lrr}
+\toprule
+Model & Brier & ECE \\
+\midrule
+LightGBM & 0.086 & 0.049 \\
+MLP (5-seed) & 0.113 & 0.065 \\
+Transformer (plain, 5-seed) & 0.087 & 0.036 \\
+Transformer (ALiBi, 5-seed) & 0.087 & 0.038 \\
+Logistic ($L_2$) & 0.093 & 0.049 \\
+\bottomrule
+\end{tabular}
+\caption{Brier score and expected calibration error (ECE, 10 equal-width bins) on the pooled 2021--2026 test sample. The positive-label rate is approximately 13.8\%.}
+\label{tab:calibration}
+\end{table}
 
 \section{Conclusion}
-TP2 is stronger than standard calendar monotonicity and does not follow from no-arbitrage alone; applying it to SPY requires accounting for American exercise. We derive sufficient conditions under which an American call has zero early-exercise premium and a dividend-based bound identifying violations too large to be explained by early exercise.
-On the trading side, the violations retain the high hit rate found in earlier work on SPX before commissions, but trading every detected candidate produces negative aggregate normalized P\&L after them, turning the empirical problem from unconditional trading into conditional trade selection. Over six chronological test periods in 2021--2026, LightGBM, an MLP, two transformer specifications, and logistic regression all select smaller subsets with positive aggregate out-of-sample P\&L. The relative performance depends on the criterion: the MLP has the largest normalized P\&L, the transformers the highest active-day Sharpe ratios, and LightGBM and the MLP the best baseline premium-budget growth. TP2 thus provides a useful way to define candidate trading events, while the decision to trade a particular violation depends on information available when the event occurs and on the costs of implementing the position.
+TP2 imposes a restriction on European call prices across strikes and maturities that is stronger than standard calendar monotonicity and does not follow from no-arbitrage alone. Applying this restriction to SPY requires accounting for the American exercise feature. We derive sufficient conditions under which an American call has zero early-exercise premium and a dividend-based bound that identifies violations too large to be explained by early exercise.
+We then study the trading implications of TP2 violations in SPY. Before commissions, the violations retain the high hit rate found in earlier work on SPX. After commissions, however, trading every detected candidate produces negative aggregate normalized P\&L. This turns the empirical problem from unconditional trading into one of conditional trade selection.
+Using six chronological test periods from 2021--2026, LightGBM, an MLP, two transformer specifications, and logistic regression all select smaller subsets with positive aggregate out-of-sample P\&L. The relative performance depends on the evaluation criterion: the MLP has the largest normalized P\&L, the transformers have the highest active-day Sharpe ratios, and LightGBM and the MLP perform best in the baseline premium-budget experiment. The results support using TP2 as a theory-based filter for candidate trading events and machine learning as a second-stage rule for deciding which of those events remain worth trading after costs.
 
 \bibliographystyle{ACM-Reference-Format}
 \begingroup
