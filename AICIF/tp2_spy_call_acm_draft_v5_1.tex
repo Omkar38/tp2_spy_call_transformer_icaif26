@@ -326,10 +326,12 @@ We also compare the selected portfolios with random subsets of the candidate tra
 
 \smallskip\noindent\textbf{Performance by Theory Category.}
 Table~\ref{tab:theorycat} partitions realized out-of-sample performance by the theory categories of Section~\ref{sec:american}, using the already-trained predictions. The unconditional book tracks the classification: near break-even where the theory certifies the violation as European-equivalent ($-\$2.32$M at Sharpe $-0.21$), with essentially the entire loss in the unresolved group ($-\$10.08$M at $-4.60$). The model selections split along the same boundary: the MLP earns \$3.24M of its \$3.47M total in the European-equivalent group, while the transformers and LightGBM attain their highest Sharpe ratios in the unresolved group (2.94, 3.09, 2.90). The machine-learning stage is therefore not only managing transaction costs---its gains concentrate where the theory certifies the European reading, and the attention models add value where the American wedge is live. The dividend-bound group is too small for separate conclusions.
-%% VERIFY[category-counts]: 85,668 + 771 + 33,036 = 119,475 evaluated episodes
-%% vs 125,002 test-span episodes in Section 2 (gap 5,527). Ask coauthors what
-%% the excluded episodes are (missing category or payoff data?) before
-%% camera-ready; the text says "evaluated" episodes to stay accurate.
+%% VERIFY[category-counts]: the artifact's per-category episode counts
+%% (85,668 / 771 / 33,036 = 119,475) do not reconcile with the 125,002
+%% test-span episodes of Section 2 (gap 5,527). The counts are therefore NOT
+%% printed in Table 4 (per-category P&L and Sharpe are unaffected; Section 2's
+%% shares carry the category sizes). When coauthors explain the gap, reinstate
+%% the counts with the correct qualifier. DO NOT invent reconciling numbers.
 
 
 \begin{figure}[tb]
@@ -367,7 +369,6 @@ Logistic ($L_2$) & 12{,}803 & \$1.35M & 1.82 & $[\$0.05\mathrm{M},\ \$2.73\mathr
 \begin{tabular}{lrrr}
 \toprule
  & Prop.~\ref{prop:euro} European-eq. & Prop.~\ref{prop:cert} div.-bound & Unresolved \\
- & 85{,}668 ep. & 771 ep. & 33{,}036 ep. \\
 \midrule
 Unconditional & $-\$2.32$M $(-0.21)$ & $-\$129$K $(-1.92)$ & $-\$10.08$M $(-4.60)$ \\
 MLP (5-seed) & \$3.24M $(2.06)$ & $-\$83$K $(-5.68)$ & \$319K $(1.13)$ \\
