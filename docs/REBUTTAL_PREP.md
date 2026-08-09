@@ -7,16 +7,22 @@ rebuttal is ready when reviews arrive. Ordered by priority.
 
 ## P0 — could decide the review outcome
 
-1. **Commission convention vs hold-to-expiry (reviewer's #1, reject-risk).**
-   The pipeline charges $1.30 per contract per leg (two $0.65 sides) while trades
-   are held to expiration (no closing execution; IBKR charges no exercise/assignment
-   fee). Questions for the code: (a) is $1.30 what the label code actually charges
-   per contract-leg? (b) If it is a doubled/conservative convention, compute the
-   **entry-only sensitivity**: unconditional P&L and each model's P&L at $0.65 per
-   contract per leg. The reviewer computes unconditional flips to ≈ +$24M entry-only —
-   if true, the framing "signal survives the spread but not commissions" needs the
-   sensitivity stated. Also quantify omitted exchange/regulatory/OCC pass-through fees,
-   which cut the other way. THIS IS THE SINGLE MOST IMPORTANT NUMBER TO HAVE READY.
+1. **Commission convention vs hold-to-expiry (reviewer's #1) — CODE CHECKED 2026-08-09.**
+   CONFIRMED: `scripts/build_liquid_exit_labels.py` (`_build_expiration_payoff_rows`)
+   charges `transaction_cost = 2.0 * commission_per_contract * |qty|` per traded leg
+   with `commission_per_contract = 0.65` (src/tp2rr2/config.py) — a round-trip charge —
+   while the expiration-payoff policy settles at intrinsic value with NO closing
+   execution. The same 2.0x convention appears in episode_mini_backtest*.py.
+   **Unconditional entry-only sensitivity (exact, from the committed brief-25
+   decomposition artifact):** commission drag is linear in the multiplier, so
+   entry-only drag = $73.51M / 2 = $36.76M, giving unconditional entry-only
+   normalized P&L of +$60.99M − $36.76M = **+$24.2M** (vs −$12.52M at 2.0x).
+   The reviewer's arithmetic is correct. **Per-model entry-only + win rates/Sharpes:
+   run `TP2MVTransformer/86_entry_only_commissions.py`** (committed; gates on the
+   −$12.52M and Table 1 reproductions). Also still needed: a one-paragraph rationale
+   for the 2.0x convention (conservative allowance for exchange/regulatory/OCC
+   pass-through fees and assignment handling not otherwise modeled) with rough fee
+   magnitudes. Bonus resolved: G uses entry MID prices (rev2-G closed; paper updated).
 
 2. **Joint quote-quality screen subsample (reviewer's #2).** For the 5–7% of candidates
    surviving all screens jointly: N, P&L, and a date-block CI. If the CI is wide and

@@ -248,9 +248,9 @@ Trades enter at quoted prices: long options at the ask, short options at the bid
 R^{s}=
 \frac{\mathrm{premium}+\Pi^{s}-\mathrm{cost}^{s}}{G},
 \]
-where $G$ is the gross entry exposure, the weighted sum of the entry prices of the two traded legs.
-%% VERIFY[rev2-G]: confirm the exact price convention in G (executed bid/ask vs
-%% mid) from the label code and state it here in one clause.
+where $G$ is the gross entry exposure, the weighted sum of the two traded legs' entry mid prices.
+%% rev2-G RESOLVED 2026-08-09 from scripts/build_liquid_exit_labels.py:
+%% entry_gross_exposure = sum over traded legs of |entry_mid * qty * multiplier|.
 For reporting we convert this return to a normalized dollar P\&L of $1000\,R^{s}$ per trade. The \$1{,}000 amount is a scaling convention, not the capital required to execute the position: gross entry exposures range from median values of about \$7--\$11 to a maximum of \$814{,}000. As in the source construction, position weights can imply fractional contract quantities, with commissions scaled proportionally. We do not simulate pin risk, assignment thresholds, stock delivery, or margin, and we do not credit interest on the initial premium or model financing, so the payoff calculation is a frictionless expiration-settlement equivalent rather than a full simulation of brokerage mechanics.
 The main analysis uses only the T1 and K2 denominations of Section~\ref{sec:denominations}, both of which short the near-dated $(\tilde K_2,T_1)$ contract. This restriction is imposed before model training: the alternative $T_2$ and $K_1$ denominations short the longer-dated contract and leave the short position exposed longer, and~\cite{glasserman2025tp2} finds T1 and K2 dominant in SPX across violations and years. The same holds in SPY: a LightGBM model trained without the restriction and allowed all four denominations loses \$37.23M, with an active-day Sharpe of $-1.76$ and one positive test period of six.
 
