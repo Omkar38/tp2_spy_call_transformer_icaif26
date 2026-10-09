@@ -1,0 +1,533 @@
+\documentclass[sigconf]{acmart}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
+\definecolor{cData}{RGB}{219,234,254}\definecolor{cDataB}{RGB}{37,99,235}
+\definecolor{cFeat}{RGB}{220,252,231}\definecolor{cFeatB}{RGB}{22,163,74}
+\definecolor{cModel}{RGB}{255,237,213}\definecolor{cModelB}{RGB}{234,88,12}
+\definecolor{cEval}{RGB}{237,233,254}\definecolor{cEvalB}{RGB}{124,58,237}
+
+\setlength{\textfloatsep}{4pt plus 2pt minus 2pt}
+\setlength{\floatsep}{4pt plus 2pt minus 2pt}
+\setlength{\intextsep}{4pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{2pt}
+\setlength{\belowcaptionskip}{1pt}
+\setlength{\abovedisplayskip}{3pt plus 1pt minus 2pt}
+\setlength{\belowdisplayskip}{3pt plus 1pt minus 2pt}
+\setlength{\abovedisplayshortskip}{2pt plus 1pt minus 1pt}
+\setlength{\belowdisplayshortskip}{2pt plus 1pt minus 1pt}
+
+\AtBeginDocument{%
+  \providecommand\BibTeX{{Bib\TeX}}}
+
+\setcopyright{none}
+\copyrightyear{2026}
+\acmYear{2026}
+\acmDOI{}
+\acmConference[ICAIF '26]{ACM International Conference on AI in Finance}{November 14--17, 2026}{Milan, Italy}
+\acmISBN{}
+
+%% ============================================================================
+%% v5 (THIS FILE is the canonical paper) -- language pass (2026-08-06) over the
+%% v4 content: undergraduate-readable prose, conference register, no evaluative
+%% adjectives; proofs unchanged; all numbers verbatim. The v4 files are frozen
+%% at the pre-pass state; edit v5 only. _v5_1 is the named twin, regenerated
+%% from v5, never edited directly.
+%% v3/v4 -- full reposition for ICAIF '26 (deadline 2026-08-02 AoE).
+%% NEW-MODEL SWITCH (2026-08-07): all model-dependent numbers now come from the
+%% leak-free per-fold nested pipeline (coauthor reports in docs/rerun_2026-08-07/;
+%% artifacts nested/perfect_pipeline_*.json and TP2MVTransformer/tables/
+%% action_list/* on the compute side, committed there with stated gates).
+%% LightGBM keeps its committed 149-feature fit (the F* selection never applied
+%% to it), so its rows are unchanged. Unconditional and episode-classification
+%% numbers are model-free and unchanged. Old-pipeline and new-pipeline numbers
+%% must never mix (no-mixing rule); this file switched wholesale in one commit.
+%%
+%% REMAINING GAPS after the switch (fill only from new-model artifacts):
+%% (a) 1.5x spread slippage was NOT rerun on the new models; every slippage
+%%     claim was removed from the text. Restore only from a new-model artifact.
+%% (b) win rate, mean trade return, skew (old Table 2 cols) and budget
+%%     Sharpe/MaxDD/Calmar (old Table 3 cols) were not recomputed; the tables
+%%     now report what the new artifacts support.
+%% (c) per-model selected-tail calibration exists in newmodel_reruns.json;
+%%     only the MLP values (0.695 / 37.7%) are quoted in text.
+%% (d) no-history / permuted-history ablations were not rerun on the new
+%%     pipeline; numeric ablation claims were removed.
+%% (e) VERIFY[regime-mapping]: regime-concentration run-in maps R1 -> zero-
+%%     premium regime, R3 -> positive-rate regime; confirm with coauthors.
+%% (f) brief-25 decomposition N (234,885) vs the 250,004 candidate count is
+%%     unreconciled; the text states shares and totals without that N.
+%% (g) VERIFY[rev2-G] (price convention inside G) remains open.
+%% (h) the half-sample Sharpe split (1.17 / 2.88) in the data section was an
+%%     old-pipeline number; removed. Restore only from a new-model artifact.
+%% DEADLINE 2026-08-09 AoE; the 8-page limit is the binding constraint.
+%% ============================================================================
+
+\begin{document}
+
+\title{Machine-Learned Conditional Trading of TP2 Violations in SPY American Call Options}
+\subtitle{From Near-Arbitrage Theory to Cost-Aware Selection}
+
+\author{Jyotir Patel}
+\affiliation{%
+  \institution{Stony Brook University}
+  \city{Stony Brook}
+  \state{New York}
+  \country{USA}}
+
+\author{Pawel Polak}
+\affiliation{%
+  \institution{Stony Brook University}
+  \city{Stony Brook}
+  \state{New York}
+  \country{USA}}
+
+\author{Omkar Lashkare}
+\affiliation{%
+  \institution{Stony Brook University}
+  \city{Stony Brook}
+  \state{New York}
+  \country{USA}}
+
+\renewcommand{\shortauthors}{Patel, Polak, and Lashkare}
+
+\begin{abstract}
+Total positivity of order two (TP2) imposes a restriction on European call prices across strikes and maturities: after the appropriate normalization, the price ratio of a higher-strike call to a lower-strike call should increase with maturity. This property holds in Black--Scholes and in a broader class of European option models~\cite{glasserman2026tp2theory}. Recent evidence further shows that TP2 violations in European SPX options can behave like near-arbitrage opportunities~\cite{glasserman2025tp2}. The same interpretation does not carry over directly to SPY. Its options are American, and early exercise around discrete dividends can itself produce an apparent TP2 violation.
+
+We first ask when a violation in SPY calls can still be evaluated using the European TP2 benchmark. We derive two contract-level tests: a sufficient condition for the early-exercise premium to be zero and a dividend-based bound that identifies violations too large to be explained by early exercise. Among 177{,}487 detected episodes from 2014--2026, these tests resolve 64.0\% of the sample. In the 2021--2026 trading period, 71.0\% of episodes are European-equivalent under the zero-premium conditions.
+
+We then ask whether TP2 violations are profitable after trading costs. Trading every detected candidate at quoted bid and ask prices wins 94.7\% of the time before commissions; adding them turns 250{,}004 trades into a \$12.52 million loss with a 12.9\% win rate. The signal survives the spread but not the modeled commission charge, so we treat trading as a conditional selection problem. In six walk-forward test periods, LightGBM, an MLP, a TP2-specific transformer, and logistic regression all select subsets with positive aggregate out-of-sample P\&L. The MLP produces the largest normalized P\&L at \$3.56 million, while the transformer variants achieve active-day Sharpe ratios of 2.19 and 1.88, with date-block bootstrap intervals on total P\&L that exclude zero. In a separate premium-budget experiment, LightGBM and the MLP grow the budget by 14.9\% and 13.0\% per year. Overall, TP2 violations in SPY do not support unconditional trading after costs, but their profitability is concentrated in subsets that can be identified using information available when the violation occurs.
+\end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+ <concept>
+  <concept_id>10010147.10010257.10010258.10010259</concept_id>
+  <concept_desc>Computing methodologies~Machine learning</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10010405.10010481.10010485</concept_id>
+  <concept_desc>Applied computing~Economics</concept_desc>
+  <concept_significance>300</concept_significance>
+ </concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Computing methodologies~Machine learning}
+\ccsdesc[300]{Applied computing~Economics}
+
+\keywords{options trading, total positivity, American options, statistical arbitrage, machine learning, backtest validation, model selection}
+
+\maketitle
+
+\section{Introduction}
+\label{sec:intro}
+
+Option-pricing models can impose restrictions on the shape of the option-price surface beyond those required by no-arbitrage. Total positivity of order two (TP2) is one such restriction. For European calls, TP2 requires that, after an appropriate normalization, the price ratio of a higher-strike call to a lower-strike call increases with maturity. Glasserman and Pirjol show that TP2 holds in Black--Scholes and in a broader class of models characterized by mean-residual-life growth of the underlying distributions~\cite{glasserman2026tp2theory}. TP2 implies the usual calendar monotonicity of call prices, but the converse is not true: an arbitrage-free model can violate TP2~\cite{glasserman2026tp2theory,glasserman2023convexity}. A TP2 violation is therefore not itself an arbitrage; it indicates the failure of a stronger restriction on the option-price surface.
+
+Recent evidence suggests that such violations can nevertheless have economic significance. Glasserman, Li, and Pirjol find that TP2 violations in European SPX options are infrequent, tend to disappear within a few days, and can support profitable trading: their preferred T1 and K2 constructions win nearly every trade at mid-prices, and T1 remains profitable under a more conservative quote-side screen that buys at the ask and sells at the bid~\cite{glasserman2025tp2}. This motivates our main question: what happens when the same idea is applied to SPY, which tracks the same index but whose options are American-style contracts on a dividend-paying ETF?
+
+American exercise creates an immediate complication: observed European prices enter the TP2 inequality directly, but an American call also contains an early-exercise premium that need not affect the four options in a rectangle in the same way. In particular, discrete cash distributions can generate an apparent TP2 violation even when the corresponding European option values do not violate the benchmark. We focus on calls because their early-exercise incentive is tied to these distributions; American puts add an interest incentive on the strike that can make early exercise relevant away from ex-dividend dates. We therefore begin by asking whether an observed TP2 violation in SPY can reasonably be interpreted using the European benchmark.
+
+We address this question in two ways. First, we derive sufficient conditions under which an American call has zero early-exercise premium and hence the same frictionless value as its European counterpart (Proposition~\ref{prop:euro}): no ex-dividend date before expiration or, more generally, remaining distributions small enough relative to the interest benefit from delaying payment of the strike. Second, when a positive premium is possible, we derive a dividend-based bound identifying violations too large to be explained by any admissible premium (Proposition~\ref{prop:cert}). Both tests are computable contract by contract from announced distributions, interest rates, and market quotes. Among 177{,}487 detected SPY episodes from 2014--2026, these tests resolve 64.0\% of the sample. In the 2021--2026 trading period, 71.0\% of episodes satisfy the zero-premium conditions and are therefore European-equivalent under the assumptions of our analysis.
+
+We next ask whether the detected violations remain profitable once realistic trading costs are included. We identify strong violations directly from NBBO bid and ask quotes, combine repeated observations into episodes, hold positions to expiration, and account for quoted spreads and commissions. Before commissions, trading every candidate at the quoted bid and ask wins 94.7\% of the time and gains \$61.0M in normalized P\&L; after commissions, the same 250{,}004 trades over 2021--2026 lose \$12.52 million, with a 12.9\% win rate and an active-day Sharpe ratio of $-1.01$. Under our assumptions, the TP2 signal survives quoted spreads but not the modeled commission charge, so the unconditional strategy that works in SPX does not carry over directly to SPY after costs.
+
+This result leads naturally to a conditional trading problem. Instead of searching the full option market for predictive patterns, we start with a set of candidate trades defined by TP2 theory and ask whether information available at the time of the violation can identify those that are likely to remain profitable after costs. We formulate this as a probabilistic classification problem and compare four model families: LightGBM, a multilayer perceptron, an attention-based model adapted to the TP2 episode structure, and logistic regression. The models are trained and evaluated chronologically in six walk-forward folds, calibrated on a separate validation year, and share the same pre-specified trading rule, so the evaluation covers not only classification performance but also whether the resulting decisions translate into positive realized trading outcomes.
+
+Conditional selection changes the outcome: all four model families select substantially fewer trades and produce positive aggregate out-of-sample P\&L over the 2021--2026 test periods. The five-seed MLP ensemble earns \$3.56 million under the \$1{,}000-per-trade normalization. The two transformer variants achieve active-day Sharpe ratios of 2.19 and 1.88, and the ALiBi transformer is profitable in all six test periods. Logistic regression also selects a profitable subset, indicating that the result is not specific to a high-capacity nonlinear model. Date-clustered bootstrap intervals exclude zero for both transformer variants and for logistic regression, while the MLP result is more concentrated in a smaller number of large winners. In a separate premium-budget experiment, LightGBM and the MLP produce the highest annualized budget growth, 14.9\% and 13.0\%. The contrast with the flat-normalization results shows that identifying profitable trades and allocating limited capital to them are distinct problems.
+
+Our approach can therefore be viewed as a sequence of filters. TP2 theory defines the candidate events. The American-option analysis determines when those events can be interpreted using the European TP2 benchmark, or when early exercise is insufficient to explain the observed violation. Machine-learning models then use information available at the event to decide whether the corresponding trade should be taken after costs. The data confirm this division of labor: unconditional losses concentrate in the category the theory cannot certify, and the models' gains split along the same boundary. The prediction problem is thus narrower than general option-return forecasting: all observations arise from the same theory-defined event, and machine learning is used only for the conditional trading decision.
+
+Our contributions are:
+\begin{enumerate}
+\item \textbf{TP2 violations for American SPY calls.}
+We derive sufficient conditions under which the early-exercise premium of an American call is zero and a dividend-based certificate for violations that are too large to be explained by early exercise (Propositions~\ref{prop:euro}--\ref{prop:cert}). Applied to the full SPY sample, they resolve 64.0\% of detected episodes and show how the fraction of European-equivalent observations changes with the interest-rate and dividend environment.
+\item \textbf{A cost-aware benchmark for trading TP2 violations in SPY.}
+We adapt the SPX trading construction of~\cite{glasserman2025tp2} to American SPY calls, accounting explicitly for quote construction, episode formation, forward adjustment under discrete distributions, expiration payoffs, and transaction costs. Strong violations are identified from executable quote sides, repeated signals are consolidated into episodes, and realized outcomes include quoted spreads and per-contract commissions. Under this construction, unconditional trading wins 94.7\% of trades before commissions but becomes unprofitable after commissions. This provides a direct benchmark for studying which detected violations remain economically useful after costs.
+\item \textbf{Walk-forward machine-learning selection conditional on TP2 violations.}
+We formulate the decision to trade a detected TP2 violation as an out-of-sample classification problem and compare tree-based, feed-forward, attention-based, and linear models under the same chronological evaluation protocol. Training, calibration, and testing are separated in time, and the models are evaluated using both predictive metrics and realized trading outcomes. All four model families select subsets with positive aggregate out-of-sample P\&L, while the robustness and capital-budget experiments show that statistical selection performance does not translate uniformly into portfolio performance under different sizing and cost assumptions.
+\end{enumerate}
+
+\section{TP2 Theory and the Trading Construction}
+\label{sec:related}
+
+\smallskip\noindent\textbf{The TP2 Property of Call Prices.}
+\label{sec:tp2theory}
+Let $C(K,T)=\mathbb{E}[(S_T-K)^+]$ denote the undiscounted European call value on a normalized underlying $\{S_t\}$ with $S_0=1$. Call prices satisfy TP2 if, for all $K_1\le K_2$ and $T_1\le T_2$,
+\begin{equation}
+C(K_1,T_1)\,C(K_2,T_2)\;\ge\;C(K_1,T_2)\,C(K_2,T_1).
+\label{eq:tp2}
+\end{equation}
+{\sloppy Equivalently, every $2\times2$ determinant
+$\det\left(\begin{smallmatrix} C(K_1,T_1) & C(K_1,T_2)\\ C(K_2,T_1) & C(K_2,T_2)\end{smallmatrix}\right)$
+is non-negative, and the ratio $C(K_2,T)/C(K_1,T)$ increases with maturity $T$. Glasserman and Pirjol show that this property holds for Black--Scholes calls at all strikes and, under regularity conditions, characterize it through mean-residual-life ordering of the underlying distributions~\cite{glasserman2026tp2theory}. TP2 implies calendar monotonicity, but it does not follow from no-arbitrage alone: an arbitrage-free European model can fail TP2~\cite{glasserman2026tp2theory,glasserman2023convexity}. An observed violation of Equation~\eqref{eq:tp2} is therefore a failure of the TP2 restriction, not by itself an arbitrage.\par}
+
+\smallskip\noindent\textbf{The Forward-Adjusted Empirical Condition and the Four Trade Denominations.}
+\label{sec:denominations}
+With interest rates and dividends, the TP2 comparison aligns strikes by forward moneyness. We let $F_T$ denote the parity-implied forward price, estimated cross-sectionally from put--call parity for each date and expiry, so the adjustment incorporates market expectations about dividends and rates. For $T_1<T_2$ and $K_1/F_{T_1}<K_2/F_{T_2}$, the corresponding inequality is
+\begin{equation}
+C(K_1,T_1)\,C(K_2,T_2)\;\ge\;C(\tilde K_1,T_2)\,C(\tilde K_2,T_1),
+\label{eq:tp2adj}
+\end{equation}
+where $\tilde K_1=K_1 F_{T_2}/F_{T_1}$ and $\tilde K_2=K_2 F_{T_1}/F_{T_2}$, rounded up to the next traded strike when the adjusted strike is not listed, following~\cite{glasserman2025tp2}. The adjustment comes from normalizing the dividend-paying asset by its forward price and assumes the normalized process satisfies the conditions of the European theory; because SPY pays discrete cash distributions, we treat Equation~\eqref{eq:tp2adj} throughout as an empirical benchmark rather than a TP2 theorem for SPY itself.
+
+Label the four contracts
+$A=C(K_1,T_1)$,
+$B=C(K_2,T_2)$,
+$C=C(\tilde K_1,T_2)$, and
+$D=C(\tilde K_2,T_1)$,
+with superscripts $a$ and $b$ for ask and bid quotes. A \emph{violation} reverses Equation~\eqref{eq:tp2adj}; a \emph{strong} violation also holds across quoted spreads, $A^aB^a<C^bD^b$. This is conservative with respect to the quoted spread, although it does not guarantee simultaneous execution at all four displayed prices.
+
+The trading construction of~\cite{glasserman2025tp2} buys the relatively underpriced pair and shorts the relatively overpriced pair. Four \emph{denominations} arise, depending on which two contracts are traded; the prices of the two non-traded contracts determine the position weights, so the premium received at entry equals the size of the violation for each denomination. We retain two of the four. Writing $X^w$ for the position weight determined by the entry price of contract $X$, their expiration payoffs are
+\[
+\begin{aligned}
+\Pi^{T_1} &= B^{w}\,(S_{T_1}-K_1)^+ - C^{w}\,(S_{T_1}-\tilde K_2)^+,\\
+\Pi^{K_2} &= A^{w}\,(S_{T_2}-K_2)^+ - C^{w}\,(S_{T_1}-\tilde K_2)^+ .
+\end{aligned}
+\]
+The $T_1$ denomination contains only near-maturity contracts; the $K_2$ denomination combines the short near-dated $(\tilde K_2,T_1)$ contract with the long $(K_2,T_2)$ contract; the alternative $T_2$ and $K_1$ denominations require short positions in the longer-dated leg. In SPX, T1 and K2 achieve the strongest results and the $T_2$ and $K_1$ denominations substantially weaker ones~\cite{glasserman2025tp2}; we restrict the main analysis to T1 and K2 (Section~\ref{sec:labels}), and a separate four-denomination check on SPY produces the same ordering.
+
+\smallskip\noindent\textbf{From European Theory to American Practice: Two Reductions and a Certificate.}
+\label{sec:american}
+The TP2 results above apply to European options~\cite{glasserman2026tp2theory}. SPY calls are American-style options on a dividend-paying ETF, so each observed value takes the form $C^{\mathrm{am}}(K,T)=C^{\mathrm{eu}}(K,T)+\pi(K,T)$ with an early-exercise premium $\pi(K,T)\ge0$~\cite{cosma2020earlyexercise}. Because the premium can differ across the four contracts, the European inequality does not apply directly to observed American prices. At each signal date we take that date as time zero and assume deterministic cash distributions and discount factors, frictionless exercise, and no ownership benefit other than the stated distributions; in the empirical implementation, the discount curve is approximated by the contemporaneous three-month rate.
+
+Three standard observations relate American and European call values~\cite{merton1973,black1975}. First, without dividends, $C^{\mathrm{eu}}_t\ge(S_t-Ke^{-r(T-t)})^+\ge(S_t-K)^+$ for $r\ge0$, so early exercise is not optimal and $C^{\mathrm{am}}=C^{\mathrm{eu}}$. Second, with discrete dividends the same argument applies on any interval containing no ex-dividend date, so early exercise can be optimal only immediately before an ex-date. Third, the premium is bounded by the present value of the remaining dividends, $\pi(K,T)\le\bar D(T):=\sum_{t_i\le T}\delta_i e^{-rt_i}$: for any exercise time $\tau$, the European lower bound $C^{\mathrm{eu}}_\tau\ge S_\tau-\mathrm{PV}_\tau(\text{dividends in }(\tau,T])-Ke^{-r(T-\tau)}$ implies
+\[
+(S_\tau-K)^+
+\le
+C^{\mathrm{eu}}_\tau
++
+\mathrm{PV}_\tau(\text{dividends in }(\tau,T]),
+\]
+and discounting to time zero, taking expectations, and optimizing over $\tau$ gives $C^{\mathrm{am}}\le C^{\mathrm{eu}}+\bar D(T)$, using the martingale property of the discounted European price. These observations give:
+
+\begin{proposition}[Sufficient condition for zero early-exercise premium]\label{prop:euro}
+If either (i) no ex-dividend date lies in $(0,T]$, or (ii) at every ex-date $t_i\le T$,
+\begin{equation}
+\textstyle\delta_i+\sum_{j>i,\,t_j\le T}\delta_j e^{-r(t_j-t_i)}\;\le\;K\big(1-e^{-r(T-t_i)}\big),
+\label{eq:smalldiv}
+\end{equation}
+then $\pi(K,T)=0$: the frictionless American value coincides with its European counterpart. When the condition holds for all four contracts of a rectangle, the American early-exercise feature does not affect their frictionless values, and the rectangle can be evaluated against the European-call TP2 benchmark, subject to the assumptions on the normalized underlying and dividend adjustment used in the European theory~\cite{glasserman2026tp2theory}.
+\end{proposition}
+\begin{proof}
+Part (i) follows from the no-dividend argument above. For part (ii), early exercise can be optimal only at an ex-dividend date $t_i$, immediately before which it is worth $(S_{t_i^-}-K)^+$; if $S_{t_i^-}\le K$ exercise is not optimal, so it suffices to consider in-the-money states. There, continuation is worth at least the value of holding to expiration, which the European lower bound puts at $S_{t_i^-}-\delta_i-\sum_{j>i,\,t_j\le T}\delta_je^{-r(t_j-t_i)}-Ke^{-r(T-t_i)}$. Continuation minus immediate exercise is therefore at least the right-hand side of Equation~\eqref{eq:smalldiv} minus its left-hand side, which is non-negative under the stated condition. Immediate exercise is never strictly better at an ex-dividend date, so $\pi=0$.
+\end{proof}
+\noindent
+Condition (ii) applies the classical single-dividend bound underlying Black's approximation~\cite{merton1973,black1975} at each ex-dividend date. Whether it holds depends on the strike, the remaining distributions, the interest rate, and the time from each ex-date to expiration; higher rates make it easier to satisfy because delaying payment of the strike becomes more valuable (for $\delta_i/K=0.003$, the single-dividend break-even horizon is about 55 calendar days at $r=2\%$ and 22 at $r=5\%$). When $r\approx0$, as in 2021, the condition fails for every contract spanning an ex-dividend date. This links the interest-rate environment directly to the fraction of contracts whose American and European values coincide.
+
+When Proposition~\ref{prop:euro} does not apply, the dividend bound can still determine whether early exercise is large enough to account for an observed violation.
+
+\begin{proposition}[Dividend-bound certificate]\label{prop:cert}
+Let $\bar D_i=\bar D(T_i)$ and let $V^q:=C^bD^b-A^aB^a$ be the strong-violation size. If $V^q>M:=\bar D_2\,D^{b}+\bar D_1\,C^{b}$, and each NBBO brackets a frictionless American reference value ($C^{\mathrm{bid}}\le C^{\mathrm{am},*}\le C^{\mathrm{ask}}$ per contract), then the corresponding European values also violate Equation~\eqref{eq:tp2adj}: the American early-exercise premium cannot explain the observed inequality.
+\end{proposition}
+\begin{proof}
+For the undervalued pair, $C^{\mathrm{eu}}\le C^{\mathrm{am},*}\le C^{\mathrm{ask}}$ bounds the European product above by $A^aB^a$. For each overvalued leg, $C^{\mathrm{eu}}\ge C^{\mathrm{am},*}-\bar D\ge C^{\mathrm{bid}}-\bar D$, and under the stated condition the relevant lower bounds are non-negative. Multiplying them gives $C^{\mathrm{eu}}(\tilde K_1,T_2)\,C^{\mathrm{eu}}(\tilde K_2,T_1)\ge C^bD^b-M$, where the omitted cross term $\bar D_1\bar D_2\ge0$ only increases the lower bound; combining with $V^q>M$ and the upper bound on the undervalued product gives the result.
+\end{proof}
+\noindent
+$M$ has the same units as the price products in Equation~\eqref{eq:tp2adj}, so its magnitude is more informative after normalization, for example as $M/S_0^2$. Each dividend term $\bar D_i$ is typically $0.3$--$0.6\%$ of the underlying price, $\bar D_1=0$ when no ex-dividend date precedes the near expiry, and the bound is computed per episode from announced dividends.
+
+These results divide the detected rectangles into four groups: \emph{no-distribution European-equivalent} (no ex-dividend date before $T_2$), \emph{dividend-spanning European-equivalent} (Proposition~\ref{prop:euro}(ii)), \emph{dividend-bound robust} (fails the zero-premium condition but satisfies Proposition~\ref{prop:cert}), and \emph{unresolved}. The last group is necessary because premia enter both sides of the inequality, so their nonnegativity alone does not sign the American-versus-European change in the TP2 determinant.
+Across all 177{,}487 episodes, using announced dividends and the FRED three-month rate, 52.2\% have no distribution before $T_2$, 7.1\% satisfy the dividend-spanning zero-premium condition, 4.7\% satisfy the dividend-bound certificate, and 36.0\% remain unresolved.\footnote{The dividend-spanning share is zero through 2022 and 10--19\% in 2023--2025, tracking the short rate; the no-distribution share is calendar-driven.} For the 2021--2026 test period (125{,}002 episodes), the corresponding shares are 61.0\%, 10.0\%, 0.7\%, and 28.2\%, so 71.0\% of test-period episodes satisfy one of the zero-premium conditions in Proposition~\ref{prop:euro}. The machine-learning models are trained and evaluated on episodes from all four groups.
+
+We restrict the analysis to calls because early exercise works differently for American puts: the call incentive considered here comes from discrete distributions, which permits the dividend-based conditions above, whereas puts also gain interest on the strike and can be exercised away from ex-dividend dates, so the reductions do not apply directly. The restriction concerns the American analysis; the European theory gives an RR2 property for puts, whose violations~\cite{glasserman2025tp2} studies in SPX.
+%% FIGURE-SLOT[regime] — SUSPENDED by review 2026-08-06 (one principal figure:
+%% equity curves). figures/regime_partition.pdf remains committed for talks.
+%% brief-15 remaining scope is covered by the regime-concentration run-in in
+%% the Results robustness block (task-2.4 artifact), pending VERIFY[regime-mapping].
+
+\smallskip\noindent\textbf{Related Machine-Learning Work.}
+Machine learning has been applied to option pricing, volatility-surface estimation, hedging, and cross-sectional option-return prediction~\cite{bali2023option}, with related work on execution and market microstructure~\cite{kearns2013mlmicrostructure}. Conditional on a detected TP2 violation, we predict whether the associated trade will be profitable after costs. We compare boosting, neural, attention-based, and linear models on the same episode-level problem, which also provides a comparison between tree-based and neural methods on tabular data~\cite{grinsztajn2022why,gorishniy2021revisiting}; the attention-based model adds a multivariate extension of ALiBi~\cite{press2022alibi,shaw2018self} with five learned distance slopes per head (Section~\ref{sec:transformer}). Because model comparisons vary across random seeds and experimental budgets~\cite{melis2018state,lucic2018gans,agarwal2021deep,bouthillier2021accounting,dodge2019show} and repeated strategy evaluation raises data-snooping and multiple-testing concerns~\cite{white2000reality,harvey2016crosssection,bailey2014deflated}, we use pre-specified trading rules, chronological test periods, and seed-averaged ensembles for the neural models.
+
+\section{Data and Episode Construction}
+\label{sec:data}
+
+\smallskip\noindent\textbf{Source, Scope, and a Regime Shift.}
+\label{sec:data-source}
+We use SPY American call options from 2014--2026; the rolling evaluation trains on data from 2017 onward, the earliest span with enough episodes to form the required training window. We exclude 2013 because its detected count is inconsistent with the rest of the sample: 49{,}090 episodes versus 438 in 2014, a violation rate about thirty times the other years' median, entirely in weekly expiries---a coverage anomaly rather than a market event.
+Option quotes are closing NBBO observations from Databento \texttt{OPRA.PILLAR}: for each contract and trading day, the last one-minute quote at or before 16:00~ET; daily volume and open interest come from the same source. The panel covers the full listed SPY chain, approximately 55--60 million contract-session observations. SPY closing prices and realized distributions come from the SPDR series. Several variables are computed rather than taken from the feed: mid prices, Black--Scholes implied volatility inverted from the mid, spot delta, theta per calendar day, vega, and the parity-implied forward of Section~\ref{sec:denominations}.
+We require valid quotes for all four contracts of a rectangle, available forward-adjusted strikes, and complete payoff and feature data. After these filters, the modeling sample contains 177{,}487 unique episodes between 2014-02-03 and 2026-06-04, each generating two candidate trades (T1 and K2).
+Episode frequency rises by roughly two orders of magnitude across the sample, and the profitable-label rate shifts sharply between training and test periods: 27--73\% during 2017--2020 but 11--16\% during 2021--2026. Pair-weighted training base rates in the first four folds are 39.9\%, 61.3\%, 46.8\%, and 43.4\% against test rates of 14.5--16.0\%, while the last two folds are closer (15.4\% and 15.6\% training versus 11.1\% test). The only pipeline component that explicitly adapts to this shift is the one-year isotonic calibration of Section~\ref{sec:calibration}.
+
+\smallskip\noindent\textbf{Episode Detection and Tracking.}
+\label{sec:episode-tracking}
+We distinguish several units. A \emph{daily violating pair} is a date-specific observation of a TP2 rectangle; a \emph{rectangle} is the four contracts; an \emph{episode} combines consecutive daily observations of the same rectangle; a \emph{candidate trade} is an episode paired with one of the two retained denominations; a \emph{selected trade} is a candidate passing the model's trading rule.
+An episode starts when the rectangle satisfies the strong-violation condition $A^aB^a<C^bD^b$ with the rounded forward-adjusted strikes of Section~\ref{sec:denominations}; because the same violation can persist for several days, consecutive observations keyed on the same near-leg contract are merged into a single episode rather than counted repeatedly. This differs from the permanent-correction measure of the SPX study, which follows a fixed pair until its final violation date; our definition is a sampling convention that avoids treating repeated signals as independent training examples. Across the full history, 2{,}430{,}220 daily observations consolidate into 2{,}098{,}213 pair episodes, with a median duration of one session and a maximum of 14; after the strong-violation, T1/K2, payoff, cost, and feature requirements, 177{,}487 episodes remain.
+We also construct an event-time panel covering the 20 sessions before each signal through expiration. The median normalized violation premium of Equation~\eqref{eq:tp2adj} is approximately flat and slightly negative before the event, rises sharply on day 0 by construction, and then declines toward zero, consistent with the fast SPX correction~\cite{glasserman2025tp2}. Model inputs are truncated at day 0: no post-signal information is used as a feature.
+
+\smallskip\noindent\textbf{Labels, Costs, and the T1/K2 Restriction.}
+\label{sec:labels}
+Candidate trades are held to expiration, and terminal payoffs are computed from the intrinsic-value expressions $\Pi^{T_1}$ and $\Pi^{K_2}$ of Section~\ref{sec:denominations}, the convention of the SPX study~\cite{glasserman2025tp2}. It also fits our episode construction: 88.66\% of episodes last one session, so most never present a post-signal violation date for a reversion exit. As a robustness check, an exit-at-reversion rule on the selected trades yields \$3.94M less aggregate P\&L than holding to expiration, so the expiration convention is not concealing a stronger alternative exit.
+Trades enter at quoted prices: long options at the ask, short options at the bid. We charge \$1.30 per contract per leg in total, as two \$0.65 sides, matching the published Interactive Brokers IBKR Lite rate per execution.\footnote{\url{https://www.interactivebrokers.com/en/pricing/commissions-options.php}, accessed 2026.} Both sides are charged as a conservative convention although expiring positions incur no closing execution; with entry-only commissions the unconditional aggregate of Section~\ref{sec:results} would be roughly $+\$24$M rather than $-\$12.52$M, so the unconditional sign depends on this convention, while the model selections are profitable under the stricter one. For denomination $s\in\{T_1,K_2\}$, normalized net profit is
+\[
+R^{s}=
+\frac{\mathrm{premium}+\Pi^{s}-\mathrm{cost}^{s}}{G},
+\]
+where $G$ is the gross entry exposure, the weighted sum of the two traded legs' entry mid prices.
+%% rev2-G RESOLVED 2026-08-09 from scripts/build_liquid_exit_labels.py:
+%% entry_gross_exposure = sum over traded legs of |entry_mid * qty * multiplier|.
+For reporting we convert this return to a normalized dollar P\&L of $1000\,R^{s}$ per trade---a scaling convention, not the capital required to execute the position: gross entry exposures range from medians of about \$7--\$11 to a maximum of \$814{,}000. As in the source construction, position weights can imply fractional contract quantities, with commissions scaled proportionally. We do not simulate pin risk, assignment thresholds, stock delivery, or margin, and we credit no interest on the initial premium, so the payoff calculation is a frictionless expiration-settlement equivalent rather than a full simulation of brokerage mechanics.
+The main analysis uses only the T1 and K2 denominations of Section~\ref{sec:denominations}, both of which short the near-dated $(\tilde K_2,T_1)$ contract. This restriction is imposed before model training: the alternative $T_2$ and $K_1$ denominations short the longer-dated contract and leave the short position exposed longer, and~\cite{glasserman2025tp2} finds T1 and K2 dominant in SPX across violations and years. The same holds in SPY: a LightGBM model trained without the restriction and allowed all four denominations loses \$37.23M, with an active-day Sharpe of $-1.76$ and one positive test period of six.
+
+\section{Models and Evaluation Protocol}
+\label{sec:method}
+
+For episode $i$ and denomination $s\in\{T_1,K_2\}$, define
+\[
+Y_{i,s}=\mathbf 1\{R^{\mathrm{net}}_{i,s}>0\},
+\qquad
+p_{i,s}=
+\Pr\big(Y_{i,s}=1\mid X_{i,s}\big),
+\]
+where $X_{i,s}$ is the information available for that episode and denomination and $R^{\mathrm{net}}_{i,s}$ is the normalized net profit of Section~\ref{sec:labels}: the prediction problem is whether a candidate trade will have positive net profit after the costs in the backtest. Each episode has two candidate actions; we compare their calibrated probabilities and trade the denomination with the higher probability if it is at least 0.5, and otherwise take no trade. All stages follow calendar time: detection, feature construction, training, validation-year calibration, and test-year evaluation.
+
+\smallskip\noindent\textbf{Walk-Forward Design.}
+We use six rolling folds with test years 2021 through 2026. Each fold trains on three years, calibrates on the following year, and tests on the next: the first fold is 2017--2019 / 2020 / 2021 and the last is 2022--2024 / 2025 / 2026. Feature scaling comes from the training period and isotonic calibration from the validation year, applied unchanged to the test year; no test-period observations enter feature selection, scaling, calibration, or fitting. Because positions are held to expiration, a small fraction of validation-year trades resolve inside the test year; we purge these boundary-crossers from the validation set before calibration (and, for the neural models, before early stopping) and retrain, so all reported results account for this expiry overlap.
+
+\smallskip\noindent\textbf{Feature Construction.}
+\label{sec:features}
+We use the contract labels $A$--$D$ of Section~\ref{sec:denominations}; a feature prefixed by one of these letters refers to that option, with $D$ the short near-dated leg. The 149 candidate features come from quote-level quantities and simple transforms, serving four roles in the trading decision. \emph{Contract and surface location}: per-leg bid, ask, mid, strike, calendar days to expiration, implied volatility, and delta, theta, and vega, plus the rectangle's forward prices, adjusted strikes, strike and maturity gaps, implied-volatility slopes and term spreads across the legs, and the underlying SPY price; these locate the rectangle on the surface and term structure, which shapes how a violation can revert. \emph{Short-leg risk}: the price, Greeks, moneyness, and time to expiry of leg $D$, the near-dated contract that both retained denominations short. These are the observable determinants of the early-exercise premium in Proposition~\ref{prop:euro}: delta and moneyness indicate whether exercise can be optimal at all, time to expiry whether an ex-dividend date is spanned, and theta the time value forfeited by exercising early. \emph{Liquidity}: quoted sizes, open interest, and absolute and relative bid--ask spreads for the legs and the traded pair; costs are the binding friction in Section~\ref{sec:results}, so net profit depends on the quotes a trade must cross. \emph{Violation size and history}: the mid-price violation size $C_{\mathrm{mid}}D_{\mathrm{mid}}-A_{\mathrm{mid}}B_{\mathrm{mid}}$, the strong-violation ratio $C^bD^b/(A^aB^a)$ that measures the violation net of the spread, the pre-signal maximum of the normalized violation, and the signal month; the premium collected at entry equals the violation size, so these measure the room a trade has to clear its costs.
+Feature selection is performed separately within each fold: using only that fold's training period, five seeded LightGBM runs~\cite{ke2017lightgbm} rank the candidates by a combination of split gain, split count, and permutation importance, and the averaged ranking's top 48 features, denoted $F_k^\ast$, are retained. Neither the calibration nor the test year enters this procedure; averaging across runs stabilizes the ranking near the cutoff.
+$F_k^\ast$ contains no dividend or interest-rate variables: the dividend fields in our data can reflect amounts finalized after the signal date, so they are excluded from the features and enter only the theory-side classification of Section~\ref{sec:american}, which interprets the sample rather than trades it. The features thus supply the raw materials the theory identifies as relevant---the violation's size and the market determinants of the early-exercise premium---but not the classification itself. The models are free to ignore the theoretical boundary; that their realized gains align with it (Table~\ref{tab:theorycat}) indicates these variables matter in the way the propositions predict.
+The MLP, transformer, and logistic regression use the same fold-specific $F_k^\ast$. LightGBM is treated differently: its main specification uses the full 149-candidate pool, because the 48-feature subset is selected by LightGBM importance measures, so restricting LightGBM to it is not a neutral common-input comparison (the 48-feature version raises its Sharpe by 0.46). Comparisons among the MLP, transformer, and logistic regression therefore hold the feature set fixed; comparisons with LightGBM also reflect input dimension. The downstream models receive feature values only, never LightGBM predictions.
+
+\smallskip\noindent\textbf{Model Specifications.}
+All models use the same six folds and the same $p\ge0.5$ trading rule. LightGBM uses 350 trees, learning rate 0.04, 31 leaves, and balanced class weights. The MLP has layers 48-64-32-1 with ReLU activations, trained with Adam, $L_2$ regularization, and early stopping. The transformer has hidden dimension 64 and four attention heads, attends to up to 64 prior episode tokens, and is trained with AdamW, validation-loss checkpointing, and an auxiliary Huber loss on realized returns. An $L_2$-regularized logistic regression on $F_k^\ast$ provides a linear benchmark. The MLP and transformer results use five random seeds, with raw probabilities averaged across seeds before a single isotonic calibration, because results vary across initializations; LightGBM and logistic regression are each fit once.
+
+\smallskip\noindent\textbf{The Transformer and Its Distance-Biased Variant.}
+\label{sec:transformer}
+Each episode-denomination pair forms a token containing its $F_k^\ast$ features, a strategy embedding, and calendar information. To incorporate recent market context, the current token cross-attends to tokens from the 64 most recent episodes on strictly earlier calendar dates---chosen by date only, never by label or outcome---zero-padded when fewer exist. The attention logits are
+$a^{h}_{ij}=q_i\!\cdot\!k_j/\sqrt{d}\,+\,\text{(same/cross-strategy bonus)}$.
+
+\noindent\textbf{MV-ALiBi variant.}
+We also consider a distance-biased attention mechanism. Standard ALiBi adds a linear distance penalty to attention scores~\cite{press2022alibi}; we replace the scalar distance with a vector of five episode-level distances, subtracting $m_h^{\top}d_{ij}$ from the logit, where $d_{ij}$ collects the five distances between episodes $i$ and $j$ and $m_h$ is a learned vector of positive slopes for head $h$, related to relative-position attention~\cite{shaw2018self}. The two specifications perform similarly: the plain transformer's active-day Sharpe is 2.05 and the distance-biased version's 2.13, with one additional positive test period, most of the difference coming from 2022; the date-block interval for the difference includes zero, so we report both and do not interpret the gap as a main result.
+
+\smallskip\noindent\textbf{Calibration and Trade Selection.}
+\label{sec:calibration}
+Raw probabilities are calibrated by isotonic regression~\cite{zadrozny2002transforming}: for each fold, the calibration function is estimated on validation-year predictions and applied unchanged to the test year. The rule is fixed across models and years; the threshold is not optimized by model or test year.
+For the neural models, the same validation year serves both checkpoint selection and calibration; we note this reuse of the validation sample. Calibration also does not fully absorb the temporal change in the label rate: among trades selected by the MLP, the average calibrated probability is 0.695 while the realized win rate is 37.7\%, so the one-year calibration remains substantially miscalibrated in the selected tail. On the pooled test sample, the transformers have the lowest calibration errors of the five specifications (Section~\ref{sec:results}).
+
+\section{Results}
+\label{sec:results}
+
+The theoretical results determine how the empirical TP2 violations should be interpreted. Proposition~\ref{prop:euro} identifies episodes for which the American call values coincide with their European counterparts, while Proposition~\ref{prop:cert} identifies additional violations that cannot be explained by early-exercise premia. The trading experiments then ask a different question: conditional on a TP2 violation having been detected, can it be traded profitably after costs? The machine-learning models are used for this second-stage selection problem and are evaluated across all theoretical categories.
+All models use the same six walk-forward folds, the same validation-year isotonic calibration, and the same pre-specified $p\ge0.5$ trading rule. Each episode generates at most one trade, ties resolved toward T1; portfolio statistics are computed identically for every model. The active-day Sharpe ratio is the annualized ratio ($\times\sqrt{252}$) of mean daily P\&L to its standard deviation, calculated over days on which the strategy has at least one open position; days without positions are omitted. We report total normalized P\&L, active-day Sharpe, a date-block bootstrap 95\% interval~\cite{kunsch1989} for total P\&L, the number of test periods with positive P\&L, and a separate premium-budget experiment below.
+
+\smallskip\noindent\textbf{Unconditional Baseline and Model Comparison.}
+Trading all 250{,}004 candidate trades over 2021--2026 loses \$12.52M under the \$1{,}000-per-trade normalization, with active-day Sharpe $-1.01$, maximum drawdown $-\$24.51$M, a 12.9\% win rate, and two of six test periods profitable.
+This differs from the SPX evidence~\cite{glasserman2025tp2}; in SPY, the result turns on commissions. Before them---still entering long positions at the ask and short positions at the bid---the same trades win 94.7\% of the time and generate \$61.0M in normalized P\&L; adding the per-contract commissions produces the \$12.52M loss above. Thus, within our SPY construction, the detected violations survive the quoted bid--ask spread but not the modeled commission charge when every candidate is traded. This decomposition concerns the SPY backtest itself; it does not attribute the difference between our results and the SPX results of~\cite{glasserman2025tp2} to commissions alone.
+The machine-learning models are used to select a smaller subset of these candidates. Each model produces positive aggregate out-of-sample P\&L over the 2021--2026 test periods (Table~\ref{tab:consolidated} and Figure~\ref{fig:equity}). Logistic regression earns \$1.35M with an active-day Sharpe ratio of 1.82. The MLP ensemble has the largest total P\&L at \$3.56M. The plain and ALiBi transformers earn \$886K and \$819K, with Sharpe ratios of 2.19 and 1.88, respectively. The ALiBi transformer is profitable in all six test periods.
+The date-block bootstrap intervals exclude zero for the two transformer variants and for logistic regression. The corresponding interval for the MLP includes zero, with its aggregate P\&L more concentrated in a smaller number of large winning trades.
+We also compare the selected portfolios with random subsets of the candidate trades. Across 1{,}000 random draws matched to each model's number of selected trades, average P\&L is $-\$0.71$M. A stricter comparison also matches the model's active days and trades per day. Under this comparison, only 8\% of random draws exceed the plain transformer's total P\&L. For LightGBM, 67\% of the matched random draws exceed its P\&L, suggesting its edge lies mainly in day selection rather than within-day trade choice.
+
+\smallskip\noindent\textbf{Performance by Theory Category.}
+Table~\ref{tab:theorycat} partitions realized out-of-sample performance by the theory categories of Section~\ref{sec:american}, using the already-trained predictions. The unconditional book tracks the classification: near break-even where the theory certifies the violation as European-equivalent ($-\$2.32$M at Sharpe $-0.21$), with most of the loss in the unresolved group ($-\$10.08$M at $-4.60$). The model selections split along the same boundary: the MLP earns \$3.24M of its \$3.47M total in the European-equivalent group, while the transformers and LightGBM attain their highest Sharpe ratios in the unresolved group (2.94, 3.09, 2.90). The machine-learning stage is therefore not only managing transaction costs---the MLP's gains concentrate where the theory certifies the European reading, and the attention models add value where the American wedge is live. The dividend-bound group is too small for separate conclusions.
+%% VERIFY[category-counts]: the artifact's per-category episode counts
+%% (85,668 / 771 / 33,036 = 119,475) do not reconcile with the 125,002
+%% test-span episodes of Section 2 (gap 5,527). The counts are therefore NOT
+%% printed in Table 4 (per-category P&L and Sharpe are unaffected; Section 2's
+%% shares carry the category sizes). When coauthors explain the gap, reinstate
+%% the counts with the correct qualifier. DO NOT invent reconciling numbers.
+
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.45\linewidth]{figures/equity_curves_newmodel.pdf}
+\caption{Test periods 2021--2026. (a)~Cumulative normalized P\&L (\$1{,}000-per-trade convention): the unconditional strategy loses \$12.52M; each model-selected portfolio ends positive. (b)~Premium-budget account equity (\$1M start, 1\%-of-cash daily limit) for LightGBM, the MLP, and the plain transformer.}
+\label{fig:equity}
+\end{figure}
+
+\begin{table}[tb]
+\centering
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrcc}
+\toprule
+Method & Trades & Total P\&L & Active-day Sharpe & 95\% CI on P\&L & Pos.\ periods \\
+\midrule
+Unconditional & 250{,}004 & $-$\$12.52M & $-$1.01 & --- & 2/6 \\
+LightGBM & 21{,}128 & \$1.18M & 1.75 & $[\$0.18\mathrm{M},\ \$2.49\mathrm{M}]$ & 5/6 \\
+MLP (5-seed) & 19{,}719 & \$3.56M & 1.81 & $[-\$1.05\mathrm{M},\ \$10.44\mathrm{M}]$ & 5/6 \\
+Transformer (plain, 5-seed) & 15{,}402 & \$886K & 2.19 & $[\$0.06\mathrm{M},\ \$1.77\mathrm{M}]$ & 6/6 \\
+Transformer (ALiBi, 5-seed) & 15{,}551 & \$819K & 1.88 & $[-\$0.07\mathrm{M},\ \$1.76\mathrm{M}]$ & 6/6 \\
+Logistic ($L_2$) & 12{,}860 & \$1.35M & 1.82 & $[\$0.16\mathrm{M},\ \$2.98\mathrm{M}]$ & 5/6 \\
+\bottomrule
+\end{tabular}%
+}
+\caption{Model comparison over the 2021--2026 test periods; 2026 is partial. The MLP and transformer results are five-seed ensembles, with raw probabilities averaged before calibration. LightGBM and logistic regression are single fits. The 95\% intervals are from a date-block bootstrap of total P\&L; dollar values use the \$1{,}000-per-trade normalization.}
+\label{tab:consolidated}
+\end{table}
+
+\begin{table}[tb]
+\centering
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrr}
+\toprule
+ & Prop.~\ref{prop:euro} European-eq. & Prop.~\ref{prop:cert} div.-bound & Unresolved \\
+\midrule
+Unconditional & $-\$2.32$M $(-0.21)$ & $-\$129$K $(-1.92)$ & $-\$10.08$M $(-4.60)$ \\
+MLP (5-seed) & \$3.37M $(1.96)$ & $-\$83$K $(-5.68)$ & \$265K $(0.93)$ \\
+Transformer (plain) & \$427K $(1.45)$ & $-\$14$K $(-0.60)$ & \$472K $(2.99)$ \\
+Transformer (ALiBi) & \$366K $(1.10)$ & \$12K $(0.61)$ & \$441K $(2.98)$ \\
+LightGBM & \$732K $(1.34)$ & $-\$10$K $(-0.34)$ & \$453K $(3.08)$ \\
+\bottomrule
+\end{tabular}%
+}
+\caption{Realized P\&L by theory-derived category, 2021--2026, with active-day Sharpe in parentheses. Selected trades are partitioned after training; no models are retrained. The unconditional row trades every candidate.}
+\label{tab:theorycat}
+\end{table}
+
+%% NOTE (PI decision 2026-08-05): the operating-point-confound contribution,
+%% seed-dispersion discussion, matched-selectivity run-in, and selectivity
+%% figure were removed in full. Do not reintroduce them. The committed artifacts
+%% (selectivity_sweep.csv, mlp5_sweep_verdict.json, DSR JSONs, figure) remain
+%% the internal record. Table 2 reports the five-seed protocol only.
+
+\smallskip\noindent\textbf{Equal-Weight Premium-Budget Accounting Experiment.}
+\label{sec:capitalscaled}
+The \$1{,}000-per-trade normalization is useful for comparing trade selection, but it does not impose a capital constraint. We therefore run a second experiment that tracks an account starting with \$1M in cash. On each day, at most 1\% of available cash can be committed to premiums on new positions, with the amount divided equally across trades selected that day.
+This accounting differs from the gross-exposure sizing convention used in the SPX study~\cite{glasserman2025tp2}. We therefore interpret the results as growth in a normalized cash account rather than as an estimate of deployable return on capital.
+Under the baseline fractional-contract convention, LightGBM and the MLP produce the highest annualized cash-balance growth, at 14.9\% and 13.0\%, respectively. Logistic regression grows at 7.4\%, while the plain and ALiBi transformers produce 5.6\% and 3.5\% (Table~\ref{tab:capitalscaled} and Figure~\ref{fig:equity}b).
+These figures depend on the sizing assumptions. Requiring integer numbers of contracts changes both the ranking and the growth rates. Reserving Reg-T margin for short positions, without allowing margin netting, reduces annualized growth to approximately 1--2\% for all models. The differences between Tables~\ref{tab:consolidated} and~\ref{tab:capitalscaled} show that selecting profitable trades and allocating limited capital across those trades are separate problems.
+
+\begin{table}[tb]
+\centering
+\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+Model & Premium & Integer & Reg-T margin \\
+\midrule
+Unconditional & $-11.7\%$ & --- & --- \\
+LightGBM & 14.9\% & 12.4\% & 0.6\% \\
+MLP (5-seed) & 13.0\% & 8.9\% & 1.2\% \\
+Transformer (plain, 5-seed) & 5.6\% & 6.8\% & 2.5\% \\
+Transformer (ALiBi, 5-seed) & 3.5\% & 5.5\% & 2.3\% \\
+Logistic ($L_2$) & 7.4\% & 27.5\% & 1.8\% \\
+\bottomrule
+\end{tabular}
+\caption{Annualized cash-balance growth in the premium-budget experiment over 2021--2026. The account starts with \$1M and limits new-position premiums to 1\% of available cash per day, allocated equally across trades, for fractional contracts, integer contracts, and fractional contracts with Reg-T margin reserved for short positions without netting. Growth under the stated accounting convention, not deployable returns on capital.}
+\label{tab:capitalscaled}
+\end{table}
+
+\smallskip\noindent\textbf{Robustness.}
+\label{sec:robustness}
+
+\noindent\textbf{Strategy-level breakdown.}
+The results are not confined to one of the two retained denominations. The MLP earns \$0.99M from T1 trades and \$2.48M from K2 trades. LightGBM is more evenly divided, with \$378K from T1 and \$304K from K2. LightGBM's corresponding Sharpe ratios are 0.85 and 1.74.
+
+\noindent\textbf{By test period.}
+The unconditional strategy loses money in four of the six test periods, with year-to-year swings far larger than any model-selected strategy's (Figure~\ref{fig:equity}a). The ALiBi transformer is positive in every test period. The MLP, plain transformer, and logistic regression are negative only in 2022, with losses of \$10K, \$27K, and \$34K, respectively. The ALiBi transformer earns \$3K in that year. LightGBM has one negative test period.
+
+\noindent\textbf{Excluding the partial year.}
+The 2026 sample covers approximately 107 trading days; restricting the unconditional benchmark to the five complete test years, 2021--2025, produces a loss of \$17.45M and an active-day Sharpe ratio of $-1.73$. The $F_k^\ast$ models remain profitable without 2026, whose contribution is \$32K for the MLP, \$179K and \$182K for the transformers, and \$608K for logistic regression.
+
+\noindent\textbf{Training window.}
+We compare the three-year rolling window with an expanding training window for LightGBM. The expanding specification earns slightly more total P\&L by trading more heavily late in the sample, but its Sharpe ratio is lower in five of the six test years and negative in 2024 ($-0.13$, against 1.59 for the rolling window). We therefore retain the three-year training window.
+
+\noindent\textbf{Early assignment.}
+Between 16\% and 27\% of model-selected trades have a short leg that spans an ex-dividend date. We repeat the analysis after removing these trades. The active-day Sharpe increases from 1.25 to 1.42 for LightGBM, from 1.92 to 2.19 for the MLP, and from 1.82 to 1.93 for logistic regression. It decreases from 2.05 to 1.88 for the plain transformer and from 2.13 to 2.02 for the ALiBi transformer. All five strategies retain positive aggregate P\&L after the exclusion.
+
+\noindent\textbf{Selection rule.}
+The main specification trades when the calibrated probability of a positive net return is at least 0.5. As an alternative, we consider a value-based rule that trains a regressor of $\mathbb{E}[R\mid X]$ and trades the higher-$\mathbb{E}[R]$ denomination whenever the predicted expected normalized return is positive. For LightGBM, this increases total P\&L to \$3.80M but reduces the active-day Sharpe ratio to 0.94; applied to the MLP it yields \$1.85M at a Sharpe of 0.86. The probability threshold is therefore the higher-Sharpe rule for both model families, and we retain it as the pre-specified main specification.
+
+\noindent\textbf{Quote quality and the forward.}
+Under stricter quote-quality screens (positive bids, minimum quoted size, maximum relative spread, minimum open interest and volume) applied individually, the main results are unchanged; applied jointly, they leave only 5--7\% of the candidate trades and remove aggregate profitability.
+We also reconstruct the violations using a forward built from spot, dividends, and the short rate instead of put--call parity. Under this specification, 66\% of episodes retain the same adjusted-strike targets, and aggregate P\&L remains positive for each model specification.
+
+\noindent\textbf{Feature-selection stability.}
+We repeat the fold-specific feature-selection procedure using three independent sets of random seeds. The resulting MLP active-day Sharpe ratio is $2.16\pm0.38$, indicating that the reported result is not specific to a single feature-selection run.
+
+\noindent\textbf{Market exposure.}
+The selected strategies retain exposure to movements in SPY. Although 82\% of trades have negative net delta at entry, a trade-level regression of MLP returns on the underlying move produces a positive coefficient of 16.5. Adding the squared underlying move reduces this coefficient to 8.3, consistent with an important nonlinear component from the short near-dated option. We therefore do not interpret the strategies as market-neutral.
+
+\noindent\textbf{Classification metrics.}
+On the pooled test sample (positive-label rate approximately 13.8\%, 10 equal-width bins), the two transformer specifications are the best calibrated, with expected calibration error (ECE) 0.036 and 0.038 at Brier score 0.087; LightGBM and logistic regression both have ECE 0.049 (Brier 0.086 and 0.093), and the MLP has the highest ECE at 0.065 (Brier 0.113). This is consistent with the selected-tail calibration result discussed in Section~\ref{sec:calibration}. Calibration performance does not have the same ordering as trading P\&L: the MLP has the largest total P\&L despite having the highest calibration error.
+
+\section{Conclusion}
+TP2 imposes a restriction on European call prices across strikes and maturities that is stronger than standard calendar monotonicity and does not follow from no-arbitrage alone. Applying this restriction to SPY requires accounting for the American exercise feature. We derive sufficient conditions under which an American call has zero early-exercise premium and a dividend-based bound that identifies violations too large to be explained by early exercise.
+We then study the trading implications of TP2 violations in SPY. Before commissions, the violations retain the high hit rate found in earlier work on SPX. After commissions, however, trading every detected candidate produces negative aggregate normalized P\&L. This turns the empirical problem from unconditional trading into one of conditional trade selection.
+Using six chronological test periods from 2021--2026, LightGBM, an MLP, two transformer specifications, and logistic regression all select smaller subsets with positive aggregate out-of-sample P\&L. The relative performance depends on the evaluation criterion: the MLP has the largest normalized P\&L, the transformers have the highest active-day Sharpe ratios, and LightGBM and the MLP perform best in the baseline premium-budget experiment. The results support using TP2 as a theory-based filter for candidate trading events and machine learning as a second-stage rule for deciding which of those events remain worth trading after costs.
+
+\bibliographystyle{ACM-Reference-Format}
+\begingroup
+\scriptsize
+\setlength{\itemsep}{0pt}
+\setlength{\parskip}{0pt}
+\begin{thebibliography}{27}
+\setlength{\itemsep}{0pt}
+
+\bibitem{glasserman2025tp2}
+Paul Glasserman, Mike Li, and Dan Pirjol. 2025. Trading TP\textsubscript{2} Option Violations. \textit{Quantitative Finance} 25, 8 (2025), 1177--1198. \url{https://doi.org/10.1080/14697688.2025.2538597}
+
+\bibitem{press2022alibi}
+Ofir Press, Noah A. Smith, and Mike Lewis. 2022. Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation. In \textit{ICLR}.
+
+\bibitem{glasserman2026tp2theory}
+Paul Glasserman and Dan Pirjol. 2026. When Are Option Prices TP\textsubscript{2}? \textit{Mathematical Finance} 36, 3 (2026), 571--594. \url{https://doi.org/10.1111/mafi.70024}
+
+\bibitem{glasserman2023convexity}
+Paul Glasserman and Dan Pirjol. 2023. Total Positivity and Relative Convexity of Option Prices. \textit{Frontiers of Mathematical Finance} 2, 1 (2023), 1--32. \url{https://doi.org/10.3934/fmf.2023001}
+
+\bibitem{merton1973}
+Robert C. Merton. 1973. Theory of Rational Option Pricing. \textit{Bell Journal of Economics and Management Science} 4, 1 (1973), 141--183. \url{https://doi.org/10.2307/3003143}
+
+\bibitem{black1975}
+Fischer Black. 1975. Fact and Fantasy in the Use of Options. \textit{Financial Analysts Journal} 31, 4 (1975), 36--41, 61--72. \url{https://doi.org/10.2469/faj.v31.n4.36}
+
+\bibitem{ke2017lightgbm}
+Guolin Ke et al. 2017. LightGBM: A Highly Efficient Gradient Boosting Decision Tree. In \textit{NeurIPS 30}, 3146--3154.
+
+\bibitem{zadrozny2002transforming}
+Bianca Zadrozny and Charles Elkan. 2002. Transforming Classifier Scores into Accurate Multiclass Probability Estimates. In \textit{KDD}, 694--699. \url{https://doi.org/10.1145/775047.775151}
+
+\bibitem{cosma2020earlyexercise}
+Antonio Cosma et al. 2020. Early Exercise Decision in American Options with Dividends, Stochastic Volatility, and Jumps. \textit{J.\ Financial and Quantitative Analysis} 55, 1 (2020), 331--356. \url{https://doi.org/10.1017/S0022109018001229}
+
+\bibitem{kearns2013mlmicrostructure}
+Michael Kearns and Yuriy Nevmyvaka. 2013. Machine Learning for Market Microstructure and High Frequency Trading. In \textit{High-Frequency Trading}. Risk Books.
+
+\bibitem{kunsch1989}
+Hans R. K\"unsch. 1989. The Jackknife and the Bootstrap for General Stationary Observations. \textit{Annals of Statistics} 17, 3 (1989), 1217--1241. \url{https://doi.org/10.1214/aos/1176347265}
+
+\bibitem{bailey2014deflated}
+David H. Bailey and Marcos L\'opez de Prado. 2014. The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality. \textit{Journal of Portfolio Management} 40, 5 (2014), 94--107. \url{https://doi.org/10.3905/jpm.2014.40.5.094}
+
+\bibitem{harvey2016crosssection}
+Campbell R. Harvey, Yan Liu, and Heqing Zhu. 2016. $\ldots$ and the Cross-Section of Expected Returns. \textit{Rev.\ Financial Studies} 29, 1 (2016), 5--68. \url{https://doi.org/10.1093/rfs/hhv059}
+
+\bibitem{white2000reality}
+Halbert White. 2000. A Reality Check for Data Snooping. \textit{Econometrica} 68, 5 (2000), 1097--1126. \url{https://doi.org/10.1111/1468-0262.00152}
+
+\bibitem{bouthillier2021accounting}
+Xavier Bouthillier et al. 2021. Accounting for Variance in Machine Learning Benchmarks. In \textit{MLSys} 3.
+
+\bibitem{dodge2019show}
+Jesse Dodge et al. 2019. Show Your Work: Improved Reporting of Experimental Results. In \textit{EMNLP-IJCNLP}, 2185--2194. \url{https://doi.org/10.18653/v1/D19-1224}
+
+\bibitem{melis2018state}
+G\'abor Melis, Chris Dyer, and Phil Blunsom. 2018. On the State of the Art of Evaluation in Neural Language Models. In \textit{ICLR}.
+
+\bibitem{lucic2018gans}
+Mario Lucic et al. 2018. Are GANs Created Equal? A Large-Scale Study. In \textit{NeurIPS 31}, 698--707.
+
+\bibitem{agarwal2021deep}
+Rishabh Agarwal et al. 2021. Deep Reinforcement Learning at the Edge of the Statistical Precipice. In \textit{NeurIPS 34}, 29304--29320.
+
+\bibitem{grinsztajn2022why}
+L\'eo Grinsztajn, Edouard Oyallon, and Ga\"el Varoquaux. 2022. Why Do Tree-Based Models Still Outperform Deep Learning on Typical Tabular Data? In \textit{NeurIPS 35 D\&B}. \url{https://doi.org/10.52202/068431-0037}
+
+\bibitem{gorishniy2021revisiting}
+Yury Gorishniy et al. 2021. Revisiting Deep Learning Models for Tabular Data. In \textit{NeurIPS 34}, 18932--18943.
+
+\bibitem{shaw2018self}
+Peter Shaw, Jakob Uszkoreit, and Ashish Vaswani. 2018. Self-Attention with Relative Position Representations. In \textit{NAACL-HLT}, 464--468. \url{https://doi.org/10.18653/v1/N18-2074}
+
+\bibitem{bali2023option}
+Turan G. Bali et al. 2023. Option Return Predictability with Machine Learning and Big Data. \textit{Rev.\ Financial Studies} 36, 9 (2023), 3548--3602. \url{https://doi.org/10.1093/rfs/hhad017}
+
+\end{thebibliography}
+\endgroup
+
+\end{document}
