@@ -259,12 +259,7 @@ We also construct an event-time panel covering the 20 sessions before each signa
 \smallskip\noindent\textbf{Labels, Costs, and the T1/K2 Restriction.}
 \label{sec:labels}
 Candidate trades are held to expiration, and terminal payoffs are computed from the intrinsic-value expressions $\Pi^{T_1}$ and $\Pi^{K_2}$ of Section~\ref{sec:denominations}, the convention of the SPX study~\cite{glasserman2025tp2}. It also fits our episode construction: 88.66\% of episodes last one session, so most never present a post-signal violation date for a reversion exit. As a robustness check, an exit-at-reversion rule on the selected trades yields \$3.94M less aggregate P\&L than holding to expiration, so the expiration convention is not concealing a stronger alternative exit.
-Trades enter at quoted prices: long options at the ask, short options at the bid. We charge \$1.30 per contract per leg in total, as two \$0.65 sides, matching the published Interactive Brokers IBKR Lite rate per execution.\footnote{\url{https://www.interactivebrokers.com/en/pricing/commissions-options.php}, accessed 2026.} Both sides are charged as a conservative convention although expiring positions incur no closing execution; with entry-only commissions the unconditional aggregate of Section~\ref{sec:results} would be roughly $+\$24$M rather than $-\$12.52$M, so the unconditional sign depends on this convention, while the model selections are profitable under the stricter one. For denomination $s\in\{T_1,K_2\}$, normalized net profit is
-\[
-R^{s}=
-\frac{\mathrm{premium}+\Pi^{s}-\mathrm{cost}^{s}}{G},
-\]
-where $G$ is the gross entry exposure, the weighted sum of the two traded legs' entry mid prices.
+Trades enter at quoted prices: long options at the ask, short options at the bid. We charge \$1.30 per contract per leg in total, as two \$0.65 sides, matching the published Interactive Brokers IBKR Lite rate per execution.\footnote{\url{https://www.interactivebrokers.com/en/pricing/commissions-options.php}, accessed 2026.} Both sides are charged as a conservative convention although expiring positions incur no closing execution; with entry-only commissions the unconditional aggregate of Section~\ref{sec:results} would be roughly $+\$24$M rather than $-\$12.52$M, so the unconditional sign depends on this convention, while the model selections are profitable under the stricter one. For denomination $s\in\{T_1,K_2\}$, normalized net profit is $R^{s}=(\mathrm{premium}+\Pi^{s}-\mathrm{cost}^{s})/G$, where $G$ is the gross entry exposure, the weighted sum of the two traded legs' entry mid prices.
 %% rev2-G RESOLVED 2026-08-09 from scripts/build_liquid_exit_labels.py:
 %% entry_gross_exposure = sum over traded legs of |entry_mid * qty * multiplier|.
 For reporting we convert this return to a normalized dollar P\&L of $1000\,R^{s}$ per trade---a scaling convention, not the capital required to execute the position: gross entry exposures range from medians of about \$7--\$11 to a maximum of \$814{,}000. As in the source construction, position weights can imply fractional contract quantities, with commissions scaled proportionally. We do not simulate pin risk, assignment thresholds, stock delivery, or margin, and we credit no interest on the initial premium, so the payoff calculation is a frictionless expiration-settlement equivalent rather than a full simulation of brokerage mechanics.
@@ -273,14 +268,7 @@ The main analysis uses only the T1 and K2 denominations of Section~\ref{sec:deno
 \section{Models and Evaluation Protocol}
 \label{sec:method}
 
-For episode $i$ and denomination $s\in\{T_1,K_2\}$, define
-\[
-Y_{i,s}=\mathbf 1\{R^{\mathrm{net}}_{i,s}>0\},
-\qquad
-p_{i,s}=
-\Pr\big(Y_{i,s}=1\mid X_{i,s}\big),
-\]
-where $X_{i,s}$ is the information available for that episode and denomination and $R^{\mathrm{net}}_{i,s}$ is the normalized net profit of Section~\ref{sec:labels}: the prediction problem is whether a candidate trade will have positive net profit after the costs in the backtest. Each episode has two candidate actions; we compare their calibrated probabilities and trade the denomination with the higher probability if it is at least 0.5, and otherwise take no trade. All stages follow calendar time: detection, feature construction, training, validation-year calibration, and test-year evaluation.
+For episode $i$ and denomination $s\in\{T_1,K_2\}$, define $Y_{i,s}=\mathbf 1\{R^{\mathrm{net}}_{i,s}>0\}$ and $p_{i,s}=\Pr(Y_{i,s}=1\mid X_{i,s})$, where $X_{i,s}$ is the information available for that episode and denomination and $R^{\mathrm{net}}_{i,s}$ is the normalized net profit of Section~\ref{sec:labels}: the prediction problem is whether a candidate trade will have positive net profit after the costs in the backtest. Each episode has two candidate actions; we compare their calibrated probabilities and trade the denomination with the higher probability if it is at least 0.5, and otherwise take no trade. All stages follow calendar time: detection, feature construction, training, validation-year calibration, and test-year evaluation.
 
 \smallskip\noindent\textbf{Walk-Forward Design.}
 We use six rolling folds with test years 2021 through 2026. Each fold trains on three years, calibrates on the following year, and tests on the next: the first fold is 2017--2019 / 2020 / 2021 and the last is 2022--2024 / 2025 / 2026. Feature scaling comes from the training period and isotonic calibration from the validation year, applied unchanged to the test year; no test-period observations enter feature selection, scaling, calibration, or fitting. Because positions are held to expiration, a small fraction of validation-year trades resolve inside the test year; we purge these boundary-crossers from the validation set before calibration (and, for the neural models, before early stopping) and retrain, so all reported results account for this expiry overlap.
@@ -333,7 +321,15 @@ Table~\ref{tab:theorycat} partitions realized out-of-sample performance by the t
 
 \begin{figure}[tb]
 \centering
-\includegraphics[width=0.45\linewidth]{figures/equity_curves_newmodel.pdf}
+% Panels (a)/(b) cropped from the committed stacked PDF (260.7x368.4pt) and set side by side.
+% (a) keeps y in [0,177.5] from top; its year labels are the bottom strip of (b) (shared x-axis).
+\begin{minipage}[b]{0.495\linewidth}\centering
+\includegraphics[width=\linewidth,trim=0 190.86 0 0,clip]{figures/equity_curves_newmodel.pdf}\\[-0.5pt]
+\includegraphics[width=\linewidth,trim=0 0 0 352.4,clip]{figures/equity_curves_newmodel.pdf}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.495\linewidth}\centering
+\includegraphics[width=\linewidth,trim=0 0 0 177.5,clip]{figures/equity_curves_newmodel.pdf}
+\end{minipage}
 \caption{Test periods 2021--2026. (a)~Cumulative normalized P\&L (\$1{,}000-per-trade convention): the unconditional strategy loses \$12.52M; each model-selected portfolio ends positive. (b)~Premium-budget account equity (\$1M start, 1\%-of-cash daily limit) for LightGBM, the MLP, and the plain transformer.}
 \label{fig:equity}
 \end{figure}
