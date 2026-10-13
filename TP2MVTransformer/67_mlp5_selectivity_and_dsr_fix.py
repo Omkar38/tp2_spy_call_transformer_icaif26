@@ -18,7 +18,7 @@
     seed-inclusive n_trials sensitivity (21 configs, and 25 = 21 + the 4 additional
     seed draws behind the reported single-seed maximum).
 
-Also regenerates AICIF/figures/selectivity_curves.pdf with the MLP (5) curve and
+Also regenerates icaif26/figures/selectivity_curves.pdf with the MLP (5) curve and
 prints the matched-N read-off at the Transformer (5) operating point (N~=14,338),
 which is the number the ICAIF draft's Section "Matched-Selectivity Curves" awaits
 (marked TODO-RERUN[67] in tp2_spy_call_acm_draft_v3.tex).
@@ -301,7 +301,7 @@ def main() -> None:
             json.dump(res, open(path, "w"), indent=2, default=float)
             print(f"  DSR {name}({seeds}) n_trials={n_trials}: {res['DSR']:.3f}  -> {path.name}")
 
-    print("\nDONE. Paper slots: grep 'TODO-RERUN\\[67\\]' AICIF/tp2_spy_call_acm_draft_v3.tex")
+    print("\nDONE. Paper slots: grep 'TODO-RERUN\\[67\\]' icaif26/tp2_spy_call_acm_draft_v3.tex")
 
 
 if __name__ == "__main__":

@@ -99,7 +99,7 @@ within-day edge (random beats new plain only 8\%, was 62\% for committed plain).
 Read-only re-check: all gates pass (new Table 2 reproduces, decomposition net $=-$\$12.52M, calibration
 complete, derived-on-old artifacts confirmed fixed to new models). \textbf{Git:} local is ahead of origin with
 the rerun work and now includes the merged PI v5 (8 pages) --- \emph{not pushed}. \textbf{Equity figures:}
-\code{AICIF/figures/equity\_curves.pdf} (committed-model, matches committed Table 2/3) and
+\code{icaif26/figures/equity\_curves.pdf} (committed-model, matches committed Table 2/3) and
 \code{equity\_curves\_newmodel.pdf} (new-model set). \textbf{Read next:} \code{rerun\_outputs\_summary.pdf}
 and this file. No v5 tex edited --- insertions await the PI pass.
 \end{document}

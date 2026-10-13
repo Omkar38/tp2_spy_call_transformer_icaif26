@@ -92,5 +92,5 @@ independently locatable rather than only implied by the script that made it):
 - `TP2MVTransformer/professor_update_2026-07-14.pdf` — rendered output of Stage 12's `30_make_professor_update_2026_07_14.py`; source of the Section 5.3 significance-test p-values and the Section 5.6 SPX benchmark table.
 
 ## Stage 14 — Paper
-- `AICIF/tp2_spy_call_acm_draft.tex`
-- `AICIF/figures/lifecycle_normalized_pressure_band.png` — copied from Stage 6's output for direct inclusion in the paper.
+- `icaif26/tp2_spy_call_acm_draft.tex`
+- `icaif26/figures/lifecycle_normalized_pressure_band.png` — copied from Stage 6's output for direct inclusion in the paper.

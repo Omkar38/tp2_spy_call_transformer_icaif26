@@ -1,6 +1,6 @@
 """#1 selectivity curves: Sharpe & Sortino vs number of trades N, as the
 calibrated selection threshold sweeps. Adjudicates whether the model ranking
-is an operating-point artifact. Writes AICIF/figures/selectivity_curves.pdf."""
+is an operating-point artifact. Writes icaif26/figures/selectivity_curves.pdf."""
 from pathlib import Path
 import os
 os.environ.setdefault("MPLCONFIGDIR", str(Path(__file__).resolve().parents[1] / "TP2MVTransformer" / ".mplconfig"))

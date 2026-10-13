@@ -5,14 +5,14 @@
 Revision pass against Prof. Polak's action list (`docs/professor_action_list_tracker.md`).
 
 ## Files
-- `AICIF/tp2_spy_call_acm_draft_v2.tex` — working draft, **anonymous** (`review,anonymous`).
-- `AICIF/tp2_spy_call_acm_draft_v2_1.tex` / `.pdf` — **same body + the three named authors** (`review`, de-anonymized). Bodies are in sync; edit both (or keep v2_1 as the live named copy).
+- `icaif26/tp2_spy_call_acm_draft_v2.tex` — working draft, **anonymous** (`review,anonymous`).
+- `icaif26/tp2_spy_call_acm_draft_v2_1.tex` / `.pdf` — **same body + the three named authors** (`review`, de-anonymized). Bodies are in sync; edit both (or keep v2_1 as the live named copy).
 - `docs/professor_action_list_tracker.md` — granular item-by-item tracker.
 
 ## How to build (this machine)
 LaTeX is via **tectonic** (installed with `brew install tectonic`; auto-fetches `acmart`). No system TeX / `pdflatex`.
 ```bash
-tectonic -X compile AICIF/tp2_spy_call_acm_draft_v2_1.tex --outdir <dir>
+tectonic -X compile icaif26/tp2_spy_call_acm_draft_v2_1.tex --outdir <dir>
 pdfinfo <dir>/..._v2_1.pdf | grep Pages     # page check (poppler)
 ```
 Non-transformer results harness: `scratchpad/harness.py` (reads the committed token dataset; reproduces MLP/LightGBM/etc.). Reproduced **MLP(1) $1.41M/2.60 and MLP(5) $3.43M/1.66 exactly**.

@@ -15,9 +15,9 @@ Research paper for **ICAIF 2026** (ACM conference, Milan/Bocconi; hard **8-page*
 1. `README.md` — top-level scope, data policy, caveats.
 2. `docs/pipeline.md` — plain-English pipeline narrative.
 3. `docs/archive2_to_transformer_pipeline_tracker.md` — stage-by-stage tracker (input -> script -> output -> purpose). Last updated 2026-07-12.
-4. `AICIF/PIPELINE_FILES.md` — the exact start-to-end file lineage behind the paper's numbers (the "pure" pipeline). Note: it still references the old draft name `tp2_spy_call_acm_draft.tex`; the live paper is the v2 file below.
+4. `icaif26/PIPELINE_FILES.md` — the exact start-to-end file lineage behind the paper's numbers (the "pure" pipeline). Note: it still references the old draft name `tp2_spy_call_acm_draft.tex`; the live paper is the v2 file below.
 5. `TP2MVTransformer/README.md` — the transformer sub-stage.
-6. `AICIF/tp2_spy_call_acm_draft_v2.tex` — **THE CURRENT, FINAL, WORKING DRAFT.** This is what to edit. Not v1 (`tp2_spy_call_acm_draft.tex`), not v3.
+6. `icaif26/tp2_spy_call_acm_draft_v2.tex` — **THE CURRENT, FINAL, WORKING DRAFT.** This is what to edit. Not v1 (`tp2_spy_call_acm_draft.tex`), not v3.
 
 ## 3. Repo geography
 - `Archive-2/` — professor-provided raw SPY option data (not in git).
@@ -25,7 +25,7 @@ Research paper for **ICAIF 2026** (ACM conference, Milan/Bocconi; hard **8-page*
 - `data/` — `processed/`, `features/`, `labels/`, `ml/` parquets (the source of truth for every number).
 - `ExpiryMLCorrection/` — corrected expiry-label ML pipeline (LightGBM baselines).
 - `TP2MVTransformer/` — numbered scripts (`01_...` to `57_...`) for the MLP baseline, the TP2-MV-ALiBi transformer, ablations, capital-scaled backtest, bootstrap, calibration, and report generators. Outputs in its `data/`, `tables/`, `figures/`.
-- `AICIF/` — the ICAIF paper (.tex/.pdf), `figures/`, `PIPELINE_FILES.md`.
+- `icaif26/` — the ICAIF paper (.tex/.pdf), `figures/`, `PIPELINE_FILES.md`.
 - `ProfessorMeetingScript/` — speaking scripts + agendas for professor meetings.
 - `docs/agent_memory/` — a mirror of the persistent project memory; read `project_icaif_submission_status.md` for the most current state.
 

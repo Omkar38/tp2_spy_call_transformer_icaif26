@@ -1,6 +1,6 @@
 # Professor Action List — Tracker (Polak email, 2026-07-30)
 
-Working tracker for the ICAIF v2 draft (`AICIF/tp2_spy_call_acm_draft_v2.tex`).
+Working tracker for the ICAIF v2 draft (`icaif26/tp2_spy_call_acm_draft_v2.tex`).
 Deadline **Aug 2, 2026**. Hard **8-page** limit (paper currently 8/8).
 
 Legend — **Feasibility**: ✅ doable now, no training; 🧮 compute from committed token
